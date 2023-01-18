@@ -1,5 +1,6 @@
 import SolutionExplorer from '../solutionExplorer/solutionExplorer.js'
 import Toolbox from '../toolbox/toolbox.js'
+import localStorageHelper from '../../utils/localStorageHelper.js'
 
 class Aside extends HTMLElement {
   constructor() {
@@ -83,6 +84,16 @@ class Aside extends HTMLElement {
         }
       })
     })
+    if (localStorageHelper.getItem('openNav') === 'false') {
+      document.querySelector('.aside-body').style.display = 'none'
+      document.querySelector('.aside-header').style.display = 'none'
+      // document.querySelector('.openNav').style.display = 'block'
+      document.querySelector('.resizable-left').style.width = '100%'
+      document.querySelector('.resizable-right').style.right = '0px'
+      document.querySelector('.resizable-right').style.width = '50px'
+      document.querySelector('.resizable-right').style.removeProperty('left')
+      document.querySelector('.resizer').style.display = 'none'
+    }
   }
 }
 

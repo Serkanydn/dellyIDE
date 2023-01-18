@@ -77,12 +77,12 @@ class FileEditor extends HTMLElement {
     }
     Resizable.initialise('main', sizes)
 
-    // Resizable.resizingEnded = () => {
-    //   const resWrap1 = `${Resizable.activeContentWindows[0].children[0].width / window.innerWidth}`
-    //   const resWrap2 = `${Resizable.activeContentWindows[0].children[1].width / window.innerWidth}`
-    //   localStorageHelper.setItem('resWrap1', resWrap1)
-    //   localStorageHelper.setItem('resWrap2', resWrap2)
-    // }
+    Resizable.resizingEnded = () => {
+      const resWrap1 = `${Resizable.activeContentWindows[0].children[0].width / window.innerWidth}`
+      const resWrap2 = `${Resizable.activeContentWindows[0].children[1].width / window.innerWidth}`
+      localStorageHelper.setItem('resWrap1', resWrap1)
+      localStorageHelper.setItem('resWrap2', resWrap2)
+    }
   }
 
   connectedCallback() {

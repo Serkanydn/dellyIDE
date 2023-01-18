@@ -314,7 +314,7 @@ class Header extends HTMLElement {
             icon: `${localStorageHelper.getItem('openNav') === 'true' ? 'chevronright' : 'chevronleft'}`,
             hint: `${localStorageHelper.getItem('openNav') === 'true' ? 'Hide panel' : 'Show panel'}`,
             onClick() {
-              if (localStorageHelper.getItem('openNav') === 'true') {
+              if (localStorageHelper.getItem("openNav") === "true") {
                 localStorageHelper.setItem('openNav', 'false')
                 document.querySelector('.aside-body').style.display = 'none'
                 document.querySelector('.aside-header').style.display = 'none'
@@ -323,28 +323,22 @@ class Header extends HTMLElement {
                 document.querySelector('.resizable-right').style.width = '0px'
                 document.querySelector('.resizable-right').style.removeProperty('left')
                 document.querySelector('.resizer').style.display = 'none'
-                this.option('icon', 'chevronleft')
-                this.option('hint', 'Show panel')
-                localStorageHelper.setItem('resWrap1', '1')
-                localStorageHelper.setItem('resWrap2', '0')
-                Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
-                Resizable.activeContentWindows[0].childrenResize()
+                this.option("icon", "chevronleft")
+                this.option("hint", "Show Panel ")
                 return
               }
-              localStorageHelper.setItem('openNav', 'true')
-              document.querySelector('.aside-body').style.display = 'flex'
-              document.querySelector('.aside-header').style.display = 'flex'
-              document.querySelector('.resizable-right').style.left = '896px'
-              document.querySelector('.resizable-right').style.width = '4000px'
-              document.querySelector('.resizable-right').style.removeProperty('right')
-              document.querySelector('.resizer').style.display = 'block'
-              Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
-              Resizable.activeContentWindows[0].childrenResize()
-
-              localStorageHelper.setItem('resWrap1', '0.7')
-              localStorageHelper.setItem('resWrap2', '0.3')
-              this.option('icon', 'chevronright')
-              this.option('hint', 'Hide panel')
+                localStorageHelper.setItem('openNav', 'true')
+                debugger;
+                document.querySelector('.aside-body').style.display = 'flex'
+                document.querySelector('.aside-header').style.display = 'flex'
+                document.querySelector('.resizable-right').style.left = '896px'
+                // document.querySelector('.resizable-right').style.width = '400px'
+                document.querySelector('.resizable-right').style.removeProperty('right')
+                document.querySelector('.resizer').style.display = 'block'
+                Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
+                Resizable.activeContentWindows[0].childrenResize()
+                this.option("icon", "chevronright")
+                this.option("hint", "Hide Panel ")
             },
           },
         },
@@ -411,6 +405,16 @@ class Header extends HTMLElement {
         // },
       ],
     })
+    // Resizable.resizingEnded = function () {
+    //   var width = document.body.clientWidth;
+    //   const resizableLeft = document.querySelector('.resizable-left').style.width;
+    //   const resizableRight = document.querySelector('.resizable-right').style.width;
+    //   const first = width/100;
+    //   const resWrap1 = ((parseInt(resizableLeft)/first)/100)
+    //   const resWrap2 = ((parseInt(resizableRight)/first)/100)
+    //   localStorageHelper.setItem("resWrap1",resWrap1)
+    //   localStorageHelper.setItem("resWrap2",resWrap2)
+    // }
   }
 }
 
