@@ -334,15 +334,15 @@ class Header extends HTMLElement {
               localStorageHelper.setItem('openNav', 'true')
               document.querySelector('.aside-body').style.display = 'flex'
               document.querySelector('.aside-header').style.display = 'flex'
-              document.querySelector('.resizable-right').style.left = '896px'
-              document.querySelector('.resizable-right').style.width = '4000px'
+              // document.querySelector('.resizable-right').style.left = '896px'
+              document.querySelector('.resizable-right').style.width = '400px'
               document.querySelector('.resizable-right').style.removeProperty('right')
               document.querySelector('.resizer').style.display = 'block'
               Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
               Resizable.activeContentWindows[0].childrenResize()
 
-              localStorageHelper.setItem('resWrap1', '0.7')
-              localStorageHelper.setItem('resWrap2', '0.3')
+              // localStorageHelper.setItem('resWrap1', '0.7')
+              // localStorageHelper.setItem('resWrap2', '0.3')
               this.option('icon', 'chevronright')
               this.option('hint', 'Hide panel')
             },
