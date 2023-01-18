@@ -62,7 +62,7 @@ class SolutionExplorer extends HTMLElement {
     this.selectedTreeItem = null
   }
 
-  async connectedCallback() {
+  connectedCallback() {
     const self = this
 
     const fileGateService = new FileGateService()
@@ -71,9 +71,16 @@ class SolutionExplorer extends HTMLElement {
       const files = await fileGateService.readAllFilesWithDomainId(activeDomain.id)
       this.setTreelistItems(files.data)
 
-      const contentEditorHelper = new ContentEditorHelper()
-      contentEditorHelper.clearContent()
-      localStorageHelper.setItem('activeDomainId', activeDomain.id)
+      const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
+      if (storageActiveDomainId !== activeDomain.id) {
+        const contentEditorHelper = new ContentEditorHelper()
+        contentEditorHelper.clearContent()
+        localStorageHelper.removeOpenedFiles()
+        // * Headerda active domain değiştikten sonra storage ile redux'taki domain eşit olmuyor if'in içerisine giriyor.
+        // * Açılmış contentleri tekrar yükleyebilmek için headerda local storage'e set ettiğimiz activeDomainId'yi buraya taşımak zorunda kaldık.
+        // * Aksi halde headerda redux'a activeDomain'i attığımız için burası açılışta da çalışıyor ve  storage'deki openFiles'lar siliniyor.
+        localStorageHelper.setItem('activeDomainId', activeDomain.id)
+      }
 
       self.treeListInstance.searchByText('')
     })

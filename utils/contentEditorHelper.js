@@ -4,6 +4,7 @@ import SweetAlert2Helper from './sweetAlert2Helper.js'
 import {setSelectedFile} from '../store/slices/content.js'
 import EditorNavButton from '../components/editorNavButton/editorNavButton.js'
 import ContentEditor from '../components/contentEditor/contentEditor.js'
+import localStorageHelper from './localStorageHelper.js'
 
 class ContentEditorHelper {
   constructor() {
@@ -90,6 +91,7 @@ class ContentEditorHelper {
     const {data} = await fileGateService.readFileById(_contentId)
 
     const {id, name, ufId, path, extension, content} = data
+    localStorageHelper.addOpenedFile(_contentId)
 
     // ! Nav
     const editorNavButtons = document.querySelector('.file-editor-nav-buttons')
@@ -108,6 +110,12 @@ class ContentEditorHelper {
     document.querySelector('.splashScreen').style.display = 'none'
   }
 
+  async LoadContents(_contentIds) {
+    for (const contentId of _contentIds) {
+      await this.changeContent(contentId)
+    }
+  }
+
   async removeContent(_contentId) {
     const contentEditor = this.getContentEditorWithDataId(_contentId)
     const navButton = this.getNavButtonWithDataId(_contentId)
@@ -116,6 +124,7 @@ class ContentEditorHelper {
 
     contentEditor.remove()
     navButton.remove()
+    localStorageHelper.removeOpenedFile(_contentId)
 
     const openedContentEditors = this.getOpenedContentEditors()
     if (openedContentEditors.length > 0) {
@@ -165,6 +174,29 @@ class ContentEditorHelper {
 
     if (incomingEditor === _contentId) return
     await this.loadContent(_contentId)
+  }
+
+  changeFontSize(fontSize) {
+    localStorageHelper.setItem('fontSize', fontSize)
+    const contentEditors = this.getOpenedContentEditors()
+    if (contentEditors.length > 0) {
+      contentEditors.forEach(({state}) => {
+        const contentEditor = document.querySelector(`content-editor[data-id='${state.id}']`)
+        contentEditor.setFontSize(fontSize)
+      })
+    }
+  }
+
+  changeTheme(theme) {
+    localStorageHelper.setItem('theme', theme)
+    const contentEditors = this.getOpenedContentEditors()
+
+    if (contentEditors.length > 0) {
+      contentEditors.forEach(({state}) => {
+        const contentEditor = document.querySelector(`content-editor[data-id='${state.id}']`)
+        contentEditor.setTheme(theme)
+      })
+    }
   }
 
   clearContent() {

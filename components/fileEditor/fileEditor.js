@@ -1,8 +1,9 @@
 import Aside from '../aside/aside.js'
 import FileGateService from '../../services/fileGateService.js'
 import localStorageHelper from '../../utils/localStorageHelper.js'
-import {useSelector, useSubscribe} from '../../store/index.js'
+import {useDispatch, useSelector, useSubscribe} from '../../store/index.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
+import {setSelectedFile} from '../../store/slices/content.js'
 
 class FileEditor extends HTMLElement {
   constructor(state) {
@@ -40,7 +41,7 @@ class FileEditor extends HTMLElement {
     `
   }
 
-  preparingLayouts() {
+  async preparingLayouts() {
     const fileMenu = document.querySelector('.file-menu')
 
     const asideComponent = new Aside()
@@ -54,6 +55,15 @@ class FileEditor extends HTMLElement {
     })
 
     document.addEventListener('keydown', this.ctrlSaveEvent)
+
+    const openedFiles = localStorageHelper.getOpenedFiles()
+
+    if (openedFiles.length > 0) {
+      await new ContentEditorHelper().LoadContents(openedFiles)
+      const fileGateService = new FileGateService()
+      const {data: file} = await fileGateService.readFileById(openedFiles.pop())
+      useDispatch(setSelectedFile(file))
+    }
   }
 
   async ctrlSaveEvent(event) {
@@ -77,15 +87,15 @@ class FileEditor extends HTMLElement {
     }
     Resizable.initialise('main', sizes)
 
-    // Resizable.resizingEnded = () => {
-    //   const resWrap1 = `${Resizable.activeContentWindows[0].children[0].width / window.innerWidth}`
-    //   const resWrap2 = `${Resizable.activeContentWindows[0].children[1].width / window.innerWidth}`
-    //   localStorageHelper.setItem('resWrap1', resWrap1)
-    //   localStorageHelper.setItem('resWrap2', resWrap2)
-    // }
+    Resizable.resizingEnded = () => {
+      const resWrap1 = `${Resizable.activeContentWindows[0].children[0].width / window.innerWidth}`
+      const resWrap2 = `${Resizable.activeContentWindows[0].children[1].width / window.innerWidth}`
+      localStorageHelper.setItem('resWrap1', resWrap1)
+      localStorageHelper.setItem('resWrap2', resWrap2)
+    }
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     this.preparingResizable()
     this.preparingLayouts()
 

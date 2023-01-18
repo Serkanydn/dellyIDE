@@ -33,26 +33,11 @@ class Header extends HTMLElement {
   }
 
   changeTheme(theme) {
-    localStorageHelper.setItem('theme', theme)
-    const contentEditors = new ContentEditorHelper().getOpenedContentEditors()
-
-    if (contentEditors.length > 0) {
-      contentEditors.forEach(({state}) => {
-        const contentEditor = document.querySelector(`content-editor[data-id='${state.id}']`)
-        contentEditor.setTheme(theme)
-      })
-    }
+    new ContentEditorHelper().changeTheme(theme)
   }
 
-  fontSizeChange(fontSize) {
-    localStorageHelper.setItem('fontSize', fontSize)
-    const contentEditors = new ContentEditorHelper().getOpenedContentEditors()
-    if (contentEditors.length > 0) {
-      contentEditors.forEach(({state}) => {
-        const contentEditor = document.querySelector(`content-editor[data-id='${state.id}']`)
-        contentEditor.setFontSize(fontSize)
-      })
-    }
+  changeFontSize(fontSize) {
+    new ContentEditorHelper().changeFontSize(fontSize)
   }
 
   async saveFile() {
@@ -60,8 +45,7 @@ class Header extends HTMLElement {
   }
 
   async saveAllFiles() {
-    const contentEditorHelper = new ContentEditorHelper()
-    contentEditorHelper.saveAllFiles()
+    new ContentEditorHelper().saveAllFiles()
   }
 
   async deleteFile() {
@@ -105,23 +89,19 @@ class Header extends HTMLElement {
   }
 
   foldSelection() {
-    const contentEditorHelper = new ContentEditorHelper()
-    contentEditorHelper.foldSelection()
+    new ContentEditorHelper().foldSelection()
   }
 
   unFoldSelection() {
-    const contentEditorHelper = new ContentEditorHelper()
-    contentEditorHelper.unFoldSelection()
+    new ContentEditorHelper().unFoldSelection()
   }
 
   addCommentLine() {
-    const contentEditorHelper = new ContentEditorHelper()
-    contentEditorHelper.addCommentLine()
+    new ContentEditorHelper().addCommentLine()
   }
 
   removeCommentLine() {
-    const contentEditorHelper = new ContentEditorHelper()
-    contentEditorHelper.removeCommentLine()
+    new ContentEditorHelper().removeCommentLine()
   }
 
   async connectedCallback() {
@@ -193,7 +173,7 @@ class Header extends HTMLElement {
             displayExpr: 'value',
             value: localStorageHelper.getItem('fontSize'),
             onValueChanged({value}) {
-              self.fontSizeChange(value)
+              self.changeFontSize(value)
             },
           },
         },
@@ -324,27 +304,21 @@ class Header extends HTMLElement {
                 document.querySelector('.resizable-right').style.removeProperty('left')
                 document.querySelector('.resizer').style.display = 'none'
                 this.option('icon', 'chevronleft')
-                this.option('hint', 'Show panel')
-                localStorageHelper.setItem('resWrap1', '1')
-                localStorageHelper.setItem('resWrap2', '0')
-                Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
-                Resizable.activeContentWindows[0].childrenResize()
+                this.option('hint', 'Show Panel ')
                 return
               }
+
               localStorageHelper.setItem('openNav', 'true')
               document.querySelector('.aside-body').style.display = 'flex'
               document.querySelector('.aside-header').style.display = 'flex'
-              // document.querySelector('.resizable-right').style.left = '896px'
+              document.querySelector('.resizable-right').style.left = '896px'
               document.querySelector('.resizable-right').style.width = '400px'
               document.querySelector('.resizable-right').style.removeProperty('right')
               document.querySelector('.resizer').style.display = 'block'
               Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
               Resizable.activeContentWindows[0].childrenResize()
-
-              // localStorageHelper.setItem('resWrap1', '0.7')
-              // localStorageHelper.setItem('resWrap2', '0.3')
               this.option('icon', 'chevronright')
-              this.option('hint', 'Hide panel')
+              this.option('hint', 'Hide Panel ')
             },
           },
         },
@@ -361,8 +335,6 @@ class Header extends HTMLElement {
             value: domainId,
             onValueChanged(_args) {
               const {id, name} = _args.component.option('selectedItem')
-              localStorageHelper.setItem('activeDomainId', id)
-
               useDispatch(setActiveDomain({id, name}))
             },
           },
@@ -411,6 +383,16 @@ class Header extends HTMLElement {
         // },
       ],
     })
+    // Resizable.resizingEnded = function () {
+    //   var width = document.body.clientWidth;
+    //   const resizableLeft = document.querySelector('.resizable-left').style.width;
+    //   const resizableRight = document.querySelector('.resizable-right').style.width;
+    //   const first = width/100;
+    //   const resWrap1 = ((parseInt(resizableLeft)/first)/100)
+    //   const resWrap2 = ((parseInt(resizableRight)/first)/100)
+    //   localStorageHelper.setItem("resWrap1",resWrap1)
+    //   localStorageHelper.setItem("resWrap2",resWrap2)
+    // }
   }
 }
 
