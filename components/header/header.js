@@ -312,7 +312,7 @@ class Header extends HTMLElement {
               document.querySelector('.aside-body').style.display = 'flex'
               document.querySelector('.aside-header').style.display = 'flex'
               document.querySelector('.resizable-right').style.left = '896px'
-              document.querySelector('.resizable-right').style.width = '400px'
+              // document.querySelector('.resizable-right').style.width = '400px'
               document.querySelector('.resizable-right').style.removeProperty('right')
               document.querySelector('.resizer').style.display = 'block'
               Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)

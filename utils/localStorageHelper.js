@@ -13,13 +13,41 @@ class LocalStorageHelper {
   clear() {
     localStorage.clear()
   }
+  setRecentlyFiles(data) {
+    if (!this.getItem('recentlyOpenedFiles')) {
+      var item = [{name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}]
+      console.log([JSON.stringify(item)])
+      this.setItem('recentlyOpenedFiles', JSON.stringify(item))
+      return
+    }
+    var files = JSON.parse(this.getItem('recentlyOpenedFiles'))
+    var hasId = files.some((file) => file.id === data.id)
 
+    if (hasId) {
+      var item = {name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}
+      var reOrderFiles = files.filter(function (item) {
+        return item.id != data.id
+      })
+      reOrderFiles.push(item)
+      this.setItem('recentlyOpenedFiles', JSON.stringify(reOrderFiles))
+      return
+    }
+    var item = {name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}
+    if (Object.keys(files).length > 4) {
+      files.shift()
+      files.push(item)
+      this.setItem('recentlyOpenedFiles', JSON.stringify(files))
+      return
+    }
+    files.push(item)
+    this.setItem('recentlyOpenedFiles', JSON.stringify(files))
+  }
   getAccessToken() {
-    return localStorage.getItem('access_token')
+    return this.getItem('access_token')
   }
 
   getRefreshToken() {
-    return localStorage.getRefreshToken('refresh_token')
+    return this.getRefreshToken('refresh_token')
   }
 
   getActiveUserDomains() {

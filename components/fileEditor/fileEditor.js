@@ -9,13 +9,6 @@ class FileEditor extends HTMLElement {
   constructor(state) {
     super(state)
 
-    //   <div class="welcomeText">
-    //   <h4> A hackable text editor for the 21<sup>st</sup> Century </h4>
-    // </div>
-    // <div class="welcomeDesc">
-    //   <label>For Help, Please Visit </label>
-    //   <li> The <a href="#"> Docs </a> for Guides and the API Reference </li>
-    // </div>
     this.innerHTML = `
  
         <div  class='file-body ' id="main">
@@ -26,14 +19,16 @@ class FileEditor extends HTMLElement {
                       <div class="companyName">
                           <a href="#">  <span> Delly</span>Editor </a>
                       </div>
-                    
+                      <div class="welcomeText">
+                      <h4>Recently Files</h4>
+                    </div>
+                    <div class="welcomeDesc">
+                      <div class="recentlyOpenedFiles">
+                      </div>
+                    </div>
                 </div>
                 <div class="editors"></div>
-
-              
-            
             </div>
-
             <div class="resizable-right" id="win2">
                 <div class="file-menu"></div>
             </div>
@@ -98,6 +93,8 @@ class FileEditor extends HTMLElement {
   async connectedCallback() {
     this.preparingResizable()
     this.preparingLayouts()
+    this.getRecentlyOpenedFiles()
+    this.openRecentlyFiles()
 
     window.addEventListener('resize', (event) => {
       event.stopPropagation()
@@ -105,6 +102,27 @@ class FileEditor extends HTMLElement {
     })
   }
 
+  getRecentlyOpenedFiles() {
+    var files = JSON.parse(localStorageHelper.getItem('recentlyOpenedFiles'))
+    const recentlyOpenedFiles = document.querySelector('.recentlyOpenedFiles')
+    var items = ''
+
+    if (!files) return
+
+    files.reverse()
+    files.map(function (element) {
+      items += `<li> <a href='#' class="openRecent" data-id="${element.id}" > ${element.name} </a></li>`
+    })
+    recentlyOpenedFiles.innerHTML = items
+  }
+  openRecentlyFiles() {
+    var file = document.querySelectorAll('.openRecent')
+    file.forEach((item) => {
+      item.addEventListener('click', function handleClick(event) {
+        new ContentEditorHelper().loadContent(event.target.getAttribute('data-id'))
+      })
+    })
+  }
   resizeControl() {
     const header = document.querySelector('header-component')
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
