@@ -50,7 +50,7 @@ class ContentEditor extends HTMLElement {
 
   setTheme(theme) {
     this.editor.updateOptions({
-      theme,
+      theme: `vs-${theme}`,
     })
     // this.editor._themeService.setTheme(theme)
   }
@@ -65,9 +65,8 @@ class ContentEditor extends HTMLElement {
   }
 
   createEditor() {
-    const theme = localStorage.getItem('theme') || 'vs-light'
+    const theme = localStorage.getItem('theme') || 'light'
     const fontSize = localStorage.getItem('fontSize') || '7px'
-    // console.log(mainConfig)
     const container = document.querySelector(`#delly-${this.state.id}`)
     const {extension, value} = this.state
     const language = this.getExtensionLongName(extension)
@@ -75,7 +74,7 @@ class ContentEditor extends HTMLElement {
     this.editor = monaco.editor.create(container, {
       value,
       language,
-      theme,
+      theme: `vs-${theme}`,
       fontSize,
       ...mainConfig,
     })

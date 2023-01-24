@@ -47,8 +47,8 @@ class FileGateService {
     return files
   }
 
-  async readAllFilesWithDomainId(domainId) {
-    const {data: files} = await this.fileClient.post('/readAllFiles', {domainId})
+  async readAllFilesWithDomainId(domainId, args) {
+    const {data: files} = await this.fileClient.post('/readAllFiles', {domainId, ...args})
     return files
   }
 

@@ -34,7 +34,60 @@ class SolutionExplorer extends HTMLElement {
     return this.treeListInstance.option('dataSource')
   }
 
-  setTreelistItems(items) {
+  getStore(id) {
+    function isNotEmpty(value) {
+      return value !== undefined && value !== null && value !== ''
+    }
+
+    return new DevExpress.data.CustomStore({
+      totalCount: 100,
+      key: 'id',
+      async load(loadOptions) {
+        // const deferred = $.Deferred()
+        const args = {}
+
+        ;[
+          'skip',
+          'take',
+          'searchValue',
+          'requireTotalCount',
+          'requireGroupCount',
+          'sort',
+          'filter',
+          'totalSummary',
+          'group',
+          'groupSummary',
+        ].forEach((i) => {
+          if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+            args[i] = JSON.stringify(loadOptions[i])
+          }
+        })
+
+        const request = {
+          // OBJ_TYPE: 'CITY',
+          search: loadOptions.filter && loadOptions.filter.length > 2 ? loadOptions.filter[2] : '',
+          // search: loadOptions.searchValue,
+          row1: loadOptions.skip,
+          row2: loadOptions.skip + loadOptions.take,
+          sortBy: 'createdAt',
+          sortDesc: 'desc',
+        }
+
+        console.log(request)
+
+        const {data: files} = await new FileGateService().readAllFilesWithDomainId(id, request)
+        console.log(files)
+
+        return {
+          data: files,
+          totalCount: files.length + 1,
+        }
+      },
+    })
+  }
+
+  setTreelistItems(items, id) {
+    // const store = this.getStore(id)
     this.treeListInstance.option('dataSource', items)
   }
 
@@ -69,7 +122,7 @@ class SolutionExplorer extends HTMLElement {
 
     useSubscribe('user.activeDomain', async (activeDomain) => {
       const files = await fileGateService.readAllFilesWithDomainId(activeDomain.id)
-      this.setTreelistItems(files.data)
+      this.setTreelistItems(files.data, activeDomain.id)
 
       const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
       if (storageActiveDomainId !== activeDomain.id) {
@@ -89,13 +142,17 @@ class SolutionExplorer extends HTMLElement {
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
       dataSource: [],
+      // remoteOperations: {
+      //   filtering: true,
+      //   paging: true,
+      // },
       rootValue: null,
       allowColumnResizing: true,
       columnResizingMode: 'widget',
       columnAutoWidth: true,
       keyExpr: 'id',
       readOnly: false,
-      parentIdExpr: 'parentId',
+      // parentIdExpr: 'parentId',
       showColumnHeaders: false,
       width: '100%',
       noDataText: ' ',
@@ -109,6 +166,16 @@ class SolutionExplorer extends HTMLElement {
       selection: {
         mode: 'single',
         recursive: false,
+      },
+      paging: {
+        enabled: true,
+        pageSize: 5,
+      },
+      pager: {
+        allowedPageSizes: [5, 10, 20],
+        showPageSizeSelector: true,
+        // showInfo: true,
+        showNavigationButtons: true,
       },
 
       columns: [
@@ -194,7 +261,7 @@ class SolutionExplorer extends HTMLElement {
 
     this.contextMenu = new DevExpress.ui.dxContextMenu(contextMenu, {
       dataSource: menuItems,
-      target: '#solutionExplorer td',
+      target: '#solutionExplorer .dx-treelist-rowsview .dx-treelist-table tbody .dx-row.dx-data-row td ',
       width: '150px',
       itemTemplate(itemData) {
         const template = document.createElement('div')
@@ -215,8 +282,7 @@ class SolutionExplorer extends HTMLElement {
             const {id, objectType} = self.selectedTreeItem
             if (objectType === '0') return
 
-            const contentEditorHelper = new ContentEditorHelper()
-            await contentEditorHelper.changeContent(id)
+            await new ContentEditorHelper().changeContent(id)
 
             break
           }
@@ -245,6 +311,13 @@ class SolutionExplorer extends HTMLElement {
             break
           }
           case 'newAdd': {
+            const {id, objectType} = self.selectedTreeItem
+            if (objectType === '0') {
+              useDispatch(setSelectedFolder(self.selectedTreeItem))
+            } else {
+              useDispatch(setSelectedFolder(null))
+            }
+
             self.createModal()
             break
           }
@@ -255,8 +328,7 @@ class SolutionExplorer extends HTMLElement {
           }
           case 'delete': {
             const {id} = self.selectedTreeItem
-            const contentEditorHelper = new ContentEditorHelper()
-            await contentEditorHelper.deleteFile(id)
+            await new ContentEditorHelper().deleteFile(id)
 
             break
           }

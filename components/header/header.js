@@ -137,8 +137,8 @@ class Header extends HTMLElement {
             width: 140,
             dataSource: new DevExpress.data.ArrayStore({
               data: [
-                {id: 'vs-light', value: 'Light'},
-                {id: 'vs-dark', value: 'Dark'},
+                {id: 'light', value: 'Light'},
+                {id: 'dark', value: 'Dark'},
               ],
               key: 'id',
             }),

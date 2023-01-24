@@ -7,6 +7,8 @@ import Login from './components/login/login.js'
 import localStorageHelper from './utils/localStorageHelper.js'
 import {registerDependency} from './components/contentEditor/dependencyConfig.js'
 
+import ContentEditorHelper from './utils/contentEditorHelper.js'
+
 // const LoadCSS = (cssURL) =>
 //   new Promise((resolve) => {
 //     var link = document.createElement('link')
@@ -62,6 +64,9 @@ loadScript('./config.js').then((response) => {
 
     if (!localStorageHelper.getAccessToken()) root.append(new Login())
     else {
+      const theme = localStorage.getItem('theme') || 'light'
+
+      new ContentEditorHelper().changeTheme(theme)
       root.append(new Header())
       root.append(new FileEditor())
       registerDependency()

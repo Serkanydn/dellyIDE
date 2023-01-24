@@ -189,6 +189,18 @@ class ContentEditorHelper {
 
   changeTheme(theme) {
     localStorageHelper.setItem('theme', theme)
+    const devExtremeDarkTheme = document.querySelector('#devExtremeDarkTheme')
+    const body = document.querySelector('body')
+
+    if (theme === 'light') {
+      devExtremeDarkTheme.setAttribute('href', '')
+      body.classList.add(`bg-light`)
+      body.classList.remove('bg-dark')
+    } else {
+      devExtremeDarkTheme.setAttribute('href', './vendor/devExtreme/css/dx.dark.css')
+      body.classList.remove(`bg-light`)
+      body.classList.add('bg-dark')
+    }
     const contentEditors = this.getOpenedContentEditors()
 
     if (contentEditors.length > 0) {
@@ -197,6 +209,8 @@ class ContentEditorHelper {
         contentEditor.setTheme(theme)
       })
     }
+
+    //     DARK_STYLE_LINK.setAttribute("href", DARK_THEME_PATH);
   }
 
   clearContent() {
