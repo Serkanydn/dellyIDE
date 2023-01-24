@@ -13,7 +13,38 @@ class LocalStorageHelper {
   clear() {
     localStorage.clear()
   }
-
+  setRecentlyFiles(data){
+    if(!localStorage.getItem("recentlyOpenedFiles")){
+      var item ={"name":data.ufId+'.'+data.extension,"id":data.id}
+        localStorage.setItem("recentlyOpenedFiles",JSON.stringify(item))
+      return;
+    }
+    var files = JSON.parse(localStorage.getItem("recentlyOpenedFiles"));
+    var hasId = false;
+    for (let key in files) { 
+      if(files[key].id===data.id){
+         hasId = true;
+        }
+      }
+    if(hasId===true){
+      var item = [
+        {"name":data.ufId+'.'+data.extension,"id":data.id}]
+      var reOrderFiles = files.filter(function(item){ return item.id != data.id })  
+      reOrderFiles.push(item);
+      localStorage.setItem("recentlyOpenedFiles",JSON.stringify(reOrderFiles))
+      return;
+    }
+    var item = [
+      {"name":data.ufId+'.'+data.extension,"id":data.id}]
+    if(Object.keys(files).length>4){
+        files.shift();
+        files.push(item);
+        localStorage.setItem("recentlyOpenedFiles",JSON.stringify(files))
+        return;
+      } 
+      files.push(item);
+      localStorage.setItem("recentlyOpenedFiles",JSON.stringify(files))
+  }
   getAccessToken() {
     return localStorage.getItem('access_token')
   }

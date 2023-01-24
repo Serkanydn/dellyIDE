@@ -14,13 +14,9 @@ class ContentEditor extends HTMLElement {
     // <button id="updateVersion-${this.state.id}" class="btn btn-warning text-white"> <i class="bi bi-pencil-fill" style="font-size:14px"> </i> Version Update</button>
 
     this.innerHTML = `
-
         <div class='monaco-container d-flex flex-column h-100' >
         <div id='delly-${this.state.id}'  class='monaco editor' > </div>
         </div>
-
-
-
         `
   }
 
@@ -71,7 +67,6 @@ class ContentEditor extends HTMLElement {
     const container = document.querySelector(`#delly-${this.state.id}`)
     const {extension, value} = this.state
     const language = this.getExtensionLongName(extension)
-
     this.editor = monaco.editor.create(container, {
       value,
       language,

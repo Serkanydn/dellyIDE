@@ -328,7 +328,6 @@ class Header extends HTMLElement {
                 return
               }
                 localStorageHelper.setItem('openNav', 'true')
-                debugger;
                 document.querySelector('.aside-body').style.display = 'flex'
                 document.querySelector('.aside-header').style.display = 'flex'
                 document.querySelector('.resizable-right').style.left = '896px'

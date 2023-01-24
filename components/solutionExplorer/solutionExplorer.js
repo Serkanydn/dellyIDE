@@ -33,7 +33,10 @@ class SolutionExplorer extends HTMLElement {
   getTreelistItems() {
     return this.treeListInstance.option('dataSource')
   }
-
+  setRecentlyFiles(data){
+    localStorageHelper.setRecentlyFiles(data);
+   
+  }
   setTreelistItems(items) {
     this.treeListInstance.option('dataSource', items)
   }
@@ -170,7 +173,7 @@ class SolutionExplorer extends HTMLElement {
 
           return
         }
-
+        self.setRecentlyFiles(row.data);
         useDispatch(setSelectedFile(row.data))
       },
     })
@@ -271,6 +274,7 @@ class SolutionExplorer extends HTMLElement {
     const fileGateService = new FileGateService()
     const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
     const result = await fileGateService.readAllFilesWithDomainId(domainId)
+    // const recently = this.setRecentlyFiles(this.state);
 
     const {id, parentId, name, objectType, ufId, extension, version} = item
 

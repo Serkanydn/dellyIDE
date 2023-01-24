@@ -6,15 +6,8 @@ import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 
 class FileEditor extends HTMLElement {
   constructor(state) {
-    super(state)
-
-    //   <div class="welcomeText">
-    //   <h4> A hackable text editor for the 21<sup>st</sup> Century </h4>
-    // </div>
-    // <div class="welcomeDesc">
-    //   <label>For Help, Please Visit </label>
-    //   <li> The <a href="#"> Docs </a> for Guides and the API Reference </li>
-    // </div>
+    super(state) 
+  
     this.innerHTML = `
  
         <div  class='file-body ' id="main">
@@ -25,14 +18,17 @@ class FileEditor extends HTMLElement {
                       <div class="companyName">
                           <a href="#">  <span> Delly</span>Editor </a>
                       </div>
-                    
+                      <div class="welcomeText">
+                      <h4> A hackable text editor for the 21<sup>st</sup> Century </h4>
+                    </div>
+                    <div class="welcomeDesc">
+                      <label>Recently Files </label>
+                      <div class="recentlyOpenedFiles">
+                      </div>
+                    </div>
                 </div>
                 <div class="editors"></div>
-
-              
-            
             </div>
-
             <div class="resizable-right" id="win2">
                 <div class="file-menu"></div>
             </div>
@@ -88,13 +84,37 @@ class FileEditor extends HTMLElement {
   connectedCallback() {
     this.preparingResizable()
     this.preparingLayouts()
+    this.getRecentlyOpenedFiles()
+    this.openRecentlyFiles()
 
     window.addEventListener('resize', (event) => {
       event.stopPropagation()
       this.resizeControl()
     })
-  }
+   
 
+  } 
+
+  getRecentlyOpenedFiles(){
+      var files = JSON.parse(localStorageHelper.getItem("recentlyOpenedFiles"));
+      const recentlyOpenedFiles = document.querySelector('.recentlyOpenedFiles');
+      var items ="";
+      files.reverse();
+      console.log(files)
+      files.map(function(element){
+         items += `<li> <a href='#' class="openRecent" data-id="${element.id}" > ${element.name} </a></li>`
+    });
+    recentlyOpenedFiles.innerHTML = items;
+    }
+   openRecentlyFiles(){
+    var file  = document.querySelectorAll('.openRecent');
+    file.forEach(item => {
+      item.addEventListener('click', function handleClick(event) {
+       new ContentEditorHelper().loadContent(event.target.getAttribute('data-id'))
+      });
+    });
+     
+  } 
   resizeControl() {
     const header = document.querySelector('header-component')
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
@@ -130,6 +150,7 @@ class FileEditor extends HTMLElement {
       document.querySelector('.resizable-right').style.removeProperty('left')
       document.querySelector('.resizer').style.display = 'none'
     }
+
   }
 
   disconnectedCallback() {

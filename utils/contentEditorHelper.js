@@ -136,6 +136,9 @@ class ContentEditorHelper {
 
     useDispatch(setSelectedFile({}))
     document.querySelector('.file-editor-nav-buttons').classList.remove('nav-tabs')
+    const fileEditor = document.querySelector('file-editor')
+    fileEditor.getRecentlyOpenedFiles()
+    fileEditor.openRecentlyFiles()
     document.querySelector('.splashScreen').style.display = 'block'
   }
 
@@ -180,6 +183,9 @@ class ContentEditorHelper {
 
     const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
     fileEditorNavButtons.classList.remove('nav-tabs')
+    const fileEditor = document.querySelector('file-editor')
+    fileEditor.getRecentlyOpenedFiles()
+    fileEditor.openRecentlyFiles()
     document.querySelector('.splashScreen').style.display = 'block'
 
     useDispatch(setSelectedFile(null))
