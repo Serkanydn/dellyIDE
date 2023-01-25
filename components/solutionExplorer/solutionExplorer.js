@@ -14,7 +14,7 @@ class SolutionExplorer extends HTMLElement {
     super()
 
     this.innerHTML = `
-            <div id="solutionExplorer" class="h-100"></div>
+            <div id="solutionExplorer" class="h-100"  ></div>
             <div id="contextMenu"></div>
         `
   }
@@ -126,10 +126,11 @@ class SolutionExplorer extends HTMLElement {
     useSubscribe('user.activeDomain', async (activeDomain) => {
       const files = await fileGateService.readAllFilesWithDomainId(activeDomain.id)
       this.setTreelistItems(files.data, activeDomain.id)
-
+      console.log('subscribe')
       const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
       if (storageActiveDomainId !== activeDomain.id) {
         const contentEditorHelper = new ContentEditorHelper()
+
         contentEditorHelper.clearContent()
         localStorageHelper.removeOpenedFiles()
         // * Headerda active domain değiştikten sonra storage ile redux'taki domain eşit olmuyor if'in içerisine giriyor.
@@ -144,7 +145,7 @@ class SolutionExplorer extends HTMLElement {
     const folders = document.querySelector('#solutionExplorer')
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
-      dataSource: [],
+      // dataSource: [],
       // remoteOperations: {
       //   filtering: true,
       //   paging: true,
@@ -155,9 +156,10 @@ class SolutionExplorer extends HTMLElement {
       columnAutoWidth: true,
       keyExpr: 'id',
       readOnly: false,
-      // parentIdExpr: 'parentId',
+      parentIdExpr: 'parentId',
       showColumnHeaders: false,
       width: '100%',
+      height: '100%',
       noDataText: ' ',
       searchPanel: {
         visible: true,
@@ -165,7 +167,10 @@ class SolutionExplorer extends HTMLElement {
       },
       highlightChanges: true,
       showRowLines: true,
-      showBorders: true,
+      showBorders: false,
+      loadPanel: {
+        enabled: false,
+      },
       selection: {
         mode: 'single',
         recursive: false,

@@ -296,25 +296,19 @@ class Header extends HTMLElement {
             onClick() {
               if (localStorageHelper.getItem('openNav') === 'true') {
                 localStorageHelper.setItem('openNav', 'false')
-                document.querySelector('.aside-body').style.display = 'none'
-                document.querySelector('.aside-header').style.display = 'none'
-                document.querySelector('.resizable-left').style.width = '100%'
-                document.querySelector('.resizable-right').style.right = '0px'
-                document.querySelector('.resizable-right').style.width = '0px'
-                document.querySelector('.resizable-right').style.removeProperty('left')
-                document.querySelector('.resizer').style.display = 'none'
+                document.querySelector('#win1').style.width = '100%'
+                document.querySelector('#file-menu').classList.add('d-none')
+                document.querySelector('#resizer0').classList.add('d-none')
+                document.querySelector('#aside-body').classList.add('d-none')
                 this.option('icon', 'chevronleft')
                 this.option('hint', 'Show Panel ')
                 return
               }
 
               localStorageHelper.setItem('openNav', 'true')
-              document.querySelector('.aside-body').style.display = 'flex'
-              document.querySelector('.aside-header').style.display = 'flex'
-              document.querySelector('.resizable-right').style.left = '896px'
-              // document.querySelector('.resizable-right').style.width = '400px'
-              document.querySelector('.resizable-right').style.removeProperty('right')
-              document.querySelector('.resizer').style.display = 'block'
+              document.querySelector('#file-menu').classList.remove('d-none')
+              document.querySelector('#resizer0').classList.remove('d-none')
+              document.querySelector('#aside-body').classList.remove('d-none')
               Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
               Resizable.activeContentWindows[0].childrenResize()
               this.option('icon', 'chevronright')

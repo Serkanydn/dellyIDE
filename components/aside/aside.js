@@ -8,7 +8,6 @@ class Aside extends HTMLElement {
     super()
 
     // <button id="update" class="btn btn-success ">Güncelle</button>
-    this.fileEditor = document.querySelector('file-editor')
     //   <div class="openNav">
     //   <button id="nav-open-button" class="btn btn-light bi bi-chevron-double-left" data-id="0"> </button>
     // </div>
@@ -20,10 +19,10 @@ class Aside extends HTMLElement {
     <div class="aside-header d-flex justify-content-between mt-1"> 
       <div id="toolbarArea"></div>
     </div>
-    <div class="aside-body d-flex flex-column h-100 justify-content-between">
-       <div class="aside-content  h-100"> 
+    <div id="aside-body" class=" d-flex flex-column h-100 justify-content-between">
+       <div class="aside-content flex-grow-1" > 
       </div>
-      <nav class="aside-nav mb-1">
+      <nav class="aside-nav" >
             <div class="nav nav-tabs border-bottom-0 nav-justified buttons" id="nav-tab" role="tablist">
               <button
                 class="nav-link active"
@@ -51,7 +50,7 @@ class Aside extends HTMLElement {
     `
   }
 
-  async connectedCallback() {
+  connectedCallback() {
     this.solutionExplorer = new SolutionExplorer()
 
     const asideContent = document.querySelector('.aside-content')
@@ -87,14 +86,14 @@ class Aside extends HTMLElement {
     })
 
     if (localStorageHelper.getItem('openNav') === 'false') {
-      document.querySelector('.aside-body').style.display = 'none'
+      document.querySelector('#aside-body').classList.add('d-none')
       document.querySelector('.aside-header').style.display = 'none'
       // document.querySelector('.openNav').style.display = 'block'
       document.querySelector('.resizable-left').style.width = '100%'
-      document.querySelector('.resizable-right').style.right = '0px'
-      document.querySelector('.resizable-right').style.width = '50px'
+      // document.querySelector('.resizable-right').style.right = '0px'
+      // document.querySelector('.resizable-right').style.width = '50px'
       document.querySelector('.resizable-right').style.removeProperty('left')
-      document.querySelector('.resizer').style.display = 'none'
+      document.querySelector('.resizer').classList.add('d-none')
     }
   }
 }

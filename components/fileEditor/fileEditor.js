@@ -15,12 +15,12 @@ class FileEditor extends HTMLElement {
             <div class='resizable-left file-content d-flex flex-column flex-grow-1' id='win1' >
                 <div class="file-editor-nav-buttons d-flex align-items-center w-100 border-bottom-0 nav  "></div>
 
-                <div class="splashScreen">
+                <div class="splashScreen  ">
                       <div class="companyName">
                           <a href="#" class="font-weight-light " >  <span> Delly</span>Editor </a>
                       </div>
                       <div class="welcomeText mt-15 font-weight-normal">
-                      <h4>Recently Files</h4>
+                      <h4 class="font-weight-light" data-bs-theme="dark">Recently Files</h4>
                     </div>
                     <div class="welcomeDesc mt-15">
                       <div class="recentlyOpenedFiles">
@@ -30,14 +30,14 @@ class FileEditor extends HTMLElement {
                 <div class="editors w-100 h-100"></div>
             </div>
             <div class="resizable-right" id="win2">
-                <div class="file-menu w-100 h-100"></div>
+                <div id="file-menu" class=" w-100 h-100"></div>
             </div>
       </div>
     `
   }
 
   async preparingLayouts() {
-    const fileMenu = document.querySelector('.file-menu')
+    const fileMenu = document.querySelector('#file-menu')
 
     const asideComponent = new Aside()
     fileMenu.appendChild(asideComponent)
@@ -73,7 +73,8 @@ class FileEditor extends HTMLElement {
 
   preparingResizable() {
     const header = document.querySelector('header-component')
-    const height = window.innerHeight - 60
+    console.log('prepatingResize', header.offsetHeight)
+    const height = window.innerHeight - 56
     document.getElementById('main').style.width = `${window.innerWidth}px`
     document.getElementById('main').style.height = `${height}px`
     const sizes = {
@@ -127,37 +128,26 @@ class FileEditor extends HTMLElement {
     const header = document.querySelector('header-component')
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
 
+    console.log('resize control')
+
     if (selectedFileId) {
       const contentEditor = document.querySelector(`content-editor[data-id='${selectedFileId}']`)
       contentEditor.setLayout()
     }
 
+    Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight)
+    Resizable.activeContentWindows[0].childrenResize()
+
     if (localStorageHelper.getItem('openNav') === 'true') {
-      localStorageHelper.setItem('resWrap1', localStorageHelper.getItem('resWrap1') || '0.7')
-      localStorageHelper.setItem('resWrap2', localStorageHelper.getItem('resWrap2') || '0.3')
-      document.querySelector('.aside-body').style.display = 'flex'
-      document.querySelector('.aside-header').style.display = 'flex'
-      document.querySelector('.resizable-right').style.left = '896px'
-      document.querySelector('.resizable-right').style.width = '400px'
       document.querySelector('.resizable-right').style.removeProperty('right')
-      document.querySelector('.resizer').style.display = 'block'
+      document.querySelector('.resizer').classList.add('d-block')
 
-      Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight)
-      Resizable.activeContentWindows[0].childrenResize()
+      return
     }
-    if (localStorageHelper.getItem('openNav') === 'false') {
-      // localStorageHelper.setItem('openNav', '0')
 
-      Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight)
-      Resizable.activeContentWindows[0].childrenResize()
-      document.querySelector('.aside-body').style.display = 'none'
-      document.querySelector('.aside-header').style.display = 'none'
-      document.querySelector('.resizable-left').style.width = '100%'
-      document.querySelector('.resizable-right').style.right = '0px'
-      document.querySelector('.resizable-right').style.width = '0px'
-      document.querySelector('.resizable-right').style.removeProperty('left')
-      document.querySelector('.resizer').style.display = 'none'
-    }
+    document.querySelector('.resizable-left').style.width = '100%'
+    document.querySelector('.resizable-right').style.removeProperty('left')
+    document.querySelector('.resizer').classList.add('d-none')
   }
 
   disconnectedCallback() {

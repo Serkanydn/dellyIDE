@@ -1,6 +1,15 @@
 a {
   text-decoration: none;
 }
+/* body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-y: scroll;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+} */
 
 .aside-header {
   -webkit-text-stroke: 0.5px;
@@ -14,7 +23,6 @@ small.text-muted.smallUfid {
 .nav-link {
   color: #495057 !important;
   padding: 6px 30px 6px 12px;
-
 }
 
 .nav-link.active {
@@ -30,7 +38,6 @@ small.text-muted.smallUfid {
 .splashScreen {
   margin: 7vh auto;
 }
-
 
 .splashScreen .welcomeDesc li {
   font-size: 13px;
@@ -114,7 +121,7 @@ small.text-muted.smallUfid {
 }
 
 .aside-nav .nav-justified .nav-item,
-.nav-justified>.nav-link {
+.nav-justified > .nav-link {
   border-color: #e9ecef #e9ecef #dee2e6 !important;
   border-bottom: none;
 }
