@@ -14,7 +14,7 @@ class SolutionExplorer extends HTMLElement {
     super()
 
     this.innerHTML = `
-            <div id="solutionExplorer"></div>
+            <div id="solutionExplorer" class="h-100"></div>
             <div id="contextMenu"></div>
         `
   }

@@ -8,7 +8,7 @@ class Login extends HTMLElement {
     this.innerHTML = `
  
       <div class="wrapper fadeInDown">
-      <div id="formContent">
+      <div id="formContent" class="bg-white w-90 p-0 text-center rounded position-relative">
         <!-- Tabs Titles -->
     
         <!-- Icon -->
@@ -19,21 +19,21 @@ class Login extends HTMLElement {
         <!-- Login Form -->
         <form>
         
-        <input type="text" id="email" class="loginInput fadeIn second"  placeholder="E-posta" value="" aria-describedby="inputGroupPrepend"  />
+        <input type="text" id="email" class="loginInput border-0 text-center text-decoration-none d-inline-block  m-1 fadeIn second"  placeholder="E-posta" value="" aria-describedby="inputGroupPrepend"  />
       
           
-          <input type="password" id="password" class="loginInput fadeIn third"  placeholder="Şifre" value="">
+          <input type="password" id="password" class="loginInput border-0 text-center text-decoration-none d-inline-block  m-1 fadeIn third"  placeholder="Şifre" value="">
 
 
           <div id="loginValidation" class="alert alert-danger d-none" role="alert"></div>
 
-          <input type="submit" id="login" class="loginButton fadeIn fourth" value="Login">
+          <input type="submit" id="login" class="loginButton fadeIn border-0 fourth text-white text-center text-uppercase d-inline-block text-decoration-none" value="Login">
 
           
         </form>
     
         <!-- Remind Passowrd -->
-        <div id="formFooter">
+        <div id="formFooter text-center">
          <a class="underlineHover" style="text-decoration:none" href="#">Forgot Password?</a>
         </div>
     

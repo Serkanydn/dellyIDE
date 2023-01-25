@@ -16,15 +16,15 @@ class Aside extends HTMLElement {
     //       <button id="nav-hide-button" class="btn btn-light bi bi-chevron-double-right" data-id="0"> </button>
     //     </div>
     this.innerHTML = `
-    <div class="aside">
-    <div class="aside-header"> 
+    <div class="aside d-flex  flex-column h-100">
+    <div class="aside-header d-flex justify-content-between mt-1"> 
       <div id="toolbarArea"></div>
     </div>
-    <div class="aside-body">
-       <div class="aside-content"> 
+    <div class="aside-body d-flex flex-column h-100 justify-content-between">
+       <div class="aside-content  h-100"> 
       </div>
-      <nav class="aside-nav">
-            <div class="nav nav-tabs nav-justified buttons" id="nav-tab" role="tablist">
+      <nav class="aside-nav mb-1">
+            <div class="nav nav-tabs border-bottom-0 nav-justified buttons" id="nav-tab" role="tablist">
               <button
                 class="nav-link active"
                 id="solutionExplorer"

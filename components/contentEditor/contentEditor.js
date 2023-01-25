@@ -15,7 +15,7 @@ class ContentEditor extends HTMLElement {
 
     this.innerHTML = `
         <div class='monaco-container d-flex flex-column h-100' >
-        <div id='delly-${this.state.id}'  class='monaco editor' > </div>
+        <div id='delly-${this.state.id}'  class='monaco editor h-100 w-100' > </div>
         </div>
         `
   }

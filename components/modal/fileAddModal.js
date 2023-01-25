@@ -11,7 +11,7 @@ class FileAddModal extends HTMLElement {
 <div  class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
 
-    <div class="modal-content">
+    <div class="modal-content w-50">
       <div class="modal-header">
         <h5 class="modal-title" id="fileModalLabel">File Add</h5>
         <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -21,7 +21,7 @@ class FileAddModal extends HTMLElement {
          <div class="row  mb-2">
             <div class="col-md-12 d-flex" disabled>
                <label  class="form-label" for="">Type</label>
-              <div id="type"></div>
+              <div id="type" class="ml-1"></div>
             </div>
          </div>
 

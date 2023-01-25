@@ -12,7 +12,7 @@ class FileUpdateModal extends HTMLElement {
 
 <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content w-50">
       <div class="modal-header">
         <h5 class="modal-title" id="fileModalLabel">File Update</h5>
         <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

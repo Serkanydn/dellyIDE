@@ -11,7 +11,7 @@ class EditorNavButton extends HTMLElement {
     <div id="editorNavItem-${this.state.contentId}" class="nav-item">
       <div class=" position-relative">
         <button id="select-${this.state.contentId}" class="nav-link active" data-bs-toggle="tooltip" data-bs-placement="right" title="${this.state.path}">${this.state.title}.${this.state.extension}</button>
-        <button id="remove-${this.state.contentId}" class="remove-button position-absolute translate-middle badge rounded-pill "><i class="bi bi-x"></i> </button>
+        <button id="remove-${this.state.contentId}" class="remove-button p-0 m-0 position-absolute translate-middle badge bg-white text-dark border-0 rounded-pill "><i class="bi bi-x"></i> </button>
       </div>
     </div>
         `

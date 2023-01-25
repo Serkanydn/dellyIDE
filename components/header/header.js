@@ -14,7 +14,7 @@ class Header extends HTMLElement {
     this.fileEditor = document.querySelector('file-editor')
     this.innerHTML = `
    
-    <div class="header" >
+    <div class="header p-2" >
       <div id="headerToolbar">
       </div>
     </div>

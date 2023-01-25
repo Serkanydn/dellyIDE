@@ -11,26 +11,26 @@ class FileEditor extends HTMLElement {
 
     this.innerHTML = `
  
-        <div  class='file-body ' id="main">
-            <div class='resizable-left file-content' id='win1' >
-                <div class="file-editor-nav-buttons w-100 nav  "></div>
+        <div  class='file-body d-flex' id="main">
+            <div class='resizable-left file-content d-flex flex-column flex-grow-1' id='win1' >
+                <div class="file-editor-nav-buttons d-flex align-items-center w-100 border-bottom-0 nav  "></div>
 
                 <div class="splashScreen">
                       <div class="companyName">
-                          <a href="#">  <span> Delly</span>Editor </a>
+                          <a href="#" class="font-weight-light " >  <span> Delly</span>Editor </a>
                       </div>
-                      <div class="welcomeText">
+                      <div class="welcomeText mt-15 font-weight-normal">
                       <h4>Recently Files</h4>
                     </div>
-                    <div class="welcomeDesc">
+                    <div class="welcomeDesc mt-15">
                       <div class="recentlyOpenedFiles">
                       </div>
                     </div>
                 </div>
-                <div class="editors"></div>
+                <div class="editors w-100 h-100"></div>
             </div>
             <div class="resizable-right" id="win2">
-                <div class="file-menu"></div>
+                <div class="file-menu w-100 h-100"></div>
             </div>
       </div>
     `
