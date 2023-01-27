@@ -107,6 +107,8 @@ class ContentEditorHelper {
     const editors = document.querySelector('.file-content .editors')
     editors.append(editor)
 
+    useDispatch(setSelectedFile(data))
+
     document.querySelector('.splashScreen').style.display = 'none'
   }
 

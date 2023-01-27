@@ -23,6 +23,12 @@ class SolutionExplorer extends HTMLElement {
     this.selectedTreeItem = file
     this.treeListInstance.option('selectedRowKeys', [file.id])
   }
+
+  clearSelectedTreeItem() {
+    this.selectedTreeItem = null
+    this.treeListInstance.option('selectedRowKeys', [])
+  }
+
   getSelectedTreeItem() {
     return this.selectedTreeItem
   }
@@ -142,6 +148,18 @@ class SolutionExplorer extends HTMLElement {
       self.treeListInstance.searchByText('')
     })
 
+    // ? Store Subscribe
+    useSubscribe('content.selectedFile', async (selectedFile) => {
+      if (Object.keys(selectedFile).length === 0) {
+        self.clearSelectedTreeItem()
+        return
+      }
+
+      if (selectedFile.objectType === '1') {
+        self.setSelectedTreeItem(selectedFile)
+      }
+    })
+
     const folders = document.querySelector('#solutionExplorer')
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
@@ -197,8 +215,11 @@ class SolutionExplorer extends HTMLElement {
             mainDiv.classList.add('d-flex')
 
             const icon = document.createElement('img')
+            // icon.classList.add(`folder-${id}`)
+            icon.style.width = '20px'
+            icon.style.objectFit = 'cover'
             icon.classList.add('img')
-            icon.src = `icon/${data.extension ? data.extension : 'folder'}.png`
+            icon.src = `icon/${data.extension ? data.extension : 'folder'}.svg`
 
             const contentDiv = document.createElement('div')
             const text = document.createElement('small')
@@ -244,6 +265,14 @@ class SolutionExplorer extends HTMLElement {
           useDispatch(setSelectedFolder(null))
         }
       },
+      rowExpanding(event) {
+        // const img = document.querySelector(`.folder-${event.key}`)
+        // console.log(img)
+        // img.src = 'icon/folderOpen.svg'
+        // self.refreshTreeList()
+        // const img = row.element.querySelector('#img')
+        // console.log(img)
+      },
       rowDblClick(row) {
         if (row.data.objectType === '0') {
           const {id: key} = row.data
@@ -253,7 +282,7 @@ class SolutionExplorer extends HTMLElement {
           return
         }
         self.setRecentlyFiles(row.data)
-        useDispatch(setSelectedFile(row.data))
+        new ContentEditorHelper().changeContent(row.data.id)
       },
     })
 

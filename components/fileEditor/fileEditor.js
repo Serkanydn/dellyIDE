@@ -55,9 +55,6 @@ class FileEditor extends HTMLElement {
 
     if (openedFiles.length > 0) {
       await new ContentEditorHelper().LoadContents(openedFiles)
-      const fileGateService = new FileGateService()
-      const {data: file} = await fileGateService.readFileById(openedFiles.pop())
-      useDispatch(setSelectedFile(file))
     }
   }
 

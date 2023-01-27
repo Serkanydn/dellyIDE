@@ -56,7 +56,6 @@ const loadScript = (src, async = true, type = 'text/javascript') =>
       reject(err)
     }
   })
-
 loadScript('./config.js').then((response) => {
   if (response.status) {
     window.config = config
@@ -65,11 +64,18 @@ loadScript('./config.js').then((response) => {
     if (!localStorageHelper.getAccessToken()) root.append(new Login())
     else {
       const theme = localStorage.getItem('theme') || 'light'
-
+      root.style.opacity = 0
       new ContentEditorHelper().changeTheme(theme)
       root.append(new Header())
       root.append(new FileEditor())
       registerDependency()
+
+      const spinner = document.querySelector('#spinner-container')
+      setTimeout(() => {
+        spinner.style.display = 'none'
+        spinner.style.opacity = 0
+        root.style.opacity = 1
+      }, 500)
     }
   }
 })
