@@ -42,6 +42,13 @@ class LocalStorageHelper {
     files.push(item)
     this.setItem('recentlyOpenedFiles', JSON.stringify(files))
   }
+  removeFromRecentlyFiles(id){
+    var files = JSON.parse(this.getItem('recentlyOpenedFiles'))
+    var reOrderFiles = files.filter(function (item) {
+      return item.id != id
+    })
+    this.setItem('recentlyOpenedFiles', JSON.stringify(reOrderFiles))
+  }
   getAccessToken() {
     return this.getItem('access_token')
   }

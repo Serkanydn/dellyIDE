@@ -76,14 +76,17 @@ class ContentEditorHelper {
   async deleteFile(fileId) {
     const {isConfirmed} = await SweetAlert2Helper.confirmedSweet({text: 'Do you want to delete the file?', icon: 'warning'})
     if (!isConfirmed) return
-
     const fileGateService = new FileGateService()
     const {data: deletedItemResult} = await fileGateService.disableFile(fileId)
-
     const contentEditor = this.getContentEditorWithDataId(fileId)
     await this.solutionExplorer.treeListDeleteRow(fileId)
     if (contentEditor) this.removeContent(fileId)
+    localStorageHelper.removeFromRecentlyFiles(fileId)
+    const fileEditor = document.querySelector('file-editor')
+    fileEditor.getRecentlyOpenedFiles()
+    fileEditor.openRecentlyFiles()
     SweetAlert2Helper.toastFire({title: deletedItemResult.message})
+    
   }
 
   async loadContent(_contentId) {
