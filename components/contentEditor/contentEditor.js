@@ -111,23 +111,31 @@ class ContentEditor extends HTMLElement {
   }
 
   foldSelection() {
+    if (!this.getSelectionText()) return
     const foldAction = this.editor.getAction('editor.fold')
     foldAction.run()
   }
 
   unFoldSelection() {
+    if (!this.getSelectionText()) return
     const unFoldAction = this.editor.getAction('editor.unfold')
     unFoldAction.run()
   }
 
   addCommentLine() {
+    if (!this.getSelectionText()) return
     const addCommentLineAction = this.editor.getAction('editor.action.addCommentLine')
     addCommentLineAction.run()
   }
 
   removeCommentLine() {
+    if (!this.getSelectionText()) return
     const removeCommentLineAction = this.editor.getAction('editor.action.removeCommentLine')
     removeCommentLineAction.run()
+  }
+
+  getSelectionText() {
+    return this.editor.getModel().getValueInRange(this.editor.getSelection())
   }
 
   connectedCallback() {
