@@ -2,47 +2,14 @@ import {useDispatch} from '../../store/index.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 
 class CustomContextMenu extends HTMLElement {
-  constructor({mouseX, mouseY, activeContentId}) {
+  constructor({mouseX, mouseY, target, activeContentId}) {
     super()
-    this.state = {mouseX, mouseY, activeContentId}
+    this.state = {mouseX, mouseY, target, activeContentId}
     this.innerHTML = `
     
-   <div id="context-menu" class="position-absolute">
-
-     <ul class="list-group">
-
-          <a class="list-group-item list-group-item-light" type="button" data-name="copyPath">
-            <i class="me-1 dx-icon-map"></i>
-            Copy Path
-          </a>
-
-          <a class="list-group-item list-group-item-light" type="button" data-name="close">
-            <i class="me-1 dx-icon-close"></i>
-            Close
-          </a>
-          
-          <a class="list-group-item list-group-item-light" type="button" data-name="closeAll">
-            <i class="me-1 dx-icon-close"></i>
-            Close All
-          </a>
-
-          <a class="list-group-item list-group-item-light" type="button" data-name="delete">
-            <i class="me-1 dx-icon-trash"></i>
-            Delete
-          </a>
-
-     </ul>
-   
+   <div id="custom-context-menu" >
    </div>
         `
-  }
-
-  handleMouseDown = (event) => {
-    // ? 1 = auxclick, 2 = rightclick
-    if (event.button === 1 || event.button === 2) {
-      this.remove()
-      return
-    }
   }
 
   async onItemClick(actionName, contentId) {
@@ -68,28 +35,45 @@ class CustomContextMenu extends HTMLElement {
   }
 
   connectedCallback() {
-    const contextMenu = this.querySelector('#context-menu')
+    const contextMenu = this.querySelector('#custom-context-menu')
+    const self = this
 
-    contextMenu.style.top = `${this.state.mouseY}px`
-    contextMenu.style.left = `${this.state.mouseX}px`
+    const menuItems = [
+      {id: 'copyPath', text: 'Copy Path', icon: 'dx-icon-map'},
+      {id: 'close', text: 'Close', icon: 'dx-icon-close'},
+      {id: 'closeAll', text: 'Close All', icon: 'dx-icon-close'},
+      {id: 'delete', text: 'Delete', icon: 'dx-icon-trash'},
+    ]
 
-    document.addEventListener('click', () => {
-      this.remove()
-    })
+    this.contextMenu = new DevExpress.ui.dxContextMenu(contextMenu, {
+      dataSource: menuItems,
+      target: self.state.target,
+      width: '150px',
+      itemTemplate(itemData) {
+        const template = document.createElement('div')
+        template.style.height = '25px'
+        template.classList.add('d-flex', 'align-items-center')
+        if (itemData.icon) {
+          const span = document.createElement('span')
+          span.classList.add(itemData.icon, 'me-2')
+          template.appendChild(span)
+        }
 
-    document.addEventListener('mousedown', this.handleMouseDown)
-
-    this.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', async (event) => {
-        const dataName = a.getAttribute('data-name')
-        await this.onItemClick(dataName, this.state.activeContentId)
-        this.remove()
-      })
+        template.append(itemData.text)
+        return template
+      },
+      onItemClick(event) {
+        self.onItemClick(event.itemData.id, self.state.activeContentId)
+        self.remove()
+      },
+      closeOnOutsideClick() {
+        self.remove()
+      },
     })
   }
 
   disconnectedCallback() {
-    document.removeEventListener('mousedown', this.handleMouseDown)
+    this.contextMenu.dispose()
   }
 }
 window.customElements.define('custom-context-menu', CustomContextMenu)

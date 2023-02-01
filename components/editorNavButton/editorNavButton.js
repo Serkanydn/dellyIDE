@@ -51,7 +51,8 @@ class EditorNavButton extends HTMLElement {
 
         // console.log(this.state.contentId)
         const {clientX: mouseX, clientY: mouseY} = event
-        document.querySelector('body').append(new CustomContextMenu({mouseX, mouseY, activeContentId: this.state.contentId}))
+        // document.querySelector('body').append(new CustomContextMenu({mouseX, mouseY, activeContentId: this.state.contentId}))
+        document.querySelector('body').append(new CustomContextMenu({target: this, activeContentId: this.state.contentId}))
       }
     })
   }

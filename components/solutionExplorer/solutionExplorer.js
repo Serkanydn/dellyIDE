@@ -15,7 +15,7 @@ class SolutionExplorer extends HTMLElement {
 
     this.innerHTML = `
             <div id="solutionExplorer" class="h-100"  ></div>
-            <div id="contextMenu"></div>
+            <div id="context-menu"></div>
         `
   }
 
@@ -282,7 +282,7 @@ class SolutionExplorer extends HTMLElement {
       },
     })
 
-    const contextMenu = document.querySelector('#contextMenu')
+    const contextMenu = this.querySelector('#context-menu')
     const menuItems = [
       {id: 'open', text: 'Open', icon: 'dx-icon-folder'},
       {id: 'duplicate', text: 'Duplicate', icon: 'dx-icon-copy'},
