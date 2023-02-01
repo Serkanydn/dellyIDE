@@ -170,14 +170,14 @@ class FileUpdateModal extends HTMLElement {
       },
     })
 
-    new DevExpress.ui.dxValidator(name, {
-      validationRules: [
-        {
-          type: 'required',
-          message: 'Filename field is required.',
-        },
-      ],
-    })
+    // new DevExpress.ui.dxValidator(name, {
+    //   validationRules: [
+    //     {
+    //       type: 'required',
+    //       message: 'Filename field is required.',
+    //     },
+    //   ],
+    // })
 
     const version = document.querySelector('#version')
 

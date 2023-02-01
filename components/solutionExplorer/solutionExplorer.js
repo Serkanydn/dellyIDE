@@ -328,18 +328,9 @@ class SolutionExplorer extends HTMLElement {
             break
           }
           case 'copyPath': {
-            const {id, ufId, domainId, objectType, extension} = self.selectedTreeItem
-            if (objectType === '0') return
+            const {id} = self.selectedTreeItem
 
-            let path
-
-            if (ufId) path = `${config.webServiceUrl}/${domainId}/${ufId}.${extension}`
-            else path = `${config.webServiceUrl}/${domainId}/${id}.${extension}`
-
-            self.copyTextToClipboard(path)
-            SweetAlert2.toastFire({
-              title: 'Copied',
-            })
+            await new ContentEditorHelper().copyPath(id)
 
             break
           }
@@ -402,43 +393,6 @@ class SolutionExplorer extends HTMLElement {
 
     document.body.append(fileUpdateModal)
     fileUpdateModal.open()
-  }
-
-  fallbackCopyTextToClipboard(text) {
-    var textArea = document.createElement('textarea')
-    textArea.value = text
-
-    // Avoid scrolling to bottom
-    textArea.style.top = '0'
-    textArea.style.left = '0'
-    textArea.style.position = 'fixed'
-
-    document.body.appendChild(textArea)
-    textArea.focus()
-    textArea.select()
-
-    try {
-      var successful = document.execCommand('copy')
-      var msg = successful ? 'successful' : 'unsuccessful'
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err)
-    }
-
-    document.body.removeChild(textArea)
-  }
-  copyTextToClipboard(text) {
-    if (!navigator.clipboard) {
-      this.fallbackCopyTextToClipboard(text)
-      return
-    }
-    navigator.clipboard.writeText(text).then(
-      () => {
-        // console.log('Async: Copying to clipboard was successful!')
-      },
-      (err) => {
-        console.error('Async: Could not copy text: ', err)
-      }
-    )
   }
 }
 

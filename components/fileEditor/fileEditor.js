@@ -103,9 +103,7 @@ class FileEditor extends HTMLElement {
     var files = JSON.parse(localStorageHelper.getItem('recentlyOpenedFiles'))
     const recentlyOpenedFiles = document.querySelector('.recentlyOpenedFiles')
     var items = ''
-
     if (!files) return
-
     files.reverse()
     files.map(function (element) {
       items += `<li> <a href='#' class="openRecent" data-id="${element.id}" > ${element.name} </a></li>`
@@ -120,6 +118,7 @@ class FileEditor extends HTMLElement {
       })
     })
   }
+
   resizeControl() {
     const header = document.querySelector('header-component')
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)

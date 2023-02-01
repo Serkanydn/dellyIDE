@@ -13,23 +13,26 @@ class LocalStorageHelper {
   clear() {
     localStorage.clear()
   }
+
   setRecentlyFiles(data) {
     if (!this.getItem('recentlyOpenedFiles')) {
-      const item = [{name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}]
+      var item = [{name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}]
+      console.log([JSON.stringify(item)])
       this.setItem('recentlyOpenedFiles', JSON.stringify(item))
       return
     }
-    const files = JSON.parse(this.getItem('recentlyOpenedFiles'))
-    const hasId = files.some((file) => file.id === data.id)
-
-    const item = {name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}
+    var files = JSON.parse(this.getItem('recentlyOpenedFiles'))
+    var hasId = files.some((file) => file.id === data.id)
     if (hasId) {
-      const reOrderFiles = files.filter((item) => item.id !== data.id)
+      var item = {name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}
+      var reOrderFiles = files.filter(function (item) {
+        return item.id != data.id
+      })
       reOrderFiles.push(item)
       this.setItem('recentlyOpenedFiles', JSON.stringify(reOrderFiles))
       return
     }
-    // const item = {name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}
+    var item = {name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}
     if (Object.keys(files).length > 4) {
       files.shift()
       files.push(item)
