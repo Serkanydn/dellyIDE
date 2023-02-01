@@ -20,6 +20,11 @@ class CustomContextMenu extends HTMLElement {
             <i class="me-1 dx-icon-close"></i>
             Close
           </a>
+          
+          <a class="list-group-item list-group-item-light" type="button" data-name="closeAll">
+            <i class="me-1 dx-icon-close"></i>
+            Close All
+          </a>
 
           <a class="list-group-item list-group-item-light" type="button" data-name="delete">
             <i class="me-1 dx-icon-trash"></i>
@@ -43,18 +48,20 @@ class CustomContextMenu extends HTMLElement {
   async onItemClick(actionName, contentId) {
     switch (actionName) {
       case 'copyPath': {
-        console.log(actionName)
         await new ContentEditorHelper().copyPath(contentId)
         break
       }
       case 'delete': {
-        console.log(actionName)
         await new ContentEditorHelper().deleteFile(contentId)
         break
       }
       case 'close': {
-        console.log(actionName)
         await new ContentEditorHelper().removeContent(contentId)
+        break
+      }
+
+      case 'closeAll': {
+        new ContentEditorHelper().clearContent()
         break
       }
     }
@@ -62,6 +69,7 @@ class CustomContextMenu extends HTMLElement {
 
   connectedCallback() {
     const contextMenu = this.querySelector('#context-menu')
+
     contextMenu.style.top = `${this.state.mouseY}px`
     contextMenu.style.left = `${this.state.mouseX}px`
 

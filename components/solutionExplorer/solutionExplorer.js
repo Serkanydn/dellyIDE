@@ -302,7 +302,7 @@ class SolutionExplorer extends HTMLElement {
         template.classList.add('d-flex', 'align-items-center')
         if (itemData.icon) {
           const span = document.createElement('span')
-          span.classList.add(itemData.icon, 'mr-2')
+          span.classList.add(itemData.icon, 'me-2')
           template.appendChild(span)
         }
 
