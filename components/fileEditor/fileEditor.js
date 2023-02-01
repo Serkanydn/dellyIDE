@@ -115,7 +115,10 @@ class FileEditor extends HTMLElement {
     file.forEach((item) => {
       item.addEventListener('click', function handleClick(event) {
         new ContentEditorHelper().loadContent(event.target.getAttribute('data-id'))
-      })
+        var files = JSON.parse(localStorageHelper.getItem('recentlyOpenedFiles'))
+        var data = files.filter((file) => file.id === event.target.getAttribute('data-id'))
+        localStorageHelper.setOrderRecentlyFiles(data);
+       })
     })
   }
 
