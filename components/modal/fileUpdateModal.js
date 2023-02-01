@@ -223,7 +223,6 @@ class FileUpdateModal extends HTMLElement {
     const {data: result} = await fileGateService.update(object)
 
     if (!result.success) {
-      console.log(result)
       SweetAlert2Helper.toastFire({title: result.error.message, icon: 'error'})
       return
     }

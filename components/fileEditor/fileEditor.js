@@ -70,8 +70,7 @@ class FileEditor extends HTMLElement {
 
   preparingResizable() {
     const header = document.querySelector('header-component')
-    console.log('prepatingResize', header.offsetHeight)
-    const height = window.innerHeight - 56
+    const height = window.innerHeight - 57
     document.getElementById('main').style.width = `${window.innerWidth}px`
     document.getElementById('main').style.height = `${height}px`
     const sizes = {
@@ -125,14 +124,12 @@ class FileEditor extends HTMLElement {
     const header = document.querySelector('header-component')
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
 
-    console.log('resize control')
-
     if (selectedFileId) {
       const contentEditor = document.querySelector(`content-editor[data-id='${selectedFileId}']`)
       contentEditor.setLayout()
     }
 
-    Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight)
+    Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight - 1)
     Resizable.activeContentWindows[0].childrenResize()
 
     if (localStorageHelper.getItem('openNav') === 'true') {

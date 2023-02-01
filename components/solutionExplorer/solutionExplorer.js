@@ -79,10 +79,7 @@ class SolutionExplorer extends HTMLElement {
           sortDesc: 'desc',
         }
 
-        console.log(request)
-
         const {data: files} = await new FileGateService().readAllFilesWithDomainId(id, request)
-        console.log(files)
 
         return {
           data: files,
@@ -132,7 +129,6 @@ class SolutionExplorer extends HTMLElement {
     useSubscribe('user.activeDomain', async (activeDomain) => {
       const files = await fileGateService.readAllFilesWithDomainId(activeDomain.id)
       this.setTreelistItems(files.data, activeDomain.id)
-      console.log('subscribe')
       const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
       if (storageActiveDomainId !== activeDomain.id) {
         const contentEditorHelper = new ContentEditorHelper()

@@ -1,7 +1,7 @@
 a {
   text-decoration: none;
 }
-/* body {
+body {
   -ms-overflow-style: none;
   scrollbar-width: none;
   overflow-y: scroll;
@@ -9,7 +9,7 @@ a {
 
 body::-webkit-scrollbar {
   display: none;
-} */
+}
 
 .aside-header {
   -webkit-text-stroke: 0.5px;
