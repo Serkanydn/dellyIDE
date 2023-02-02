@@ -36,6 +36,11 @@ class ContentEditorHelper {
     const {id: selectedFile} = useSelector((state) => state.content.selectedFile)
     return document.querySelector(`editor-nav-button[data-id='${selectedFile}']`)
   }
+  refreshRecentlyOpenedFiles(){
+    const fileEditor = document.querySelector('file-editor')
+    fileEditor.getRecentlyOpenedFiles()
+    fileEditor.openRecentlyFiles()
+  }
 
   async saveFile() {
     const activeContentEditor = this.getActiveContentEditor()
@@ -82,9 +87,8 @@ class ContentEditorHelper {
     await this.solutionExplorer.treeListDeleteRow(fileId)
     if (contentEditor) this.removeContent(fileId)
     localStorageHelper.removeFromRecentlyFiles(fileId)
-    const fileEditor = document.querySelector('file-editor')
-    fileEditor.getRecentlyOpenedFiles()
-    fileEditor.openRecentlyFiles()
+    this.refreshRecentlyOpenedFiles()
+
     SweetAlert2Helper.toastFire({title: deletedItemResult.message})
     
   }
@@ -148,9 +152,7 @@ class ContentEditorHelper {
 
     useDispatch(setSelectedFile({}))
     document.querySelector('.file-editor-nav-buttons').classList.remove('nav-tabs')
-    const fileEditor = document.querySelector('file-editor')
-    fileEditor.getRecentlyOpenedFiles()
-    fileEditor.openRecentlyFiles()
+    this.refreshRecentlyOpenedFiles()
     document.querySelector('.splashScreen').style.display = 'block'
   }
 
@@ -232,11 +234,9 @@ class ContentEditorHelper {
 
     const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
     fileEditorNavButtons.classList.remove('nav-tabs')
-    const fileEditor = document.querySelector('file-editor')
-    fileEditor.getRecentlyOpenedFiles()
-    fileEditor.openRecentlyFiles()
-    document.querySelector('.splashScreen').style.display = 'block'
+    this.refreshRecentlyOpenedFiles()
 
+    document.querySelector('.splashScreen').style.display = 'block'
     useDispatch(setSelectedFile(null))
   }
 

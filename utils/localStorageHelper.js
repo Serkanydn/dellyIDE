@@ -16,7 +16,6 @@ class LocalStorageHelper {
   setRecentlyFiles(data) {
     if (!this.getItem('recentlyOpenedFiles')) {
       var item = [{name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}]
-      console.log([JSON.stringify(item)])
       this.setItem('recentlyOpenedFiles', JSON.stringify(item))
       return
     }
@@ -57,6 +56,9 @@ class LocalStorageHelper {
       return item.id != id
     })
     this.setItem('recentlyOpenedFiles', JSON.stringify(reOrderFiles))
+  }
+  clearRecentlyOpenedFiles(){
+    this.removeItem('recentlyOpenedFiles')
   }
   getAccessToken() {
     return this.getItem('access_token')
