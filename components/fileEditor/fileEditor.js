@@ -103,11 +103,14 @@ class FileEditor extends HTMLElement {
     var files = JSON.parse(localStorageHelper.getItem('recentlyOpenedFiles'))
     const recentlyOpenedFiles = document.querySelector('.recentlyOpenedFiles')
     var items = ''
-    if (!files) return
-    files.reverse()
-    files.map(function (element) {
-      items += `<li> <a href='#' class="openRecent" data-id="${element.id}" > ${element.name} </a></li>`
-    })
+
+    if (files) {
+      files.reverse()
+      files.map(function (element) {
+        items += `<li> <a href='#' class="openRecent" data-id="${element.id}" > ${element.name} </a></li>`
+      })
+    }
+
     recentlyOpenedFiles.innerHTML = items
   }
   openRecentlyFiles() {

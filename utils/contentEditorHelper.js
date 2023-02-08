@@ -37,6 +37,11 @@ class ContentEditorHelper {
     const {id: selectedFile} = useSelector((state) => state.content.selectedFile)
     return document.querySelector(`editor-nav-button[data-id='${selectedFile}']`)
   }
+  refreshRecentlyOpenedFiles() {
+    const fileEditor = document.querySelector('file-editor')
+    fileEditor.getRecentlyOpenedFiles()
+    fileEditor.openRecentlyFiles()
+  }
 
   async saveFile() {
     const activeContentEditor = this.getActiveContentEditor()
@@ -79,15 +84,15 @@ class ContentEditorHelper {
     const {isConfirmed} = await SweetAlert2Helper.confirmedSweet({text: 'Do you want to delete the file?', icon: 'warning'})
     if (!isConfirmed) return
     const fileGateService = new FileGateService()
+
     const {data: deletedItemResult} = await fileGateService.disableFile(_contentId)
     const contentEditor = this.getContentEditorWithDataId(_contentId)
     // await this.solutionExplorer.treeListDeleteRow(_contentId)
     this.solutionExplorer.refreshTreeList()
     if (contentEditor) this.removeContent(_contentId)
-    localStorageHelper.removeFromRecentlyFiles(_contentId)
-    const fileEditor = document.querySelector('file-editor')
-    fileEditor.getRecentlyOpenedFiles()
-    fileEditor.openRecentlyFiles()
+    localStorageHelper.removeFromRecentlyFiles(fileId)
+    this.refreshRecentlyOpenedFiles()
+
     SweetAlert2Helper.toastFire({title: deletedItemResult.message})
   }
 
@@ -156,9 +161,7 @@ class ContentEditorHelper {
 
     useDispatch(setSelectedFile({}))
     document.querySelector('.file-editor-nav-buttons').classList.remove('nav-tabs')
-    const fileEditor = document.querySelector('file-editor')
-    fileEditor.getRecentlyOpenedFiles()
-    fileEditor.openRecentlyFiles()
+    this.refreshRecentlyOpenedFiles()
     document.querySelector('.splashScreen').style.display = 'block'
   }
 
@@ -240,11 +243,9 @@ class ContentEditorHelper {
 
     const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
     fileEditorNavButtons.classList.remove('nav-tabs')
-    const fileEditor = document.querySelector('file-editor')
-    fileEditor.getRecentlyOpenedFiles()
-    fileEditor.openRecentlyFiles()
-    document.querySelector('.splashScreen').style.display = 'block'
+    this.refreshRecentlyOpenedFiles()
 
+    document.querySelector('.splashScreen').style.display = 'block'
     useDispatch(setSelectedFile(null))
   }
 
