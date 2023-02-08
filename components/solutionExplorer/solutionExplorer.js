@@ -67,6 +67,7 @@ class SolutionExplorer extends HTMLElement {
         //   console.log('"id": ', element.id, ' ----- ', '"parentId": ', element.parentId)
         // })
         // console.log('-------------------------------------------------------------------------------------------------------------------')
+        console.log(files)
 
         return {
           data: files,
@@ -126,7 +127,7 @@ class SolutionExplorer extends HTMLElement {
         localStorageHelper.removeOpenedFiles()
         localStorageHelper.clearRecentlyOpenedFiles()
         contentEditorHelper.refreshRecentlyOpenedFiles()
-       
+
         // * Headerda active domain değiştikten sonra storage ile redux'taki domain eşit olmuyor if'in içerisine giriyor.
         // * Açılmış contentleri tekrar yükleyebilmek için headerda local storage'e set ettiğimiz activeDomainId'yi buraya taşımak zorunda kaldık.
         // * Aksi halde headerda redux'a activeDomain'i attığımız için burası açılışta da çalışıyor ve  storage'deki openFiles'lar siliniyor.
@@ -175,9 +176,9 @@ class SolutionExplorer extends HTMLElement {
       highlightChanges: true,
       showRowLines: true,
       showBorders: false,
-      // loadPanel: {
-      //   enabled: false,
-      // },
+      loadPanel: {
+        enabled: false,
+      },
       selection: {
         mode: 'single',
         recursive: false,
