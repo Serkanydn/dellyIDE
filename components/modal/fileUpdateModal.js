@@ -258,15 +258,17 @@ class FileUpdateModal extends HTMLElement {
     // * File
     if (updatedFile.objectType === '1') {
       const editorNavButton = document.querySelector(`editor-nav-button[data-id="${this.state?.id}"`)
-      const oldBtnTitle = `${editorNavButton.state.title}.${editorNavButton.state.extension}`
-      const newBtnTitle = `${updatedFile.name || updatedFile.ufId || updatedFile.id}.${updatedFile.extension}`
+      if (editorNavButton) {
+        const oldBtnTitle = `${editorNavButton.state.title}.${editorNavButton.state.extension}`
+        const newBtnTitle = `${updatedFile.name || updatedFile.ufId || updatedFile.id}.${updatedFile.extension}`
 
-      if ((editorNavButton && oldBtnTitle !== newBtnTitle) || editorNavButton.state.path !== updatedFile.path) {
-        const selectButton = editorNavButton.querySelector(`#select-${this.state?.id}`)
-        selectButton.innerText = newBtnTitle
-        selectButton.title = updatedFile.path
-        editorNavButton.state.path = updatedFile.path
-        if (selectedFileId === updatedFile.id) useDispatch(setSelectedFile(updatedFile))
+        if (oldBtnTitle !== newBtnTitle || editorNavButton.state.path !== updatedFile.path) {
+          const selectButton = editorNavButton.querySelector(`#select-${this.state?.id}`)
+          selectButton.innerText = newBtnTitle
+          selectButton.title = updatedFile.path
+          editorNavButton.state.path = updatedFile.path
+          if (selectedFileId === updatedFile.id) useDispatch(setSelectedFile(updatedFile))
+        }
       }
     }
 

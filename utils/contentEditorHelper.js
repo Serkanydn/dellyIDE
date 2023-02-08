@@ -90,7 +90,7 @@ class ContentEditorHelper {
     // await this.solutionExplorer.treeListDeleteRow(_contentId)
     this.solutionExplorer.refreshTreeList()
     if (contentEditor) this.removeContent(_contentId)
-    localStorageHelper.removeFromRecentlyFiles(fileId)
+    localStorageHelper.removeFromRecentlyFiles(_contentId)
     this.refreshRecentlyOpenedFiles()
 
     SweetAlert2Helper.toastFire({title: deletedItemResult.message})
@@ -129,6 +129,8 @@ class ContentEditorHelper {
     for (const contentId of _contentIds) {
       await this.changeContent(contentId)
     }
+    // const {data: result} = await new FileGateService().readFileById(_contentIds.pop())
+    // useDispatch(setSelectedFile(result.data))
   }
 
   async removeContent(_contentId) {
@@ -249,29 +251,28 @@ class ContentEditorHelper {
     useDispatch(setSelectedFile(null))
   }
 
-  async copyPath(_contentId) {
-    const {data: result} = await new FileGateService().readFileById(_contentId)
-    const {success, message, data} = result
-
-    if (!success) {
-      SweetAlert2.toastFire({
-        title: message,
-      })
-      return
-    }
-
-    const {id, ufId, domainId, objectType, extension} = data
-
+  async copyUrl({id, ufId, domainId, objectType}) {
     if (objectType === '0') return
 
-    let path
+    let url
 
-    if (ufId) path = `${config.webServiceUrl}/${domainId}/${ufId}.${extension}`
-    else path = `${config.webServiceUrl}/${domainId}/${id}.${extension}`
+    if (ufId) url = `${config.webServiceUrl}/${domainId}/${ufId}`
+    else url = `${config.webServiceUrl}/${domainId}/${id}`
 
-    this.copyTextToClipboard(path)
+    this.copyTextToClipboard(url)
     SweetAlert2.toastFire({
       title: 'Copied',
+    })
+  }
+
+  async copyId({id, ufId, objectType}) {
+    if (objectType === '0') return
+
+    const url = ufId || id
+
+    this.copyTextToClipboard(url)
+    SweetAlert2.toastFire({
+      title: 'Id copied',
     })
   }
 

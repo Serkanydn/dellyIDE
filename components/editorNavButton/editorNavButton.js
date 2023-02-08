@@ -46,13 +46,16 @@ class EditorNavButton extends HTMLElement {
 
       editorNavItem.oncontextmenu = (event) => {
         event.preventDefault()
-        const isContextMenu = document.querySelector('custom-context-menu')
-        if (isContextMenu) return
 
-        // console.log(this.state.contentId)
-        const {clientX: mouseX, clientY: mouseY} = event
-        // document.querySelector('body').append(new CustomContextMenu({mouseX, mouseY, activeContentId: this.state.contentId}))
-        document.querySelector('body').append(new CustomContextMenu({target: this, activeContentId: this.state.contentId}))
+        const menuItems = [
+          {id: 'preview', text: 'Preview', icon: 'dx-icon-find'},
+          {id: 'copyUrl', text: 'Copy Url', icon: 'dx-icon-map'},
+          {id: 'copyId', text: 'Copy Id', icon: 'dx-icon-copy'},
+          {id: 'close', text: 'Close', icon: 'dx-icon-close'},
+          {id: 'closeAll', text: 'Close All', icon: 'dx-icon-close'},
+        ]
+
+        document.querySelector('body').append(new CustomContextMenu({target: this, items: menuItems, selectedFile: this.state.data}))
       }
     })
   }

@@ -1,7 +1,7 @@
 import FileGateService from '../../services/fileGateService.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector, useSubscribe} from '../../store/index.js'
-import {setSelectedFile} from '../../store/slices/content.js'
+import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
 
 class FileAddModal extends HTMLElement {
   constructor() {
@@ -226,8 +226,8 @@ class FileAddModal extends HTMLElement {
 
     this.close()
 
-    useDispatch(setSelectedFile(result.data))
-    // await solutionExplorer.treeListAddRow(result.data)
+    if (result.data.objectType !== '0') useDispatch(setSelectedFile(result.data))
+
     solutionExplorer.refreshTreeList()
 
     SweetAlert2Helper.toastFire({title: result.message})
