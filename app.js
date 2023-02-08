@@ -61,8 +61,13 @@ loadScript('./config.js').then((response) => {
     window.config = config
     const root = document.querySelector('#root')
 
-    if (!localStorageHelper.getAccessToken()) root.append(new Login())
-    else {
+    if (!localStorageHelper.getAccessToken()) {
+      root.append(new Login())
+      const spinner = document.querySelector('#spinner-container')
+      spinner.style.display = 'none'
+      spinner.style.opacity = 0
+      root.style.opacity = 1
+    } else {
       const theme = localStorage.getItem('theme') || 'light'
       root.style.opacity = 0
       new ContentEditorHelper().changeTheme(theme)

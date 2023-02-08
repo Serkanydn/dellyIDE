@@ -20,21 +20,6 @@ small.text-muted.smallUfid {
   font-size: 0.4rem;
 }
 
-.nav-link {
-  color: #495057 !important;
-  padding: 6px 30px 6px 12px;
-}
-
-.nav-link.active {
-  color: #0a58ca !important;
-  font-weight: 500;
-}
-
-.remove-button {
-  right: -1%;
-  top: 53%;
-}
-
 .splashScreen {
   margin: 7vh auto;
 }
@@ -66,7 +51,7 @@ small.text-muted.smallUfid {
 .resizer {
   position: absolute;
   z-index: 100;
-  background-color: #dee2e6;
+  background-color: #6c757d;
 }
 
 .verticalResizer {
@@ -115,16 +100,6 @@ small.text-muted.smallUfid {
 /* .aside-nav .nav-tabs {
   border-bottom: none !important;
 } */
-.aside-nav .nav-link.active {
-  border-color: #dee2e600 #dee2e6 #dee2e6 #dee2e6 !important;
-  border-bottom: 1px solid #dee2e6 !important;
-}
-
-.aside-nav .nav-justified .nav-item,
-.nav-justified > .nav-link {
-  border-color: #e9ecef #e9ecef #dee2e6 !important;
-  border-bottom: none;
-}
 
 .modal-content {
   margin: 0 auto;
@@ -134,9 +109,9 @@ small.text-muted.smallUfid {
   margin-left: 15px;
 }
 
-#root .header {
+/* #root .header {
   border-bottom: 4px solid #dee2e6;
-}
+} */
 
 #spinner-container {
   display: block;
@@ -166,4 +141,65 @@ small.text-muted.smallUfid {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.remove-button {
+  right: -1%;
+  top: 53%;
+  background-color: transparent !important;
+}
+
+body {
+  background-color: white;
+}
+body.bg-dark {
+  color: #dedede !important;
+}
+
+.nav-link {
+  color: rgba(73, 80, 87, 0.5) !important;
+  padding: 6px 30px 6px 12px;
+  font-weight: 500;
+}
+
+.nav-link.active {
+  color: rgba(10, 88, 202, 1) !important;
+  font-weight: 500;
+}
+
+.aside-nav .nav-link.active {
+  border-color: #dee2e600 #dee2e6 #dee2e6 #dee2e6 !important;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.aside-nav .nav-justified .nav-item,
+.nav-justified > .nav-link {
+  border-color: #e9ecef #e9ecef #dee2e6 !important;
+  border-bottom: none;
+}
+
+.aside-nav .nav-justified .nav-item,
+.nav-justified > .nav-link {
+  border-color: #e9ecef #e9ecef #dee2e6 !important;
+  border-bottom: none;
+}
+
+body.bg-dark .modal-header,
+body.bg-dark .modal-body,
+body.bg-dark .nav-link,
+body.bg-dark .remove-button {
+  background-color: #1e1e1e !important;
+  color: #dedede !important;
+  border: none;
+}
+
+body.bg-dark .nav-link {
+  font-weight: 500;
+  color: rgba(202, 202, 202, 0.5) !important;
+}
+
+body.bg-dark .nav-link.active {
+  border-color: #b2b2b2 !important;
+  color: rgba(202, 202, 202, 1) !important;
+  font-weight: 500;
 }

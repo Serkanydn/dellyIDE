@@ -117,8 +117,8 @@ class FileEditor extends HTMLElement {
         new ContentEditorHelper().loadContent(event.target.getAttribute('data-id'))
         var files = JSON.parse(localStorageHelper.getItem('recentlyOpenedFiles'))
         var data = files.filter((file) => file.id === event.target.getAttribute('data-id'))
-        localStorageHelper.setOrderRecentlyFiles(data);
-       })
+        localStorageHelper.setOrderRecentlyFiles(data)
+      })
     })
   }
 

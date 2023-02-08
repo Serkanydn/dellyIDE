@@ -55,7 +55,8 @@ class ContentEditorHelper {
     }
 
     SweetAlert2Helper.toastFire({title: updateResult.message})
-    await this.solutionExplorer.treeListUpdateRow(updateResult.data)
+    // await this.solutionExplorer.treeListUpdateRow(updateResult.data)
+    this.solutionExplorer.refreshTreeList()
   }
 
   async saveAllFiles() {
@@ -80,7 +81,8 @@ class ContentEditorHelper {
     const fileGateService = new FileGateService()
     const {data: deletedItemResult} = await fileGateService.disableFile(_contentId)
     const contentEditor = this.getContentEditorWithDataId(_contentId)
-    await this.solutionExplorer.treeListDeleteRow(_contentId)
+    // await this.solutionExplorer.treeListDeleteRow(_contentId)
+    this.solutionExplorer.refreshTreeList()
     if (contentEditor) this.removeContent(_contentId)
     localStorageHelper.removeFromRecentlyFiles(_contentId)
     const fileEditor = document.querySelector('file-editor')
@@ -95,7 +97,7 @@ class ContentEditorHelper {
 
     const {data} = result
 
-    const {id, name, ufId, path, extension, content} = data
+    const {id, name, ufId, path, extension, content, parentId} = data
     localStorageHelper.addOpenedFile(_contentId)
 
     // ! Nav
@@ -104,6 +106,7 @@ class ContentEditorHelper {
 
     const editorNavButton = new EditorNavButton({title: name || ufId || id, contentId: id, extension, data, path})
     editorNavButton.setAttribute('data-id', id)
+    editorNavButton.setAttribute('data-parentId', parentId)
     editorNavButtons.append(editorNavButton)
 
     // ! Editor
@@ -208,7 +211,7 @@ class ContentEditorHelper {
       body.classList.add(`bg-light`)
       body.classList.remove('bg-dark')
     } else {
-      devExtremeDarkTheme.setAttribute('href', './vendor/devExtreme/css/dx.dark.css')
+      devExtremeDarkTheme.setAttribute('href', './vendor/devExtreme/css/dx.generic.custom-dark-theme.css')
       body.classList.remove(`bg-light`)
       body.classList.add('bg-dark')
     }

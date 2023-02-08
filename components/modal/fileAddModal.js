@@ -100,8 +100,7 @@ class FileAddModal extends HTMLElement {
 
     const fileGateService = new FileGateService()
     const {user, content} = useSelector((state) => state)
-    const {data: files} = await fileGateService.readAllFilesWithDomainId(user.activeDomain.id)
-
+    const {data: files} = await fileGateService.readAllFilesWithDomainId({domainId: user.activeDomain.id})
     const {id: selectedFolderId, name, objectType: selectedFolderObjectType} = content.selectedFolder
 
     // let name, ufId, id;
@@ -116,7 +115,9 @@ class FileAddModal extends HTMLElement {
         key: 'id',
       }),
       placeholder: 'Parent Id',
-      displayExpr: 'name',
+      displayExpr(item) {
+        if (item) return item.name || item.id
+      },
       valueExpr: 'id',
       showClearButton: true,
       value: selectedFolderObjectType && selectedFolderId && selectedFolderId,
@@ -226,7 +227,8 @@ class FileAddModal extends HTMLElement {
     this.close()
 
     useDispatch(setSelectedFile(result.data))
-    await solutionExplorer.treeListAddRow(result.data)
+    // await solutionExplorer.treeListAddRow(result.data)
+    solutionExplorer.refreshTreeList()
 
     SweetAlert2Helper.toastFire({title: result.message})
   }
