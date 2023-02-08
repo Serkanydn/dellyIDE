@@ -139,6 +139,20 @@ class ContentEditorHelper {
 
     if (!contentEditor || !navButton) return
 
+    if (contentEditor.state.editorContentChange) {
+      await this.changeContent(_contentId)
+      const fileGateService = new FileGateService()
+      const {data: result} = await fileGateService.readFileById(_contentId)
+      const {data} = result
+      useDispatch(setSelectedFile(data))
+      const {isConfirmed} = await SweetAlert2Helper.confirmedSweet({
+        text: 'You made changes to the file and did not save it. Do you want to save?',
+        icon: 'warning',
+      })
+
+      if (isConfirmed) this.saveFile()
+    }
+
     contentEditor.remove()
     navButton.remove()
     localStorageHelper.removeOpenedFile(_contentId)
@@ -232,8 +246,30 @@ class ContentEditorHelper {
     //     DARK_STYLE_LINK.setAttribute("href", DARK_THEME_PATH);
   }
 
-  clearContent() {
+  async clearContent() {
     const contentEditors = this.getOpenedContentEditors()
+
+    for await (const editor of contentEditors) {
+      if (editor.state.editorContentChange) {
+        await this.changeContent(editor.state.id)
+        const fileGateService = new FileGateService()
+        const {data: result} = await fileGateService.readFileById(editor.state.id)
+        const {data} = result
+        useDispatch(setSelectedFile(data))
+        const {isConfirmed} = await SweetAlert2Helper.confirmedSweet({
+          text: 'You made changes to the file and did not save it. Do you want to save?',
+          icon: 'warning',
+        })
+
+        if (isConfirmed) this.saveFile()
+
+        editor.remove()
+        this.getActiveNavButton().remove()
+      }
+
+      // activeNavButton.remove()
+    }
+
     contentEditors.forEach((editor) => {
       editor.remove()
     })

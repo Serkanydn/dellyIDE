@@ -62,7 +62,7 @@ class SolutionExplorer extends HTMLElement {
           row1: loadOptions.skip,
           row2: loadOptions.skip + loadOptions.take,
           sortBy: 'createdAt',
-          sortDesc: 'desc',
+          sortDesc: 'asc',
           domainId: id,
         }
         const {data: files} = await new FileGateService().readAllFilesWithDomainId(request)
@@ -71,11 +71,11 @@ class SolutionExplorer extends HTMLElement {
         //   console.log('"id": ', element.id, ' ----- ', '"parentId": ', element.parentId)
         // })
         // console.log('-------------------------------------------------------------------------------------------------------------------')
-        console.log(files)
+        // console.log(files)
 
         return {
           data: files,
-          totalCount: files.length + 1,
+          // totalCount: files.length + 1,
         }
       },
     })
@@ -84,7 +84,7 @@ class SolutionExplorer extends HTMLElement {
   setRecentlyFiles(data) {
     localStorageHelper.setRecentlyFiles(data)
   }
-  setTreelistItems(items, domainId) {
+  setTreelistItems(domainId) {
     const customStore = this.getStore(domainId)
 
     this.treeListInstance.option('dataSource', customStore)
@@ -120,14 +120,15 @@ class SolutionExplorer extends HTMLElement {
     const fileGateService = new FileGateService()
 
     useSubscribe('user.activeDomain', async (activeDomain) => {
-      const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
+      // const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
       // console.log('domainSubs')
-      this.setTreelistItems(files.data, activeDomain.id)
+      // this.setTreelistItems(files.data, activeDomain.id)
+      this.setTreelistItems(activeDomain.id)
 
       const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
       if (storageActiveDomainId !== activeDomain.id) {
         const contentEditorHelper = new ContentEditorHelper()
-        contentEditorHelper.clearContent()
+        await contentEditorHelper.clearContent()
         localStorageHelper.removeOpenedFiles()
         localStorageHelper.clearRecentlyOpenedFiles()
         contentEditorHelper.refreshRecentlyOpenedFiles()
@@ -173,9 +174,9 @@ class SolutionExplorer extends HTMLElement {
       highlightChanges: true,
       showRowLines: true,
       showBorders: false,
-      loadPanel: {
-        enabled: false,
-      },
+      // loadPanel: {
+      //   enabled: false,
+      // },
       selection: {
         mode: 'single',
         recursive: false,
@@ -224,13 +225,14 @@ class SolutionExplorer extends HTMLElement {
                 <div>
                   <small class="me-2" style="user-select:none">${title}</small>
                   ${
-                    objectType === '1' &&
-                    `
+                    objectType === '1'
+                      ? `
                     <small style="font-size:.7rem;user-select:none;" class="text-muted" disabled>
                     ${smallTextContent}
                     </small>
                   
                   `
+                      : ''
                   }
                 </div>
             </div>

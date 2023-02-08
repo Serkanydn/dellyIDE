@@ -74,11 +74,11 @@ const baseDependencyConfigs = [
 const dependencyConfigs = [
   {
     language: 'javascript',
-    configs: [...baseDependencyConfigs, ...setDevexpressKeys('javascript')],
+    configs: [...baseDependencyConfigs, ...setDevexpressKeys('javascript'), ...setDevexpressKeysStartWithDx('javascript')],
   },
   {
     language: 'json',
-    configs: [...convertDependencyToJson(baseDependencyConfigs), ...setDevexpressKeys('json')],
+    configs: [...convertDependencyToJson(baseDependencyConfigs), ...setDevexpressKeys('json'), ...setDevexpressKeysStartWithDx('json')],
   },
 ]
 
@@ -90,10 +90,21 @@ function setDevexpressKeys(type) {
     insertText:
       type === 'json'
         ? '{\n\t"dxLabel": "${1:}",\n\t"uxPosition": "${2:}",\n\t"uxType": "${3:}"\n}'
-        : '{\n\tdxLabel: "${1:}",\n\tuxPosition: "${2:}",\n\tuxType: "${3:}"\n}',
+        : '{\n\tuxType: ' + key + ',\n\tdxLabel: "${1:}",\n\tuxPosition: "${2:}"\n}',
   }))
 }
 
+function setDevexpressKeysStartWithDx(type) {
+  const devExpressKeys = Object.keys(DevExpress.ui)
+  return devExpressKeys.map((key) => ({
+    label: type === 'json' ? `"${key}"` : key,
+    documentation: '',
+    insertText:
+      type === 'json'
+        ? '{\n\t"dxLabel": "${1:}",\n\t"uxPosition": "${2:}",\n\t"uxType": "${3:}"\n}'
+        : '{\n\tuxType: ' + key + ',\n\tdxLabel: "${1:}",\n\tuxPosition: "${2:}"\n}',
+  }))
+}
 function convertDependencyToJson(dependencies) {
   return dependencies.map((dependency) => {
     const jsonFormatLabel = `"${dependency.label}"`

@@ -60,7 +60,7 @@ class CustomContextMenu extends HTMLElement {
       }
 
       case 'closeAll': {
-        new ContentEditorHelper().clearContent()
+        await new ContentEditorHelper().clearContent()
         break
       }
       case 'delete': {
@@ -105,6 +105,7 @@ class CustomContextMenu extends HTMLElement {
   }
 
   connectedCallback() {
+    console.log(this.state.selectedFile)
     const contextMenu = this.querySelector('#custom-context-menu')
     const self = this
 
@@ -116,7 +117,7 @@ class CustomContextMenu extends HTMLElement {
         const template = `
         <div style="height:25px;" class="d-flex align-items-center">
         ${itemData.icon && `<span class="${itemData.icon} me-2"></span>`}
-        
+
         ${itemData.text}
         </div>
         `

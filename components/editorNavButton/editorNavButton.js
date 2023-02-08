@@ -1,4 +1,4 @@
-import {useDispatch} from '../../store/index.js'
+import {useDispatch, useSelector} from '../../store/index.js'
 import {setSelectedFile} from '../../store/slices/content.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import CustomContextMenu from '../customContextMenu/customContextMenu.js'
