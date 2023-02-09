@@ -61,6 +61,7 @@ class ContentEditorHelper {
 
     SweetAlert2Helper.toastFire({title: updateResult.message})
     // await this.solutionExplorer.treeListUpdateRow(updateResult.data)
+    activeContentEditor.state.editorContentChange = false
     this.solutionExplorer.refreshTreeList()
   }
 
@@ -72,6 +73,7 @@ class ContentEditorHelper {
     openedContentEditors.forEach((contentEditor) => {
       const value = {id: contentEditor.state.id, content: contentEditor.getContent()}
       contents.push(value)
+      contentEditor.state.editorContentChange = false
     })
 
     const fileGateService = new FileGateService()
@@ -99,7 +101,6 @@ class ContentEditorHelper {
   async loadContent(_contentId) {
     const fileGateService = new FileGateService()
     const {data: result} = await fileGateService.readFileById(_contentId)
-
     const {data} = result
 
     const {id, name, ufId, path, extension, content, parentId} = data

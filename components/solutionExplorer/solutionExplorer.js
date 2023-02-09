@@ -291,6 +291,9 @@ class SolutionExplorer extends HTMLElement {
         }
         self.setRecentlyFiles(row.data)
         new ContentEditorHelper().changeContent(row.data.id)
+        // new ContentEditorHelper().changeContent(row.data)
+        // console.log(row.data)
+        // useDispatch(setSelectedFile(row.data.id))
       },
     })
   }

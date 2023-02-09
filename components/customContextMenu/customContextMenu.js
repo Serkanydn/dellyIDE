@@ -41,7 +41,7 @@ class CustomContextMenu extends HTMLElement {
         break
       }
       case 'preview': {
-        window.open(window.config.webServiceUrl, '_blank')
+        window.open(window.config.previewUrl + this.state.selectedFile.id, '_blank')
         break
       }
       case 'copyUrl': {
@@ -105,7 +105,6 @@ class CustomContextMenu extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log(this.state.selectedFile)
     const contextMenu = this.querySelector('#custom-context-menu')
     const self = this
 
