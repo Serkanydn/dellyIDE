@@ -143,12 +143,6 @@ small.text-muted.smallUfid {
   }
 }
 
-.remove-button {
-  right: -1%;
-  top: 53%;
-  background-color: transparent !important;
-}
-
 body {
   background-color: white;
 }
@@ -156,10 +150,17 @@ body.bg-dark {
   color: #dedede !important;
 }
 
+.remove-button {
+  right: -1%;
+  top: 53%;
+  background-color: transparent !important;
+  color: rgba(202, 202, 202, 1) !important;
+}
+
 .nav-link {
   color: rgba(73, 80, 87, 0.5) !important;
   padding: 6px 30px 6px 12px;
-  font-weight: 500;
+  /* font-weight: 500; */
 }
 
 .nav-link.active {
@@ -175,19 +176,16 @@ body.bg-dark {
 .aside-nav .nav-justified .nav-item,
 .nav-justified > .nav-link {
   border-color: #e9ecef #e9ecef #dee2e6 !important;
-  border-bottom: none;
+  /* border-bottom: none; */
 }
 
-.aside-nav .nav-justified .nav-item,
-.nav-justified > .nav-link {
-  border-color: #e9ecef #e9ecef #dee2e6 !important;
+.nav-item .nav-link {
+  border: solid 1px #dee2e6;
   border-bottom: none;
 }
 
 body.bg-dark .modal-header,
-body.bg-dark .modal-body,
-body.bg-dark .nav-link,
-body.bg-dark .remove-button {
+body.bg-dark .modal-body {
   background-color: #1e1e1e !important;
   color: #dedede !important;
   border: none;
@@ -197,15 +195,43 @@ body.bg-dark .remove-button {
   background-color: transparent;
 }
 body.bg-dark .nav-link {
-  font-weight: 500;
+  background-color: #1e1e1e !important;
+  color: #dedede !important;
+  border: solid 1px #565353;
+  border-bottom: none;
+}
+
+body.bg-dark .remove-button {
+  background-color: #1e1e1e !important;
   color: rgba(202, 202, 202, 0.5) !important;
+  border: none;
+}
+
+body.bg-dark .nav-link {
+  /* font-weight: 500; */
+  color: rgba(202, 202, 202, 0.5) !important;
+}
+body.bg-dark .nav-link:hover {
+  border-color: #878585 !important;
 }
 
 body.bg-dark .nav-link.active {
-  border-color: #b2b2b2 !important;
+  border-color: #878585 !important;
   color: rgba(202, 202, 202, 1) !important;
   font-weight: 500;
 }
 body.bg-dark .dx-icon{
   filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(130deg) brightness(100%) contrast(100%);
+}
+
+body.bg-dark #file-menu #aside-body .aside-nav .nav-link {
+  /* font-weight: 500; */
+  /* border-color: red !important; */
+  border-color: #878585 !important;
+}
+
+body.bg-dark #file-menu #aside-body .aside-nav .nav-link.active {
+  /* font-weight: 500; */
+  /* border-color: red !important; */
+  border-top: none !important;
 }

@@ -12,24 +12,29 @@ class FileUpdateModal extends HTMLElement {
 
 <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content w-50">
+    <div class="modal-content w-75">
       <div class="modal-header">
         <h5 class="modal-title" id="fileModalLabel">File Update</h5>
         <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
           <div class="modal-body">
+
+         
+
           <div class="row  mb-2" ${this.state?.objectType !== '0' ? 'disabled' : ''} >
           <div class="col-md-12 d-flex" disabled>
              <label  class="form-label" for="">Type</label>
             <div id="type"></div>
           </div>
-       </div>
+          </div>
 
+
+      
     
         <div class="row mb-2">
 
-  <label for="name" class="col-sm-2 col-form-label col-form-label-sm">Filename</label>
+          <label for="name" class="col-sm-2 col-form-label col-form-label-sm">File Name</label>
           <div class=${this.state?.objectType !== '0' ? 'col-md-7' : 'col-md-10'}>
             <div id="name" ></div>
           </div>
@@ -38,8 +43,8 @@ class FileUpdateModal extends HTMLElement {
             <div id="extension"></div>
           </div>
 
-
         </div>
+
 
 
         <div id="ufIdGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}">
@@ -54,7 +59,7 @@ class FileUpdateModal extends HTMLElement {
       
 
 
-           <div id="versionGroup" class="col-md-12" >
+           <div id="versionGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
         <div  class="row mb-2">
           <label for="version" class="col-sm-2 col-form-label col-form-label-sm">Version</label>
           <div class="col-md-10">
@@ -71,6 +76,10 @@ class FileUpdateModal extends HTMLElement {
           </div>
 
       </div>
+
+      <div  class="col-md-12 mb-2">
+      <div id="fileId" class=""></div>
+   </div>
 
       <div class="modal-footer">
       <button id="closeBtn" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" aria-label="Close">Close</button>
@@ -156,6 +165,12 @@ class FileUpdateModal extends HTMLElement {
       layout: 'horizontal',
       displayExpr: 'text',
       valueExpr: 'id',
+      disabled: true,
+    })
+
+    const fileId = document.querySelector('#fileId')
+    this.fileIdInstance = new DevExpress.ui.dxTextBox(fileId, {
+      value: this.state?.id,
       disabled: true,
     })
 
@@ -246,7 +261,6 @@ class FileUpdateModal extends HTMLElement {
     // * Folder
     if (updatedFile.objectType === '0') {
       const editorNavButtons = Array.from(document.querySelectorAll(`editor-nav-button[data-parentId="${updatedFile.id}"`))
-      console.log(editorNavButtons)
       editorNavButtons.forEach((editorNavButton) => {
         // if (!editorNavButton.state.path.includes(updatedFile.path)) {
         const selectButton = editorNavButton.querySelector('[id^="select"]')
@@ -258,15 +272,21 @@ class FileUpdateModal extends HTMLElement {
     // * File
     if (updatedFile.objectType === '1') {
       const editorNavButton = document.querySelector(`editor-nav-button[data-id="${this.state?.id}"`)
-      const oldBtnTitle = `${editorNavButton.state.title}.${editorNavButton.state.extension}`
-      const newBtnTitle = `${updatedFile.name || updatedFile.ufId || updatedFile.id}.${updatedFile.extension}`
-
-      if ((editorNavButton && oldBtnTitle !== newBtnTitle) || editorNavButton.state.path !== updatedFile.path) {
-        const selectButton = editorNavButton.querySelector(`#select-${this.state?.id}`)
-        selectButton.innerText = newBtnTitle
-        selectButton.title = updatedFile.path
-        editorNavButton.state.path = updatedFile.path
-        if (selectedFileId === updatedFile.id) useDispatch(setSelectedFile(updatedFile))
+      if (editorNavButton) {
+        const oldBtnTitle = `${editorNavButton.state.title}.${editorNavButton.state.extension}`
+        const newBtnTitle = `${updatedFile.name || updatedFile.ufId || updatedFile.id}.${updatedFile.extension}`
+        if (
+          oldBtnTitle !== newBtnTitle ||
+          editorNavButton.state.ufId !== updatedFile.ufId ||
+          editorNavButton.state.path !== updatedFile.path
+        ) {
+          const selectButton = editorNavButton.querySelector(`#select-${this.state?.id}`)
+          selectButton.innerText = newBtnTitle
+          selectButton.title = updatedFile.path
+          editorNavButton.state.path = updatedFile.path
+          editorNavButton.state.data = updatedFile
+          if (selectedFileId === updatedFile.id) useDispatch(setSelectedFile(updatedFile))
+        }
       }
     }
 

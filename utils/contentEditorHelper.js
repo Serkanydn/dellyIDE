@@ -61,6 +61,7 @@ class ContentEditorHelper {
 
     SweetAlert2Helper.toastFire({title: updateResult.message})
     // await this.solutionExplorer.treeListUpdateRow(updateResult.data)
+    activeContentEditor.state.editorContentChange = false
     this.solutionExplorer.refreshTreeList()
   }
 
@@ -72,6 +73,7 @@ class ContentEditorHelper {
     openedContentEditors.forEach((contentEditor) => {
       const value = {id: contentEditor.state.id, content: contentEditor.getContent()}
       contents.push(value)
+      contentEditor.state.editorContentChange = false
     })
 
     const fileGateService = new FileGateService()
@@ -90,7 +92,7 @@ class ContentEditorHelper {
     // await this.solutionExplorer.treeListDeleteRow(_contentId)
     this.solutionExplorer.refreshTreeList()
     if (contentEditor) this.removeContent(_contentId)
-    localStorageHelper.removeFromRecentlyFiles(fileId)
+    localStorageHelper.removeFromRecentlyFiles(_contentId)
     this.refreshRecentlyOpenedFiles()
 
     SweetAlert2Helper.toastFire({title: deletedItemResult.message})
@@ -99,7 +101,6 @@ class ContentEditorHelper {
   async loadContent(_contentId) {
     const fileGateService = new FileGateService()
     const {data: result} = await fileGateService.readFileById(_contentId)
-
     const {data} = result
 
     const {id, name, ufId, path, extension, content, parentId} = data
@@ -129,6 +130,8 @@ class ContentEditorHelper {
     for (const contentId of _contentIds) {
       await this.changeContent(contentId)
     }
+    // const {data: result} = await new FileGateService().readFileById(_contentIds.pop())
+    // useDispatch(setSelectedFile(result.data))
   }
 
   async removeContent(_contentId) {
@@ -136,6 +139,26 @@ class ContentEditorHelper {
     const navButton = this.getNavButtonWithDataId(_contentId)
 
     if (!contentEditor || !navButton) return
+
+    if (contentEditor.state.editorContentChange) {
+      await this.changeContent(_contentId)
+      const fileGateService = new FileGateService()
+      const {data: result} = await fileGateService.readFileById(_contentId)
+      const {data} = result
+      useDispatch(setSelectedFile(data))
+      const dataName = `${data.name || data.ufId || data.id}.${data.extension}`
+      const {isConfirmed, isDenied} = await SweetAlert2Helper.YesNoCancel({
+        html: `
+        Do you want to save the changes you made to <b style='color:red;'>${dataName}</b>.
+        Your changes will be lost if you don't save them.
+        `,
+        icon: 'warning',
+      })
+
+      if (!isDenied && !isConfirmed) return
+
+      if (isConfirmed) this.saveFile()
+    }
 
     contentEditor.remove()
     navButton.remove()
@@ -230,48 +253,83 @@ class ContentEditorHelper {
     //     DARK_STYLE_LINK.setAttribute("href", DARK_THEME_PATH);
   }
 
-  clearContent() {
-    const contentEditors = this.getOpenedContentEditors()
+  async clearContent() {
+    let contentEditors = this.getOpenedContentEditors()
+    let editorNavButtons = this.getOpenedNavButtons()
+
+    let isCancel = false
+
+    for await (const editor of contentEditors) {
+      if (editor.state.editorContentChange) {
+        await this.changeContent(editor.state.id)
+        const fileGateService = new FileGateService()
+        const {data: result} = await fileGateService.readFileById(editor.state.id)
+        const {data} = result
+        useDispatch(setSelectedFile(data))
+        const dataName = `${data.name || data.ufId || data.id}.${data.extension}`
+        const {isConfirmed, isDenied} = await SweetAlert2Helper.YesNoCancel({
+          html: `
+          Do you want to save the changes you made to <b style='color:red;'>${dataName}</b>.
+          Your changes will be lost if you don't save them.
+          `,
+          icon: 'warning',
+        })
+
+        contentEditors = contentEditors.filter((editor) => editor.state.id !== data.id)
+        editorNavButtons = editorNavButtons.filter((navButton) => navButton.state.contentId !== data.id)
+
+        if (!isDenied && !isConfirmed) isCancel = true
+
+        if (isConfirmed) this.saveFile()
+
+        if (isDenied || isConfirmed) {
+          editor.remove()
+          this.getActiveNavButton().remove()
+          localStorageHelper.removeOpenedFile(editor.state.id)
+        }
+      }
+    }
+
     contentEditors.forEach((editor) => {
       editor.remove()
+      localStorageHelper.removeOpenedFile(editor.state.id)
     })
 
-    const editosNavButtons = this.getOpenedNavButtons()
-    editosNavButtons.forEach((editorNavButton) => {
+    editorNavButtons.forEach((editorNavButton) => {
       editorNavButton.remove()
     })
 
-    const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
-    fileEditorNavButtons.classList.remove('nav-tabs')
-    this.refreshRecentlyOpenedFiles()
-
-    document.querySelector('.splashScreen').style.display = 'block'
-    useDispatch(setSelectedFile(null))
+    if (!isCancel) {
+      const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
+      fileEditorNavButtons.classList.remove('nav-tabs')
+      this.refreshRecentlyOpenedFiles()
+      document.querySelector('.splashScreen').style.display = 'block'
+      useDispatch(setSelectedFile(null))
+    }
   }
 
-  async copyPath(_contentId) {
-    const {data: result} = await new FileGateService().readFileById(_contentId)
-    const {success, message, data} = result
-
-    if (!success) {
-      SweetAlert2.toastFire({
-        title: message,
-      })
-      return
-    }
-
-    const {id, ufId, domainId, objectType, extension} = data
-
+  async copyUrl({id, ufId, domainId, objectType}) {
     if (objectType === '0') return
 
-    let path
+    let url
 
-    if (ufId) path = `${config.webServiceUrl}/${domainId}/${ufId}.${extension}`
-    else path = `${config.webServiceUrl}/${domainId}/${id}.${extension}`
+    if (ufId) url = `${config.webServiceUrl}/${domainId}/${ufId}`
+    else url = `${config.webServiceUrl}/${domainId}/${id}`
 
-    this.copyTextToClipboard(path)
+    this.copyTextToClipboard(url)
     SweetAlert2.toastFire({
       title: 'Copied',
+    })
+  }
+
+  async copyId({id, ufId, objectType}) {
+    if (objectType === '0') return
+
+    const url = ufId || id
+
+    this.copyTextToClipboard(url)
+    SweetAlert2.toastFire({
+      title: 'Id copied',
     })
   }
 

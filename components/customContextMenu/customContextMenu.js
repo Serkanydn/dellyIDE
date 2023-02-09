@@ -1,10 +1,14 @@
-import {useDispatch} from '../../store/index.js'
+import FileGateService from '../../services/fileGateService.js'
+import {useDispatch, useSelector} from '../../store/index.js'
+import {setSelectedFolder} from '../../store/slices/content.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
+import FileAddModal from '../modal/fileAddModal.js'
+import FileUpdateModal from '../modal/fileUpdateModal.js'
 
 class CustomContextMenu extends HTMLElement {
-  constructor({mouseX, mouseY, target, activeContentId}) {
+  constructor({items, target, selectedFile}) {
     super()
-    this.state = {mouseX, mouseY, target, activeContentId}
+    this.state = {items, target, selectedFile}
     this.innerHTML = `
     
    <div id="custom-context-menu" >
@@ -12,58 +16,114 @@ class CustomContextMenu extends HTMLElement {
         `
   }
 
-  async onItemClick(actionName, contentId) {
+  async onItemClick(actionName, fileId) {
     switch (actionName) {
-      case 'copyPath': {
-        await new ContentEditorHelper().copyPath(contentId)
+      case 'duplicate': {
+        const fileGateService = new FileGateService()
+        const {data: result} = await fileGateService.copyFile(this.state.selectedFile)
+        const solutionExplorer = document.querySelector('solution-explorer-component')
+        solutionExplorer.refreshTreeList()
+
         break
       }
-      case 'delete': {
-        await new ContentEditorHelper().deleteFile(contentId)
+      case 'newAdd': {
+        if (this.state.selectedFile.objectType === '0') {
+          useDispatch(setSelectedFolder(this.state.selectedFile))
+        } else {
+          useDispatch(setSelectedFolder(null))
+        }
+
+        this.createModal()
+        break
+      }
+      case 'update': {
+        this.updateModal(this.state.selectedFile)
+        break
+      }
+      case 'preview': {
+        window.open(window.config.previewUrl + this.state.selectedFile.id, '_blank')
+        break
+      }
+      case 'copyUrl': {
+        const {id, ufId, domainId, objectType} = this.state.selectedFile
+        await new ContentEditorHelper().copyUrl({id, ufId, domainId, objectType})
+        break
+      }
+      case 'copyId': {
+        const {id, ufId, objectType} = this.state.selectedFile
+        await await new ContentEditorHelper().copyId({id, ufId, objectType})
         break
       }
       case 'close': {
-        await new ContentEditorHelper().removeContent(contentId)
+        await new ContentEditorHelper().removeContent(fileId)
         break
       }
 
       case 'closeAll': {
-        new ContentEditorHelper().clearContent()
+        await new ContentEditorHelper().clearContent()
+        break
+      }
+      case 'delete': {
+        const {id, objectType} = this.state.selectedFile
+        await new ContentEditorHelper().deleteFile(id)
+        if (objectType === '0') useDispatch(setSelectedFolder(null))
         break
       }
     }
+  }
+
+  async createModal() {
+    const fileAddModal = new FileAddModal()
+    document.body.appendChild(fileAddModal)
+    fileAddModal.open()
+  }
+
+  async updateModal(item) {
+    const fileGateService = new FileGateService()
+    const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
+    const result = await fileGateService.readAllFilesWithDomainId({domainId})
+    // const recently = this.setRecentlyFiles(this.state);
+
+    const {id, parentId, name, objectType, ufId, extension, version, path} = item
+
+    const fileUpdateModal = new FileUpdateModal({
+      files: result,
+      id,
+      parentId,
+      name,
+      ufId,
+      extension,
+      domainId,
+      objectType,
+      domainName,
+      version,
+      path,
+    })
+
+    document.body.append(fileUpdateModal)
+    fileUpdateModal.open()
   }
 
   connectedCallback() {
     const contextMenu = this.querySelector('#custom-context-menu')
     const self = this
 
-    const menuItems = [
-      {id: 'copyPath', text: 'Copy Path', icon: 'dx-icon-map'},
-      {id: 'close', text: 'Close', icon: 'dx-icon-close'},
-      {id: 'closeAll', text: 'Close All', icon: 'dx-icon-close'},
-      {id: 'delete', text: 'Delete', icon: 'dx-icon-trash'},
-    ]
-
     this.contextMenu = new DevExpress.ui.dxContextMenu(contextMenu, {
-      dataSource: menuItems,
+      dataSource: self.state.items,
       target: self.state.target,
       width: '150px',
       itemTemplate(itemData) {
-        const template = document.createElement('div')
-        template.style.height = '25px'
-        template.classList.add('d-flex', 'align-items-center')
-        if (itemData.icon) {
-          const span = document.createElement('span')
-          span.classList.add(itemData.icon, 'me-2')
-          template.appendChild(span)
-        }
+        const template = `
+        <div style="height:25px;" class="d-flex align-items-center">
+        ${itemData.icon && `<span class="${itemData.icon} me-2"></span>`}
 
-        template.append(itemData.text)
-        return template
+        ${itemData.text}
+        </div>
+        `
+        return document.createRange().createContextualFragment(template)
       },
       onItemClick(event) {
-        self.onItemClick(event.itemData.id, self.state.activeContentId)
+        self.onItemClick(event.itemData.id, self.state.selectedFile.id)
         self.remove()
       },
       closeOnOutsideClick() {

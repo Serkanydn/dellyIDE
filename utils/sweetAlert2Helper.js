@@ -10,6 +10,19 @@ class SweetAlert2 {
     })
   }
 
+  static async YesNoCancel({title, text, html, icon}) {
+    return Swal.fire({
+      title,
+      text,
+      icon,
+      html,
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      denyButtonText: `Don't save`,
+    })
+  }
+
   static fire(title, timer = 1000, icon = 'success') {
     Swal.fire({
       title,

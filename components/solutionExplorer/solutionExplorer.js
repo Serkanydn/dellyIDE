@@ -8,6 +8,7 @@ import SweetAlert2 from '../../utils/sweetAlert2Helper.js'
 import localStorageHelper from '../../utils/localStorageHelper.js'
 
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
+import CustomContextMenu from '../customContextMenu/customContextMenu.js'
 
 class SolutionExplorer extends HTMLElement {
   constructor() {
@@ -15,18 +16,21 @@ class SolutionExplorer extends HTMLElement {
 
     this.innerHTML = `
             <div id="solutionExplorer" class="h-100"  ></div>
-            <div id="context-menu"></div>
         `
   }
 
   setSelectedTreeItem(file) {
     this.selectedTreeItem = file
-    // this.treeListInstance.option('selectedRowKeys', [file.id])
+    this.treeListInstance.option('selectedRowKeys', [file.id])
   }
 
   clearSelectedTreeItem() {
     this.selectedTreeItem = null
     this.treeListInstance.option('selectedRowKeys', [])
+  }
+
+  getSelectedRowKey() {
+    return this.treeListInstance.getSelectedRowKeys()[0]
   }
 
   getSelectedTreeItem() {
@@ -58,7 +62,7 @@ class SolutionExplorer extends HTMLElement {
           row1: loadOptions.skip,
           row2: loadOptions.skip + loadOptions.take,
           sortBy: 'createdAt',
-          sortDesc: 'desc',
+          sortDesc: 'asc',
           domainId: id,
         }
         const {data: files} = await new FileGateService().readAllFilesWithDomainId(request)
@@ -67,11 +71,11 @@ class SolutionExplorer extends HTMLElement {
         //   console.log('"id": ', element.id, ' ----- ', '"parentId": ', element.parentId)
         // })
         // console.log('-------------------------------------------------------------------------------------------------------------------')
-        console.log(files)
+        // console.log(files)
 
         return {
           data: files,
-          totalCount: files.length + 1,
+          // totalCount: files.length + 1,
         }
       },
     })
@@ -80,7 +84,7 @@ class SolutionExplorer extends HTMLElement {
   setRecentlyFiles(data) {
     localStorageHelper.setRecentlyFiles(data)
   }
-  setTreelistItems(items, domainId) {
+  setTreelistItems(domainId) {
     const customStore = this.getStore(domainId)
 
     this.treeListInstance.option('dataSource', customStore)
@@ -116,14 +120,15 @@ class SolutionExplorer extends HTMLElement {
     const fileGateService = new FileGateService()
 
     useSubscribe('user.activeDomain', async (activeDomain) => {
-      const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
+      // const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
       // console.log('domainSubs')
-      this.setTreelistItems(files.data, activeDomain.id)
+      // this.setTreelistItems(files.data, activeDomain.id)
+      this.setTreelistItems(activeDomain.id)
 
       const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
       if (storageActiveDomainId !== activeDomain.id) {
         const contentEditorHelper = new ContentEditorHelper()
-        contentEditorHelper.clearContent()
+        await contentEditorHelper.clearContent()
         localStorageHelper.removeOpenedFiles()
         localStorageHelper.clearRecentlyOpenedFiles()
         contentEditorHelper.refreshRecentlyOpenedFiles()
@@ -139,17 +144,11 @@ class SolutionExplorer extends HTMLElement {
 
     // ? Store Subscribe
     useSubscribe('content.selectedFile', async (selectedFile) => {
-      if (Object.keys(selectedFile).length === 0) {
-        self.clearSelectedTreeItem()
-        return
-      }
-
-      if (selectedFile.objectType === '1') {
-        self.setSelectedTreeItem(selectedFile)
-      }
+      self.setSelectedTreeItem(selectedFile)
     })
 
     const folders = document.querySelector('#solutionExplorer')
+    var draggingGroupName = 'appointmentsGroup'
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
       // dataSource: [],
@@ -176,9 +175,9 @@ class SolutionExplorer extends HTMLElement {
       highlightChanges: true,
       showRowLines: true,
       showBorders: false,
-      loadPanel: {
-        enabled: false,
-      },
+      // loadPanel: {
+      //   enabled: false,
+      // },
       selection: {
         mode: 'single',
         recursive: false,
@@ -196,8 +195,8 @@ class SolutionExplorer extends HTMLElement {
       toolbar: {
         items: [
           {
-            widget: 'dxButton',
             location: 'after',
+            widget: 'dxButton',
             options: {
               icon: 'icon/refresh.svg',
               onClick: () => {
@@ -205,10 +204,53 @@ class SolutionExplorer extends HTMLElement {
               },
             },
           },
+          {
+            location: 'after',
+            widget: 'dxButton',
+            locateInMenu: 'auto',
+            options: {
+              icon: 'add',
+              hint: 'Add new file',
+              onClick() {
+                self.createModal()
+              },
+            },
+          },
           'searchPanel',
         ],
       },
+      // rowDragging: {
+      //   group: draggingGroupName,
+      //   allowDropInsideItem: false,
+      //   allowReordering: false,
+      //   showDragIcons: false,
+      //   onRemove: (e) => {
+      //     alert('onRemove')
+      //   },
 
+      //   onAdd: (e) => {
+      //     alert('onAdd')
+      //   },
+      //   onDragEnd(event) {
+      //     console.log(event)
+      //     event.toData === 'dropArea' && console.log('outside TreeList')
+      //     // alert('onDragEnd')
+      //   },
+
+      //   onDragChange1: (e) => {
+      //     var visibleRows = treeList.getVisibleRows(),
+      //       sourceNode = treeList.getNodeByKey(e.itemData.ID),
+      //       targetNode = visibleRows[e.toIndex].node
+
+      //     while (targetNode && targetNode.data) {
+      //       if (targetNode.data.ID === sourceNode.data.ID) {
+      //         e.cancel = true
+      //         break
+      //       }
+      //       targetNode = targetNode.parent
+      //     }
+      //   },
+      // },
       columns: [
         {
           dataField: 'name',
@@ -216,38 +258,41 @@ class SolutionExplorer extends HTMLElement {
           cellTemplate(container, options) {
             const {data} = options
             const {id, name, ufId, objectType} = data
-            const mainDiv = document.createElement('div')
-            mainDiv.classList.add('d-flex')
 
-            const icon = document.createElement('img')
-            // icon.classList.add(`folder-${id}`)
-            icon.style.width = '20px'
-            icon.style.objectFit = 'cover'
-            icon.classList.add('img')
-            icon.src = `icon/${data.extension ? data.extension : 'folder'}.svg`
+            const title = name || ufId || id
 
-            const contentDiv = document.createElement('div')
-            const text = document.createElement('small')
-            text.textContent = name || ufId || id
-            text.classList.add('me-2')
-            text.style.userSelect = 'none'
-
-            contentDiv.append(text)
+            let smallTextContent = ufId || id
+            if ((!name && !ufId) || name === ufId) smallTextContent = ''
+            const template = `
+            <div  class="d-flex tree-list-draggable-item">
+                <img src="icon/${data.extension ? data.extension : 'folder'}.svg" style="width:20px;objectFit:'cover'" class="img"/>
+                <div>
+                  <small class="me-2" style="user-select:none">${title}</small>
+                  ${
+                    objectType === '1'
+                      ? `
+                    <small style="font-size:.7rem;user-select:none;" class="text-muted" disabled>
+                    ${smallTextContent}
+                    </small>
+                  
+                  `
+                      : ''
+                  }
+                </div>
+            </div>
+            `
+            const element = document.createRange().createContextualFragment(template)
 
             if (objectType === '1') {
-              const small = document.createElement('small')
-              small.style.fontSize = '.7em'
-              small.style.userSelect = 'none'
-              small.classList.add('text-muted')
-              small.setAttribute('disabled', 'disabled')
-              small.textContent = ufId || id
-
-              if ((!name && !ufId) || name === ufId) small.textContent = ''
-              contentDiv.append(small)
+              const draggable = element.querySelector('.tree-list-draggable-item')
+              draggable.setAttribute('draggable', true)
+              draggable.setAttribute('role', 'button')
+              draggable.addEventListener('dragstart', (event) => {
+                event.dataTransfer.setData('text/plain', `"@@include myspace/${data.ufId || data.id}@@"`)
+              })
             }
 
-            mainDiv.append(icon, contentDiv)
-            container.append(mainDiv)
+            container.append(element)
           },
         },
       ],
@@ -256,11 +301,23 @@ class SolutionExplorer extends HTMLElement {
     this.treeListInstance.on({
       contextMenuPreparing(event) {
         // ? Treelistteki itemların dışına tıklanırsa data olmadığı için patlayabiliyor.
-        if (event.row?.data) {
-          self.setSelectedTreeItem(event.row?.data)
+        if (!event.row?.data) return
+
+        const {data} = event.row
+        if (data) {
+          self.setSelectedTreeItem(data)
+        }
+
+        if (data.objectType === '0') {
+          self.createFolderContextMenu(data)
+        }
+
+        if (data.objectType === '1') {
+          self.createFileContextMenu(data)
         }
       },
-      rowClick({data}) {
+      rowClick(event) {
+        const {data} = event
         if (data.objectType === '0') {
           useDispatch(setSelectedFolder(data))
           return
@@ -288,91 +345,14 @@ class SolutionExplorer extends HTMLElement {
         }
         self.setRecentlyFiles(row.data)
         new ContentEditorHelper().changeContent(row.data.id)
-      },
-    })
-
-    const contextMenu = this.querySelector('#context-menu')
-    const menuItems = [
-      {id: 'open', text: 'Open', icon: 'dx-icon-folder'},
-      {id: 'duplicate', text: 'Duplicate', icon: 'dx-icon-copy'},
-      {id: 'copyPath', text: 'Copy Path', icon: 'dx-icon-map'},
-      {id: 'newAdd', text: 'Add New', icon: 'dx-icon-add'},
-      {id: 'update', text: 'Update', icon: 'dx-icon-edit'},
-      {id: 'delete', text: 'Delete', icon: 'dx-icon-trash'},
-    ]
-
-    this.contextMenu = new DevExpress.ui.dxContextMenu(contextMenu, {
-      dataSource: menuItems,
-      target: '#solutionExplorer .dx-treelist-rowsview .dx-treelist-table tbody .dx-row.dx-data-row td ',
-      width: '150px',
-      itemTemplate(itemData) {
-        const template = document.createElement('div')
-        template.style.height = '25px'
-        template.classList.add('d-flex', 'align-items-center')
-        if (itemData.icon) {
-          const span = document.createElement('span')
-          span.classList.add(itemData.icon, 'me-2')
-          template.appendChild(span)
-        }
-
-        template.append(itemData.text)
-        return template
-      },
-      async onItemClick(event) {
-        switch (event.itemData.id) {
-          case 'open': {
-            const {id, objectType} = self.selectedTreeItem
-            if (objectType === '0') return
-
-            await new ContentEditorHelper().changeContent(id)
-
-            break
-          }
-          case 'duplicate': {
-            const selectedFile = self.getSelectedTreeItem()
-            const fileGateService = new FileGateService()
-            const {data: result} = await fileGateService.copyFile(selectedFile)
-            // self.treeListAddRow(result.data)
-            self.refreshTreeList()
-
-            break
-          }
-          case 'copyPath': {
-            const {id} = self.selectedTreeItem
-
-            await new ContentEditorHelper().copyPath(id)
-
-            break
-          }
-          case 'newAdd': {
-            const {id, objectType} = self.selectedTreeItem
-            if (objectType === '0') {
-              useDispatch(setSelectedFolder(self.selectedTreeItem))
-            } else {
-              useDispatch(setSelectedFolder(null))
-            }
-
-            self.createModal()
-            break
-          }
-
-          case 'update': {
-            self.updateModal(self.selectedTreeItem)
-            break
-          }
-          case 'delete': {
-            const {id} = self.selectedTreeItem
-            await new ContentEditorHelper().deleteFile(id)
-
-            break
-          }
-
-          default:
-            break
-        }
+        // new ContentEditorHelper().changeContent(row.data)
+        // console.log(row.data)
+        // useDispatch(setSelectedFile(row.data.id))
       },
     })
   }
+
+  createDraggable() {}
 
   async createModal() {
     const fileAddModal = new FileAddModal()
@@ -380,30 +360,40 @@ class SolutionExplorer extends HTMLElement {
     fileAddModal.open()
   }
 
-  async updateModal(item) {
-    const fileGateService = new FileGateService()
-    const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
-    const result = await fileGateService.readAllFilesWithDomainId({domainId})
-    // const recently = this.setRecentlyFiles(this.state);
+  createFolderContextMenu(data) {
+    const menuItems = [
+      {id: 'newAdd', text: 'Add New', icon: 'dx-icon-add'},
+      {id: 'update', text: 'Update info', icon: 'dx-icon-edit'},
+      {id: 'delete', text: 'Delete', icon: 'dx-icon-trash'},
+    ]
 
-    const {id, parentId, name, objectType, ufId, extension, version, path} = item
+    document.querySelector('body').append(
+      new CustomContextMenu({
+        target: '#solutionExplorer .dx-treelist-rowsview .dx-treelist-table tbody .dx-row.dx-data-row td',
+        items: menuItems,
+        selectedFile: data,
+      })
+    )
+  }
 
-    const fileUpdateModal = new FileUpdateModal({
-      files: result,
-      id,
-      parentId,
-      name,
-      ufId,
-      extension,
-      domainId,
-      objectType,
-      domainName,
-      version,
-      path,
-    })
+  createFileContextMenu(data) {
+    const menuItems = [
+      {id: 'preview', text: 'Preview', icon: 'dx-icon-find'},
+      {id: 'duplicate', text: 'Duplicate', icon: 'dx-icon-copy'},
+      {id: 'copyUrl', text: 'Copy Url', icon: 'dx-icon-map'},
+      {id: 'copyId', text: 'Copy Id', icon: 'dx-icon-copy'},
+      {id: 'newAdd', text: 'Add New', icon: 'dx-icon-add'},
+      {id: 'update', text: 'Update info', icon: 'dx-icon-edit'},
+      {id: 'delete', text: 'Delete', icon: 'dx-icon-trash'},
+    ]
 
-    document.body.append(fileUpdateModal)
-    fileUpdateModal.open()
+    document.querySelector('body').append(
+      new CustomContextMenu({
+        target: '#solutionExplorer .dx-treelist-rowsview .dx-treelist-table tbody .dx-row.dx-data-row td',
+        items: menuItems,
+        selectedFile: data,
+      })
+    )
   }
 }
 

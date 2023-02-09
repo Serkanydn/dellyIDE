@@ -5,13 +5,10 @@ import mainConfig from './mainConfig.js'
 class ContentEditor extends HTMLElement {
   constructor({id, extension, value = ''}) {
     super()
-    this.state = {id, extension, value}
+    this.state = {id, extension, value, editorContentChange: false}
     this.editor = null
     this.solutionExplorer = document.querySelector('solution-explorer-component')
     this.fileEditor = document.querySelector('file-editor')
-    //this.asideComponent = document.querySelector('aside-component')
-    //this.selectedDomain = null
-    // <button id="updateVersion-${this.state.id}" class="btn btn-warning text-white"> <i class="bi bi-pencil-fill" style="font-size:14px"> </i> Version Update</button>
 
     this.innerHTML = `
         <div class='monaco-container d-flex flex-column h-100' >
@@ -20,17 +17,6 @@ class ContentEditor extends HTMLElement {
         `
   }
 
-  //   <div id="monaco-editor-footer" class="d-flex justify-content-between align-items-center gap-2 p-2 border-top ">
-  //   <div class="editArea">
-  //     <button id="update-${this.state.id}" class="btn btn-secondary"> <i class="bi bi-pencil-fill" style="font-size:14px"> </i> Edit</button>
-  //   </div>
-  //   <div class="fileActionArea">
-  //     <button id="save-${this.state.id}" class="btn btn-success"> <i class="bi bi-save"  style="font-size:14px"> </i> Save</button>
-  //     <button id="delete-${this.state.id}" class="btn btn-danger"> <i class="bi bi-trash" style="font-size:14px"> </i> Delete</button>
-  //   </div>
-
-  // </div>
-  // </div>
   setLayout() {
     this.editor.layout({})
   }
@@ -72,6 +58,11 @@ class ContentEditor extends HTMLElement {
       theme: `vs-${theme}`,
       fontSize,
       ...mainConfig,
+    })
+
+    this.editor.getModel().onDidChangeContent((event) => {
+      // console.log('editor change')
+      this.state.editorContentChange = true
     })
 
     //this.editor.layout({width: '100%', height: '100%'})
