@@ -61,6 +61,7 @@ class ContentEditor extends HTMLElement {
     })
 
     this.editor.getModel().onDidChangeContent((event) => {
+      // console.log('editor change')
       this.state.editorContentChange = true
     })
 

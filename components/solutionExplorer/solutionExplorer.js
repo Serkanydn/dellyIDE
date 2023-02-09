@@ -326,15 +326,6 @@ class SolutionExplorer extends HTMLElement {
         if (Object.keys(selectedFolder).length !== 0) {
           useDispatch(setSelectedFolder(null))
         }
-
-        if (data.objectType === '1') {
-          console.log(event.row)
-          // const treeListRow = self.querySelector('#treeListRow')
-          // console.log(treeListRow)
-          // treeListRow.addEventListener('ondragstart', (event) => {
-          //   console.log(event)
-          // })
-        }
       },
       rowExpanding(event) {
         // const img = document.querySelector(`.folder-${event.key}`)

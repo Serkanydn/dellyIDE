@@ -146,10 +146,16 @@ class ContentEditorHelper {
       const {data: result} = await fileGateService.readFileById(_contentId)
       const {data} = result
       useDispatch(setSelectedFile(data))
-      const {isConfirmed} = await SweetAlert2Helper.confirmedSweet({
-        text: 'You made changes to the file and did not save it. Do you want to save?',
+      const dataName = `${data.name || data.ufId || data.id}.${data.extension}`
+      const {isConfirmed, isDenied} = await SweetAlert2Helper.YesNoCancel({
+        html: `
+        Do you want to save the changes you made to <b style='color:red;'>${dataName}</b>.
+        Your changes will be lost if you don't save them.
+        `,
         icon: 'warning',
       })
+
+      if (!isDenied && !isConfirmed) return
 
       if (isConfirmed) this.saveFile()
     }
@@ -248,7 +254,10 @@ class ContentEditorHelper {
   }
 
   async clearContent() {
-    const contentEditors = this.getOpenedContentEditors()
+    let contentEditors = this.getOpenedContentEditors()
+    let editorNavButtons = this.getOpenedNavButtons()
+
+    let isCancel = false
 
     for await (const editor of contentEditors) {
       if (editor.state.editorContentChange) {
@@ -257,35 +266,46 @@ class ContentEditorHelper {
         const {data: result} = await fileGateService.readFileById(editor.state.id)
         const {data} = result
         useDispatch(setSelectedFile(data))
-        const {isConfirmed} = await SweetAlert2Helper.confirmedSweet({
-          text: 'You made changes to the file and did not save it. Do you want to save?',
+        const dataName = `${data.name || data.ufId || data.id}.${data.extension}`
+        const {isConfirmed, isDenied} = await SweetAlert2Helper.YesNoCancel({
+          html: `
+          Do you want to save the changes you made to <b style='color:red;'>${dataName}</b>.
+          Your changes will be lost if you don't save them.
+          `,
           icon: 'warning',
         })
 
+        contentEditors = contentEditors.filter((editor) => editor.state.id !== data.id)
+        editorNavButtons = editorNavButtons.filter((navButton) => navButton.state.contentId !== data.id)
+
+        if (!isDenied && !isConfirmed) isCancel = true
+
         if (isConfirmed) this.saveFile()
 
-        editor.remove()
-        this.getActiveNavButton().remove()
+        if (isDenied || isConfirmed) {
+          editor.remove()
+          this.getActiveNavButton().remove()
+          localStorageHelper.removeOpenedFile(editor.state.id)
+        }
       }
-
-      // activeNavButton.remove()
     }
 
     contentEditors.forEach((editor) => {
       editor.remove()
+      localStorageHelper.removeOpenedFile(editor.state.id)
     })
 
-    const editosNavButtons = this.getOpenedNavButtons()
-    editosNavButtons.forEach((editorNavButton) => {
+    editorNavButtons.forEach((editorNavButton) => {
       editorNavButton.remove()
     })
 
-    const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
-    fileEditorNavButtons.classList.remove('nav-tabs')
-    this.refreshRecentlyOpenedFiles()
-
-    document.querySelector('.splashScreen').style.display = 'block'
-    useDispatch(setSelectedFile(null))
+    if (!isCancel) {
+      const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
+      fileEditorNavButtons.classList.remove('nav-tabs')
+      this.refreshRecentlyOpenedFiles()
+      document.querySelector('.splashScreen').style.display = 'block'
+      useDispatch(setSelectedFile(null))
+    }
   }
 
   async copyUrl({id, ufId, domainId, objectType}) {
