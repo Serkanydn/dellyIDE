@@ -157,7 +157,7 @@ class ContentEditorHelper {
 
       if (!isDenied && !isConfirmed) return
 
-      if (isConfirmed) this.saveFile()
+      if (isConfirmed) await this.saveFile()
     }
 
     contentEditor.remove()
@@ -280,7 +280,7 @@ class ContentEditorHelper {
 
         if (!isDenied && !isConfirmed) isCancel = true
 
-        if (isConfirmed) this.saveFile()
+        if (isConfirmed) await this.saveFile()
 
         if (isDenied || isConfirmed) {
           editor.remove()
@@ -348,9 +348,7 @@ class ContentEditorHelper {
   removeCommentLine() {
     this.getActiveContentEditor()?.removeCommentLine()
   }
-  formatDocument() {
-    this.getActiveContentEditor()?.formatDocument()
-  }
+
   fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement('textarea')
     textArea.value = text
