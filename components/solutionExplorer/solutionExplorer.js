@@ -209,7 +209,7 @@ class SolutionExplorer extends HTMLElement {
             widget: 'dxButton',
             locateInMenu: 'auto',
             options: {
-              icon: 'add',
+              icon: 'icon/add.svg',
               hint: 'Add new file',
               onClick() {
                 self.createModal()
