@@ -111,12 +111,12 @@ class ContentEditor extends HTMLElement {
   }
 
   foldSelection() {
-    const foldAction = this.editor.getAction('editor.fold')
+    const foldAction = this.editor.getAction('editor.foldAll')
     foldAction.run()
   }
 
   unFoldSelection() {
-    const unFoldAction = this.editor.getAction('editor.unfold')
+    const unFoldAction = this.editor.getAction('editor.unfoldAll')
     unFoldAction.run()
   }
 
@@ -128,6 +128,10 @@ class ContentEditor extends HTMLElement {
   removeCommentLine() {
     const removeCommentLineAction = this.editor.getAction('editor.action.removeCommentLine')
     removeCommentLineAction.run()
+  }
+  formatDocument() {
+    const formatDocumentAction = this.editor.getAction('editor.action.formatDocument')
+    formatDocumentAction.run()
   }
 
   connectedCallback() {

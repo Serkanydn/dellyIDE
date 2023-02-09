@@ -133,7 +133,10 @@ small.text-muted.smallUfid {
 #type {
   margin-left: 15px;
 }
-
-#root .header {
-  border-bottom: 4px solid #dee2e6;
+ 
+.dx-toolbar,.dx-treelist-container  {
+  background-color: transparent;
+}
+body.bg-dark .dx-icon{
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(130deg) brightness(100%) contrast(100%);
 }

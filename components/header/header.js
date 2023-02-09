@@ -14,7 +14,7 @@ class Header extends HTMLElement {
     this.fileEditor = document.querySelector('file-editor')
     this.innerHTML = `
    
-    <div class="header p-2" >
+    <div class="header px-2 py-1" >
       <div id="headerToolbar">
       </div>
     </div>
@@ -103,6 +103,11 @@ class Header extends HTMLElement {
   removeCommentLine() {
     new ContentEditorHelper().removeCommentLine()
   }
+  formatDocument() {
+    console.log("sa")
+
+    new ContentEditorHelper().formatDocument()
+  }
 
   async connectedCallback() {
     const self = this
@@ -129,6 +134,128 @@ class Header extends HTMLElement {
     const headerToolbar = document.querySelector('#headerToolbar')
     this.headerToolbar = new DevExpress.ui.dxToolbar(headerToolbar, {
       items: [
+        
+        {
+          location: 'before',
+          widget: 'dxButton',
+          options: {
+            type: 'back',
+            icon: "icon/save.svg",
+            hint: 'Save file',
+            onClick() {
+              self.saveFile()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/save-all.svg",
+            hint: 'Save all files',
+            onClick() {
+              self.saveAllFiles()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/trash.svg",
+            hint: 'Delete file',
+            onClick() {
+              self.deleteFile()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/add.svg",
+            hint: 'Add new file',
+            onClick() {
+              self.createModal()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/edit.svg",
+            hint: 'Update file',
+            onClick() {
+              self.updateModal()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/fold.svg",
+            hint: 'Fold the selected lines',
+            onClick() {
+              self.foldSelection()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/unfold.svg",
+            hint: 'Unfold the selected lines',
+            onClick() {
+              self.unFoldSelection()
+            },
+          },
+        },
+
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/comment.svg",
+            hint: 'Comment out the selected lines',
+            onClick() {
+              self.addCommentLine()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/comment-discussion.svg",
+            hint: 'Uncomment out the selected lines',
+            onClick() {
+              self.removeCommentLine()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/format-document.svg",
+            hint: 'Format Document',
+            onClick() {
+              self.formatDocument()
+            },
+          },
+        },
         {
           location: 'before',
           widget: 'dxSelectBox',
@@ -178,120 +305,12 @@ class Header extends HTMLElement {
           },
         },
         {
-          location: 'before',
-          widget: 'dxButton',
-          options: {
-            type: 'back',
-            icon: 'save',
-            hint: 'Save file',
-            onClick() {
-              self.saveFile()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'repeat',
-            hint: 'Save all files',
-            onClick() {
-              self.saveAllFiles()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'trash',
-            hint: 'Delete file',
-            onClick() {
-              self.deleteFile()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'add',
-            hint: 'Add new file',
-            onClick() {
-              self.createModal()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'edit',
-            hint: 'Update file',
-            onClick() {
-              self.updateModal()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'collapse',
-            hint: 'Fold the selected lines',
-            onClick() {
-              self.foldSelection()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'expand',
-            hint: 'Unfold the selected lines',
-            onClick() {
-              self.unFoldSelection()
-            },
-          },
-        },
-
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'increaseindent',
-            hint: 'Comment out the selected lines',
-            onClick() {
-              self.addCommentLine()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: 'decreaseindent',
-            hint: 'Uncomment out the selected lines',
-            onClick() {
-              self.removeCommentLine()
-            },
-          },
-        },
-        {
           location: 'after',
           locateInMenu: 'auto',
           widget: 'dxButton',
           options: {
-            icon: `${localStorageHelper.getItem('openNav') === 'true' ? 'chevronright' : 'chevronleft'}`,
+            stylingMode : "text",
+            icon: `${localStorageHelper.getItem('openNav') === 'true' ? 'icon/chevron-right.svg' : 'icon/chevron-left.svg'}`,
             hint: `${localStorageHelper.getItem('openNav') === 'true' ? 'Hide panel' : 'Show panel'}`,
             onClick() {
               if (localStorageHelper.getItem('openNav') === 'true') {
@@ -300,10 +319,11 @@ class Header extends HTMLElement {
                 document.querySelector('#file-menu').classList.add('d-none')
                 document.querySelector('#resizer0').classList.add('d-none')
                 document.querySelector('#aside-body').classList.add('d-none')
-                this.option('icon', 'chevronleft')
+                this.option('icon', 'icon/chevron-left.svg')
                 this.option('hint', 'Show Panel ')
                 return
-              }
+              } 
+
 
               localStorageHelper.setItem('openNav', 'true')
               document.querySelector('#file-menu').classList.remove('d-none')
@@ -311,7 +331,7 @@ class Header extends HTMLElement {
               document.querySelector('#aside-body').classList.remove('d-none')
               Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
               Resizable.activeContentWindows[0].childrenResize()
-              this.option('icon', 'chevronright')
+              this.option('icon', 'icon/chevron-right.svg')
               this.option('hint', 'Hide Panel ')
             },
           },
@@ -340,7 +360,7 @@ class Header extends HTMLElement {
           options: {
             dataSource: [
               {
-                icon: 'user',
+                icon: "icon/account.svg",
                 items: [{name: 'Logout'}],
               },
             ],
@@ -353,7 +373,6 @@ class Header extends HTMLElement {
             },
           },
         },
-
         // {
         //   location: 'after',
         //   locateInMenu: 'auto',

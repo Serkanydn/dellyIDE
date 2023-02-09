@@ -19,7 +19,7 @@ Resizable.Classes = {
 
 Resizable.initialise = function (parentId, initialSizes, resizerThickness) {
   //Find left window
-  Resizable.resizerThickness = resizerThickness ? resizerThickness : 4
+  Resizable.resizerThickness = resizerThickness ? resizerThickness : 2
   Resizable.initialSizes = initialSizes
   var parent = document.getElementById(parentId)
   var parentWindow = new Resizable.ContentWindow(null, parseInt(parent.style.width, 10), parseInt(parent.style.height, 10), parent)
@@ -54,7 +54,7 @@ Resizable.ContentWindow = class {
     this.width = width
     // if (parent === null) {
     //   this.width -= 17
-    // }
+    // } 
     this.height = height
     this.sizeFractionOfParent = 0.5
 

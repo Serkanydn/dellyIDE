@@ -255,6 +255,9 @@ class ContentEditorHelper {
   removeCommentLine() {
     this.getActiveContentEditor()?.removeCommentLine()
   }
+  formatDocument() {
+    this.getActiveContentEditor()?.formatDocument()
+  }
 }
 
 export default ContentEditorHelper
