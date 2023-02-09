@@ -194,12 +194,24 @@ class SolutionExplorer extends HTMLElement {
       toolbar: {
         items: [
           {
-            widget: 'dxButton',
             location: 'after',
+            widget: 'dxButton',
             options: {
               icon: 'refresh',
               onClick: () => {
                 self.refreshTreeList()
+              },
+            },
+          },
+          {
+            location: 'after',
+            widget: 'dxButton',
+            locateInMenu: 'auto',
+            options: {
+              icon: 'add',
+              hint: 'Add new file',
+              onClick() {
+                self.createModal()
               },
             },
           },
@@ -296,6 +308,12 @@ class SolutionExplorer extends HTMLElement {
         // useDispatch(setSelectedFile(row.data.id))
       },
     })
+  }
+
+  async createModal() {
+    const fileAddModal = new FileAddModal()
+    document.body.appendChild(fileAddModal)
+    fileAddModal.open()
   }
 
   createFolderContextMenu(data) {
