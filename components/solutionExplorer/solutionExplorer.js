@@ -148,6 +148,7 @@ class SolutionExplorer extends HTMLElement {
     })
 
     const folders = document.querySelector('#solutionExplorer')
+    var draggingGroupName = 'appointmentsGroup'
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
       // dataSource: [],
@@ -218,7 +219,38 @@ class SolutionExplorer extends HTMLElement {
           'searchPanel',
         ],
       },
+      // rowDragging: {
+      //   group: draggingGroupName,
+      //   allowDropInsideItem: false,
+      //   allowReordering: false,
+      //   showDragIcons: false,
+      //   onRemove: (e) => {
+      //     alert('onRemove')
+      //   },
 
+      //   onAdd: (e) => {
+      //     alert('onAdd')
+      //   },
+      //   onDragEnd(event) {
+      //     console.log(event)
+      //     event.toData === 'dropArea' && console.log('outside TreeList')
+      //     // alert('onDragEnd')
+      //   },
+
+      //   onDragChange1: (e) => {
+      //     var visibleRows = treeList.getVisibleRows(),
+      //       sourceNode = treeList.getNodeByKey(e.itemData.ID),
+      //       targetNode = visibleRows[e.toIndex].node
+
+      //     while (targetNode && targetNode.data) {
+      //       if (targetNode.data.ID === sourceNode.data.ID) {
+      //         e.cancel = true
+      //         break
+      //       }
+      //       targetNode = targetNode.parent
+      //     }
+      //   },
+      // },
       columns: [
         {
           dataField: 'name',
@@ -232,7 +264,7 @@ class SolutionExplorer extends HTMLElement {
             let smallTextContent = ufId || id
             if ((!name && !ufId) || name === ufId) smallTextContent = ''
             const template = `
-            <div class="d-flex">
+            <div  class="d-flex tree-list-draggable-item">
                 <img src="icon/${data.extension ? data.extension : 'folder'}.svg" style="width:20px;objectFit:'cover'" class="img"/>
                 <div>
                   <small class="me-2" style="user-select:none">${title}</small>
@@ -250,6 +282,15 @@ class SolutionExplorer extends HTMLElement {
             </div>
             `
             const element = document.createRange().createContextualFragment(template)
+
+            if (objectType === '1') {
+              const draggable = element.querySelector('.tree-list-draggable-item')
+              draggable.setAttribute('draggable', true)
+              draggable.setAttribute('role', 'button')
+              draggable.addEventListener('dragstart', (event) => {
+                event.dataTransfer.setData('text/plain', `"@@include myspace/${data.ufId || data.id}@@"`)
+              })
+            }
 
             container.append(element)
           },
@@ -275,7 +316,8 @@ class SolutionExplorer extends HTMLElement {
           self.createFileContextMenu(data)
         }
       },
-      rowClick({data}) {
+      rowClick(event) {
+        const {data} = event
         if (data.objectType === '0') {
           useDispatch(setSelectedFolder(data))
           return
@@ -283,6 +325,15 @@ class SolutionExplorer extends HTMLElement {
         const {selectedFolder} = useSelector((state) => state.content)
         if (Object.keys(selectedFolder).length !== 0) {
           useDispatch(setSelectedFolder(null))
+        }
+
+        if (data.objectType === '1') {
+          console.log(event.row)
+          // const treeListRow = self.querySelector('#treeListRow')
+          // console.log(treeListRow)
+          // treeListRow.addEventListener('ondragstart', (event) => {
+          //   console.log(event)
+          // })
         }
       },
       rowExpanding(event) {
@@ -309,6 +360,8 @@ class SolutionExplorer extends HTMLElement {
       },
     })
   }
+
+  createDraggable() {}
 
   async createModal() {
     const fileAddModal = new FileAddModal()
