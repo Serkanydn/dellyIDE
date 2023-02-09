@@ -105,8 +105,6 @@ class Header extends HTMLElement {
     new ContentEditorHelper().removeCommentLine()
   }
   formatDocument() {
-    console.log("sa")
-
     new ContentEditorHelper().formatDocument()
   }
 
@@ -135,13 +133,12 @@ class Header extends HTMLElement {
     const headerToolbar = document.querySelector('#headerToolbar')
     this.headerToolbar = new DevExpress.ui.dxToolbar(headerToolbar, {
       items: [
-        
         {
           location: 'before',
           widget: 'dxButton',
           options: {
             type: 'back',
-            icon: "icon/save.svg",
+            icon: 'icon/save.svg',
             hint: 'Save file',
             onClick() {
               self.saveFile()
@@ -153,7 +150,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/save-all.svg",
+            icon: 'icon/save-all.svg',
             hint: 'Save all files',
             onClick() {
               self.saveAllFiles()
@@ -165,7 +162,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/trash.svg",
+            icon: 'icon/trash.svg',
             hint: 'Delete file',
             onClick() {
               self.deleteFile()
@@ -177,7 +174,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/add.svg",
+            icon: 'icon/add.svg',
             hint: 'Add new file',
             onClick() {
               self.createModal()
@@ -189,7 +186,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/edit.svg",
+            icon: 'icon/edit.svg',
             hint: 'Update file',
             onClick() {
               self.updateModal()
@@ -201,7 +198,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/fold.svg",
+            icon: 'icon/fold.svg',
             hint: 'Fold the selected lines',
             onClick() {
               self.foldSelection()
@@ -213,7 +210,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/unfold.svg",
+            icon: 'icon/unfold.svg',
             hint: 'Unfold the selected lines',
             onClick() {
               self.unFoldSelection()
@@ -226,7 +223,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/comment.svg",
+            icon: 'icon/comment.svg',
             hint: 'Comment out the selected lines',
             onClick() {
               self.addCommentLine()
@@ -238,7 +235,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/comment-discussion.svg",
+            icon: 'icon/comment-discussion.svg',
             hint: 'Uncomment out the selected lines',
             onClick() {
               self.removeCommentLine()
@@ -250,7 +247,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/format-document.svg",
+            icon: 'icon/format-document.svg',
             hint: 'Format Document',
             onClick() {
               self.formatDocument()
@@ -310,7 +307,7 @@ class Header extends HTMLElement {
           locateInMenu: 'auto',
           widget: 'dxButton',
           options: {
-            stylingMode : "text",
+            stylingMode: 'text',
             icon: `${localStorageHelper.getItem('openNav') === 'true' ? 'icon/chevron-right.svg' : 'icon/chevron-left.svg'}`,
             hint: `${localStorageHelper.getItem('openNav') === 'true' ? 'Hide panel' : 'Show panel'}`,
             onClick() {
@@ -323,8 +320,7 @@ class Header extends HTMLElement {
                 this.option('icon', 'icon/chevron-left.svg')
                 this.option('hint', 'Show Panel ')
                 return
-              } 
-
+              }
 
               localStorageHelper.setItem('openNav', 'true')
               document.querySelector('#file-menu').classList.remove('d-none')
@@ -361,7 +357,7 @@ class Header extends HTMLElement {
           options: {
             dataSource: [
               {
-                icon: "icon/account.svg",
+                icon: 'icon/account.svg',
                 items: [{name: 'Logout'}],
               },
             ],

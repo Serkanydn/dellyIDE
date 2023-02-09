@@ -102,7 +102,6 @@ class ContentEditorHelper {
     const fileGateService = new FileGateService()
     const {data: result} = await fileGateService.readFileById(_contentId)
     const {data} = result
-    console.log(result)
 
     const {id, name, ufId, path, extension, content, parentId} = data
     localStorageHelper.addOpenedFile(_contentId)
@@ -348,6 +347,10 @@ class ContentEditorHelper {
 
   removeCommentLine() {
     this.getActiveContentEditor()?.removeCommentLine()
+  }
+
+  formatDocument() {
+    this.getActiveContentEditor()?.formatDocument()
   }
 
   fallbackCopyTextToClipboard(text) {
