@@ -15,14 +15,20 @@ class SolutionExplorer extends HTMLElement {
 
     this.innerHTML = `
             <div id="solutionExplorer" class="h-100"  ></div>
-            <div id="contextMenu"></div>
+            <div id="context-menu"></div>
         `
   }
 
   setSelectedTreeItem(file) {
     this.selectedTreeItem = file
-    this.treeListInstance.option('selectedRowKeys', [file.id])
+    // this.treeListInstance.option('selectedRowKeys', [file.id])
   }
+
+  clearSelectedTreeItem() {
+    this.selectedTreeItem = null
+    this.treeListInstance.option('selectedRowKeys', [])
+  }
+
   getSelectedTreeItem() {
     return this.selectedTreeItem
   }
@@ -30,52 +36,37 @@ class SolutionExplorer extends HTMLElement {
     this.treeListInstance.refresh()
   }
 
+  async reloadTreeList() {
+    const dataSource = this.treeListInstance.getDataSource()
+    await dataSource.reload()
+  }
+
   getTreelistItems() {
     return this.treeListInstance.option('dataSource')
   }
 
   getStore(id) {
-    function isNotEmpty(value) {
-      return value !== undefined && value !== null && value !== ''
-    }
-
     return new DevExpress.data.CustomStore({
       totalCount: 100,
       key: 'id',
       async load(loadOptions) {
-        // const deferred = $.Deferred()
-        const args = {}
-
-        ;[
-          'skip',
-          'take',
-          'searchValue',
-          'requireTotalCount',
-          'requireGroupCount',
-          'sort',
-          'filter',
-          'totalSummary',
-          'group',
-          'groupSummary',
-        ].forEach((i) => {
-          if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-            args[i] = JSON.stringify(loadOptions[i])
-          }
-        })
+        // console.log('loadOptions.filter', loadOptions.filter)
+        // console.log(loadOptions)
 
         const request = {
-          // OBJ_TYPE: 'CITY',
-          search: loadOptions.filter && loadOptions.filter.length > 2 ? loadOptions.filter[2] : '',
-          // search: loadOptions.searchValue,
+          filter: loadOptions.filter,
           row1: loadOptions.skip,
           row2: loadOptions.skip + loadOptions.take,
           sortBy: 'createdAt',
           sortDesc: 'desc',
+          domainId: id,
         }
+        const {data: files} = await new FileGateService().readAllFilesWithDomainId(request)
 
-        console.log(request)
-
-        const {data: files} = await new FileGateService().readAllFilesWithDomainId(id, request)
+        // files.forEach((element) => {
+        //   console.log('"id": ', element.id, ' ----- ', '"parentId": ', element.parentId)
+        // })
+        // console.log('-------------------------------------------------------------------------------------------------------------------')
         console.log(files)
 
         return {
@@ -90,8 +81,9 @@ class SolutionExplorer extends HTMLElement {
     localStorageHelper.setRecentlyFiles(data)
   }
   setTreelistItems(items, domainId) {
-    // const data = this.getStore(domainId)
-    this.treeListInstance.option('dataSource', items)
+    const customStore = this.getStore(domainId)
+
+    this.treeListInstance.option('dataSource', customStore)
   }
 
   async treeListAddRow(file) {
@@ -124,9 +116,10 @@ class SolutionExplorer extends HTMLElement {
     const fileGateService = new FileGateService()
 
     useSubscribe('user.activeDomain', async (activeDomain) => {
-      const files = await fileGateService.readAllFilesWithDomainId(activeDomain.id)
+      const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
+      // console.log('domainSubs')
       this.setTreelistItems(files.data, activeDomain.id)
-      console.log('subscribe')
+
       const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
       if (storageActiveDomainId !== activeDomain.id) {
         const contentEditorHelper = new ContentEditorHelper()
@@ -134,7 +127,7 @@ class SolutionExplorer extends HTMLElement {
         localStorageHelper.removeOpenedFiles()
         localStorageHelper.clearRecentlyOpenedFiles()
         contentEditorHelper.refreshRecentlyOpenedFiles()
-       
+
         // * Headerda active domain değiştikten sonra storage ile redux'taki domain eşit olmuyor if'in içerisine giriyor.
         // * Açılmış contentleri tekrar yükleyebilmek için headerda local storage'e set ettiğimiz activeDomainId'yi buraya taşımak zorunda kaldık.
         // * Aksi halde headerda redux'a activeDomain'i attığımız için burası açılışta da çalışıyor ve  storage'deki openFiles'lar siliniyor.
@@ -144,14 +137,26 @@ class SolutionExplorer extends HTMLElement {
       self.treeListInstance.searchByText('')
     })
 
+    // ? Store Subscribe
+    useSubscribe('content.selectedFile', async (selectedFile) => {
+      if (Object.keys(selectedFile).length === 0) {
+        self.clearSelectedTreeItem()
+        return
+      }
+
+      if (selectedFile.objectType === '1') {
+        self.setSelectedTreeItem(selectedFile)
+      }
+    })
+
     const folders = document.querySelector('#solutionExplorer')
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
       // dataSource: [],
-      // remoteOperations: {
-      //   filtering: true,
-      //   paging: true,
-      // },
+      remoteOperations: {
+        filtering: true,
+        paging: true,
+      },
       rootValue: null,
       allowColumnResizing: true,
       columnResizingMode: 'widget',
@@ -159,6 +164,7 @@ class SolutionExplorer extends HTMLElement {
       keyExpr: 'id',
       readOnly: false,
       parentIdExpr: 'parentId',
+      hasItemsExpr: (data) => !data.extension,
       showColumnHeaders: false,
       width: '100%',
       height: '100%',
@@ -187,6 +193,21 @@ class SolutionExplorer extends HTMLElement {
         // showInfo: true,
         showNavigationButtons: true,
       },
+      toolbar: {
+        items: [
+          {
+            widget: 'dxButton',
+            location: 'after',
+            options: {
+              icon: 'icon/refresh.svg',
+              onClick: () => {
+                self.refreshTreeList()
+              },
+            },
+          },
+          'searchPanel',
+        ],
+      },
 
       columns: [
         {
@@ -199,8 +220,11 @@ class SolutionExplorer extends HTMLElement {
             mainDiv.classList.add('d-flex')
 
             const icon = document.createElement('img')
+            // icon.classList.add(`folder-${id}`)
+            icon.style.width = '20px'
+            icon.style.objectFit = 'cover'
             icon.classList.add('img')
-            icon.src = `icon/${data.extension ? data.extension : 'folder'}.png`
+            icon.src = `icon/${data.extension ? data.extension : 'folder'}.svg`
 
             const contentDiv = document.createElement('div')
             const text = document.createElement('small')
@@ -246,6 +270,14 @@ class SolutionExplorer extends HTMLElement {
           useDispatch(setSelectedFolder(null))
         }
       },
+      rowExpanding(event) {
+        // const img = document.querySelector(`.folder-${event.key}`)
+        // console.log(img)
+        // img.src = 'icon/folderOpen.svg'
+        // self.refreshTreeList()
+        // const img = row.element.querySelector('#img')
+        // console.log(img)
+      },
       rowDblClick(row) {
         if (row.data.objectType === '0') {
           const {id: key} = row.data
@@ -255,11 +287,11 @@ class SolutionExplorer extends HTMLElement {
           return
         }
         self.setRecentlyFiles(row.data)
-        useDispatch(setSelectedFile(row.data))
+        new ContentEditorHelper().changeContent(row.data.id)
       },
     })
 
-    const contextMenu = document.querySelector('#contextMenu')
+    const contextMenu = this.querySelector('#context-menu')
     const menuItems = [
       {id: 'open', text: 'Open', icon: 'dx-icon-folder'},
       {id: 'duplicate', text: 'Duplicate', icon: 'dx-icon-copy'},
@@ -279,7 +311,7 @@ class SolutionExplorer extends HTMLElement {
         template.classList.add('d-flex', 'align-items-center')
         if (itemData.icon) {
           const span = document.createElement('span')
-          span.classList.add(itemData.icon, 'mr-2')
+          span.classList.add(itemData.icon, 'me-2')
           template.appendChild(span)
         }
 
@@ -300,23 +332,15 @@ class SolutionExplorer extends HTMLElement {
             const selectedFile = self.getSelectedTreeItem()
             const fileGateService = new FileGateService()
             const {data: result} = await fileGateService.copyFile(selectedFile)
-            self.treeListAddRow(result.data)
+            // self.treeListAddRow(result.data)
+            self.refreshTreeList()
 
             break
           }
           case 'copyPath': {
-            const {id, ufId, domainId, objectType, extension} = self.selectedTreeItem
-            if (objectType === '0') return
+            const {id} = self.selectedTreeItem
 
-            let path
-
-            if (ufId) path = `${config.webServiceUrl}/${domainId}/${ufId}.${extension}`
-            else path = `${config.webServiceUrl}/${domainId}/${id}.${extension}`
-
-            self.copyTextToClipboard(path)
-            SweetAlert2.toastFire({
-              title: 'Copied',
-            })
+            await new ContentEditorHelper().copyPath(id)
 
             break
           }
@@ -359,10 +383,10 @@ class SolutionExplorer extends HTMLElement {
   async updateModal(item) {
     const fileGateService = new FileGateService()
     const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
-    const result = await fileGateService.readAllFilesWithDomainId(domainId)
+    const result = await fileGateService.readAllFilesWithDomainId({domainId})
     // const recently = this.setRecentlyFiles(this.state);
 
-    const {id, parentId, name, objectType, ufId, extension, version} = item
+    const {id, parentId, name, objectType, ufId, extension, version, path} = item
 
     const fileUpdateModal = new FileUpdateModal({
       files: result,
@@ -375,47 +399,11 @@ class SolutionExplorer extends HTMLElement {
       objectType,
       domainName,
       version,
+      path,
     })
 
     document.body.append(fileUpdateModal)
     fileUpdateModal.open()
-  }
-
-  fallbackCopyTextToClipboard(text) {
-    var textArea = document.createElement('textarea')
-    textArea.value = text
-
-    // Avoid scrolling to bottom
-    textArea.style.top = '0'
-    textArea.style.left = '0'
-    textArea.style.position = 'fixed'
-
-    document.body.appendChild(textArea)
-    textArea.focus()
-    textArea.select()
-
-    try {
-      var successful = document.execCommand('copy')
-      var msg = successful ? 'successful' : 'unsuccessful'
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err)
-    }
-
-    document.body.removeChild(textArea)
-  }
-  copyTextToClipboard(text) {
-    if (!navigator.clipboard) {
-      this.fallbackCopyTextToClipboard(text)
-      return
-    }
-    navigator.clipboard.writeText(text).then(
-      () => {
-        // console.log('Async: Copying to clipboard was successful!')
-      },
-      (err) => {
-        console.error('Async: Could not copy text: ', err)
-      }
-    )
   }
 }
 

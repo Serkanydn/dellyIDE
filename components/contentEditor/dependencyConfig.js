@@ -126,7 +126,6 @@ function registerDependency() {
 }
 
 function createDependencyProposals(configs, range) {
-  console.log('createDependencyProposals')
   return configs.map((config) => ({
     ...config,
     kind: monaco.languages.CompletionItemKind.Function,

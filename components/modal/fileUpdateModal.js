@@ -4,9 +4,9 @@ import {setSelectedFile} from '../../store/slices/content.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 class FileUpdateModal extends HTMLElement {
-  constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, files}) {
+  constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}) {
     super()
-    this.state = {id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, files}
+    this.state = {id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}
 
     this.innerHTML = `
 
@@ -121,7 +121,9 @@ class FileUpdateModal extends HTMLElement {
         key: 'id',
       }),
       placeholder: 'Parent Id',
-      displayExpr: 'name',
+      displayExpr(item) {
+        if (item) return item.name || item.id
+      },
       valueExpr: 'id',
       showClearButton: true,
       value: this.state?.parentId,
@@ -170,14 +172,14 @@ class FileUpdateModal extends HTMLElement {
       },
     })
 
-    new DevExpress.ui.dxValidator(name, {
-      validationRules: [
-        {
-          type: 'required',
-          message: 'Filename field is required.',
-        },
-      ],
-    })
+    // new DevExpress.ui.dxValidator(name, {
+    //   validationRules: [
+    //     {
+    //       type: 'required',
+    //       message: 'Filename field is required.',
+    //     },
+    //   ],
+    // })
 
     const version = document.querySelector('#version')
 
@@ -223,35 +225,53 @@ class FileUpdateModal extends HTMLElement {
     const {data: result} = await fileGateService.update(object)
 
     if (!result.success) {
-      console.log(result)
       SweetAlert2Helper.toastFire({title: result.error.message, icon: 'error'})
       return
+    }
+    const editorNavButton = document.querySelector(`editor-nav-button[data-id="${this.state?.id}"`)
+    if (editorNavButton) {
+      editorNavButton.setAttribute('data-parentId', parentId)
     }
 
     this.close()
 
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
 
-    // ! Dosya güncellenince ismi contente yansısın diye.
-    if (selectedFileId) {
-      const contentEditor = document.querySelector(`content-editor[data-id='${selectedFileId}']`)
-      if (
-        contentEditor &&
-        (name !== contentEditor.state.name ||
-          parentId !== contentEditor.state.parentId ||
-          extension !== contentEditor.state.extension ||
-          contentEditor.state.ufId !== ufId)
-      ) {
-        const contentEditorHelper = new ContentEditorHelper()
-        await contentEditorHelper.removeContent(selectedFileId)
-        await contentEditorHelper.changeContent(selectedFileId)
+    const updatedFile = result.data
 
-        useDispatch(setSelectedFile(result.data))
+    console.log(updatedFile)
+
+    // ! Dosya güncellenince ismi contente yansısın diye.
+
+    // * Folder
+    if (updatedFile.objectType === '0') {
+      const editorNavButtons = Array.from(document.querySelectorAll(`editor-nav-button[data-parentId="${updatedFile.id}"`))
+      console.log(editorNavButtons)
+      editorNavButtons.forEach((editorNavButton) => {
+        // if (!editorNavButton.state.path.includes(updatedFile.path)) {
+        const selectButton = editorNavButton.querySelector('[id^="select"]')
+        selectButton.title = `${updatedFile.path}/${editorNavButton.state.title}`
+        // }
+      })
+    }
+
+    // * File
+    if (updatedFile.objectType === '1') {
+      const editorNavButton = document.querySelector(`editor-nav-button[data-id="${this.state?.id}"`)
+      const oldBtnTitle = `${editorNavButton.state.title}.${editorNavButton.state.extension}`
+      const newBtnTitle = `${updatedFile.name || updatedFile.ufId || updatedFile.id}.${updatedFile.extension}`
+
+      if ((editorNavButton && oldBtnTitle !== newBtnTitle) || editorNavButton.state.path !== updatedFile.path) {
+        const selectButton = editorNavButton.querySelector(`#select-${this.state?.id}`)
+        selectButton.innerText = newBtnTitle
+        selectButton.title = updatedFile.path
+        editorNavButton.state.path = updatedFile.path
+        if (selectedFileId === updatedFile.id) useDispatch(setSelectedFile(updatedFile))
       }
     }
 
     SweetAlert2Helper.toastFire({title: result.message})
-    await solutionExplorer.treeListUpdateRow(result.data)
+    solutionExplorer.refreshTreeList()
   }
 
   removeRegisteredValidator(validator) {

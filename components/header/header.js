@@ -68,9 +68,9 @@ class Header extends HTMLElement {
 
     const fileGateService = new FileGateService()
     const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
-    const result = await fileGateService.readAllFilesWithDomainId(domainId)
+    const result = await fileGateService.readAllFilesWithDomainId({domainId})
 
-    const {id, parentId, name, objectType, ufId, extension, version} = useSelector((state) => state.content.selectedFile)
+    const {id, parentId, name, objectType, ufId, extension, version, path} = useSelector((state) => state.content.selectedFile)
 
     const fileUpdateModal = new FileUpdateModal({
       files: result,
@@ -83,6 +83,7 @@ class Header extends HTMLElement {
       objectType,
       domainName,
       version,
+      path,
     })
     document.body.append(fileUpdateModal)
     fileUpdateModal.open()

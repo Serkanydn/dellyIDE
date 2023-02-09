@@ -5,6 +5,7 @@ import {setSelectedFile} from '../store/slices/content.js'
 import EditorNavButton from '../components/editorNavButton/editorNavButton.js'
 import ContentEditor from '../components/contentEditor/contentEditor.js'
 import localStorageHelper from './localStorageHelper.js'
+import SweetAlert2 from './sweetAlert2Helper.js'
 
 class ContentEditorHelper {
   constructor() {
@@ -36,7 +37,7 @@ class ContentEditorHelper {
     const {id: selectedFile} = useSelector((state) => state.content.selectedFile)
     return document.querySelector(`editor-nav-button[data-id='${selectedFile}']`)
   }
-  refreshRecentlyOpenedFiles(){
+  refreshRecentlyOpenedFiles() {
     const fileEditor = document.querySelector('file-editor')
     fileEditor.getRecentlyOpenedFiles()
     fileEditor.openRecentlyFiles()
@@ -59,7 +60,8 @@ class ContentEditorHelper {
     }
 
     SweetAlert2Helper.toastFire({title: updateResult.message})
-    await this.solutionExplorer.treeListUpdateRow(updateResult.data)
+    // await this.solutionExplorer.treeListUpdateRow(updateResult.data)
+    this.solutionExplorer.refreshTreeList()
   }
 
   async saveAllFiles() {
@@ -78,26 +80,29 @@ class ContentEditorHelper {
     SweetAlert2Helper.toastFire({title: result.message})
   }
 
-  async deleteFile(fileId) {
+  async deleteFile(_contentId) {
     const {isConfirmed} = await SweetAlert2Helper.confirmedSweet({text: 'Do you want to delete the file?', icon: 'warning'})
     if (!isConfirmed) return
     const fileGateService = new FileGateService()
-    const {data: deletedItemResult} = await fileGateService.disableFile(fileId)
-    const contentEditor = this.getContentEditorWithDataId(fileId)
-    await this.solutionExplorer.treeListDeleteRow(fileId)
-    if (contentEditor) this.removeContent(fileId)
+
+    const {data: deletedItemResult} = await fileGateService.disableFile(_contentId)
+    const contentEditor = this.getContentEditorWithDataId(_contentId)
+    // await this.solutionExplorer.treeListDeleteRow(_contentId)
+    this.solutionExplorer.refreshTreeList()
+    if (contentEditor) this.removeContent(_contentId)
     localStorageHelper.removeFromRecentlyFiles(fileId)
     this.refreshRecentlyOpenedFiles()
 
     SweetAlert2Helper.toastFire({title: deletedItemResult.message})
-    
   }
 
   async loadContent(_contentId) {
     const fileGateService = new FileGateService()
-    const {data} = await fileGateService.readFileById(_contentId)
+    const {data: result} = await fileGateService.readFileById(_contentId)
 
-    const {id, name, ufId, path, extension, content} = data
+    const {data} = result
+
+    const {id, name, ufId, path, extension, content, parentId} = data
     localStorageHelper.addOpenedFile(_contentId)
 
     // ! Nav
@@ -106,6 +111,7 @@ class ContentEditorHelper {
 
     const editorNavButton = new EditorNavButton({title: name || ufId || id, contentId: id, extension, data, path})
     editorNavButton.setAttribute('data-id', id)
+    editorNavButton.setAttribute('data-parentId', parentId)
     editorNavButtons.append(editorNavButton)
 
     // ! Editor
@@ -113,6 +119,8 @@ class ContentEditorHelper {
     editor.setAttribute('data-id', id)
     const editors = document.querySelector('.file-content .editors')
     editors.append(editor)
+
+    useDispatch(setSelectedFile(data))
 
     document.querySelector('.splashScreen').style.display = 'none'
   }
@@ -143,7 +151,8 @@ class ContentEditorHelper {
 
         await this.changeContent(id)
         const fileGateService = new FileGateService()
-        const {data} = await fileGateService.readFileById(id)
+        const {data: result} = await fileGateService.readFileById(id)
+        const {data} = result
         useDispatch(setSelectedFile(data))
       }
 
@@ -205,7 +214,7 @@ class ContentEditorHelper {
       body.classList.add(`bg-light`)
       body.classList.remove('bg-dark')
     } else {
-      devExtremeDarkTheme.setAttribute('href', './vendor/devExtreme/css/dx.dark.css')
+      devExtremeDarkTheme.setAttribute('href', './vendor/devExtreme/css/dx.generic.custom-dark-theme.css')
       body.classList.remove(`bg-light`)
       body.classList.add('bg-dark')
     }
@@ -240,6 +249,32 @@ class ContentEditorHelper {
     useDispatch(setSelectedFile(null))
   }
 
+  async copyPath(_contentId) {
+    const {data: result} = await new FileGateService().readFileById(_contentId)
+    const {success, message, data} = result
+
+    if (!success) {
+      SweetAlert2.toastFire({
+        title: message,
+      })
+      return
+    }
+
+    const {id, ufId, domainId, objectType, extension} = data
+
+    if (objectType === '0') return
+
+    let path
+
+    if (ufId) path = `${config.webServiceUrl}/${domainId}/${ufId}.${extension}`
+    else path = `${config.webServiceUrl}/${domainId}/${id}.${extension}`
+
+    this.copyTextToClipboard(path)
+    SweetAlert2.toastFire({
+      title: 'Copied',
+    })
+  }
+
   foldSelection() {
     this.getActiveContentEditor()?.foldSelection()
   }
@@ -257,6 +292,43 @@ class ContentEditorHelper {
   }
   formatDocument() {
     this.getActiveContentEditor()?.formatDocument()
+  }
+  fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement('textarea')
+    textArea.value = text
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0'
+    textArea.style.left = '0'
+    textArea.style.position = 'fixed'
+
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+
+    try {
+      var successful = document.execCommand('copy')
+      var msg = successful ? 'successful' : 'unsuccessful'
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err)
+    }
+
+    document.body.removeChild(textArea)
+  }
+
+  copyTextToClipboard(text) {
+    if (!navigator.clipboard) {
+      this.fallbackCopyTextToClipboard(text)
+      return
+    }
+    navigator.clipboard.writeText(text).then(
+      () => {
+        // console.log('Async: Copying to clipboard was successful!')
+      },
+      (err) => {
+        console.error('Async: Could not copy text: ', err)
+      }
+    )
   }
 }
 

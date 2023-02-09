@@ -55,9 +55,6 @@ class FileEditor extends HTMLElement {
 
     if (openedFiles.length > 0) {
       await new ContentEditorHelper().LoadContents(openedFiles)
-      const fileGateService = new FileGateService()
-      const {data: file} = await fileGateService.readFileById(openedFiles.pop())
-      useDispatch(setSelectedFile(file))
     }
   }
 
@@ -73,8 +70,7 @@ class FileEditor extends HTMLElement {
 
   preparingResizable() {
     const header = document.querySelector('header-component')
-    console.log('prepatingResize', header.offsetHeight)
-    const height = window.innerHeight - 56
+    const height = window.innerHeight - 57
     document.getElementById('main').style.width = `${window.innerWidth}px`
     document.getElementById('main').style.height = `${height}px`
     const sizes = {
@@ -107,12 +103,14 @@ class FileEditor extends HTMLElement {
     var files = JSON.parse(localStorageHelper.getItem('recentlyOpenedFiles'))
     const recentlyOpenedFiles = document.querySelector('.recentlyOpenedFiles')
     var items = ''
-    if (files){
+
+    if (files) {
       files.reverse()
       files.map(function (element) {
         items += `<li> <a href='#' class="openRecent" data-id="${element.id}" > ${element.name} </a></li>`
       })
-    } 
+    }
+
     recentlyOpenedFiles.innerHTML = items
   }
   openRecentlyFiles() {
@@ -122,22 +120,21 @@ class FileEditor extends HTMLElement {
         new ContentEditorHelper().loadContent(event.target.getAttribute('data-id'))
         var files = JSON.parse(localStorageHelper.getItem('recentlyOpenedFiles'))
         var data = files.filter((file) => file.id === event.target.getAttribute('data-id'))
-        localStorageHelper.setOrderRecentlyFiles(data);
-       })
+        localStorageHelper.setOrderRecentlyFiles(data)
+      })
     })
   }
+
   resizeControl() {
     const header = document.querySelector('header-component')
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
-
-    console.log('resize control')
 
     if (selectedFileId) {
       const contentEditor = document.querySelector(`content-editor[data-id='${selectedFileId}']`)
       contentEditor.setLayout()
     }
 
-    Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight)
+    Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight - 1)
     Resizable.activeContentWindows[0].childrenResize()
 
     if (localStorageHelper.getItem('openNav') === 'true') {

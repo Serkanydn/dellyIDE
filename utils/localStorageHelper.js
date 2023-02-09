@@ -13,6 +13,7 @@ class LocalStorageHelper {
   clear() {
     localStorage.clear()
   }
+
   setRecentlyFiles(data) {
     if (!this.getItem('recentlyOpenedFiles')) {
       var item = [{name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}]
@@ -21,7 +22,6 @@ class LocalStorageHelper {
     }
     var files = JSON.parse(this.getItem('recentlyOpenedFiles'))
     var hasId = files.some((file) => file.id === data.id)
-
     if (hasId) {
       var item = {name: data.name || data.ufId || data.id + '.' + data.extension, id: data.id}
       var reOrderFiles = files.filter(function (item) {
@@ -41,7 +41,8 @@ class LocalStorageHelper {
     files.push(item)
     this.setItem('recentlyOpenedFiles', JSON.stringify(files))
   }
-  setOrderRecentlyFiles(data){
+
+  setOrderRecentlyFiles(data) {
     var files = JSON.parse(this.getItem('recentlyOpenedFiles'))
     var item = {name: data[0].name || data[0].ufId || data[0].id + '.' + data[0].extension, id: data[0].id}
     var reOrderFiles = files.filter(function (item) {
@@ -50,14 +51,16 @@ class LocalStorageHelper {
     reOrderFiles.push(item)
     this.setItem('recentlyOpenedFiles', JSON.stringify(reOrderFiles))
   }
-  removeFromRecentlyFiles(id){
+
+  removeFromRecentlyFiles(id) {
     var files = JSON.parse(this.getItem('recentlyOpenedFiles'))
     var reOrderFiles = files.filter(function (item) {
       return item.id != id
     })
     this.setItem('recentlyOpenedFiles', JSON.stringify(reOrderFiles))
   }
-  clearRecentlyOpenedFiles(){
+
+  clearRecentlyOpenedFiles() {
     this.removeItem('recentlyOpenedFiles')
   }
   getAccessToken() {

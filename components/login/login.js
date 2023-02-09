@@ -57,6 +57,8 @@ class Login extends HTMLElement {
 
       const {data} = await new UserService().login({email, password})
 
+      console.log(data)
+
       if (!data.success) {
         if (data.error) {
           SweetAlert2.toastFire({title: data.error?.message, icon: 'error'})

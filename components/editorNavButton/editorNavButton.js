@@ -1,6 +1,7 @@
 import {useDispatch} from '../../store/index.js'
 import {setSelectedFile} from '../../store/slices/content.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
+import CustomContextMenu from '../customContextMenu/customContextMenu.js'
 
 class EditorNavButton extends HTMLElement {
   constructor({title, path, data, contentId, extension}) {
@@ -34,9 +35,24 @@ class EditorNavButton extends HTMLElement {
     const editorNavItem = this.getEditorNavItemButton()
 
     editorNavItem.addEventListener('auxclick', async (event) => {
-      if (event.which === 2) {
+      if (event.which !== 2) return
+
+      event.preventDefault()
+      await new ContentEditorHelper().removeContent(this.state.contentId)
+    })
+
+    editorNavItem.addEventListener('mousedown', (event) => {
+      if (event.which !== 3) return
+
+      editorNavItem.oncontextmenu = (event) => {
         event.preventDefault()
-        await new ContentEditorHelper().removeContent(this.state.contentId)
+        const isContextMenu = document.querySelector('custom-context-menu')
+        if (isContextMenu) return
+
+        // console.log(this.state.contentId)
+        const {clientX: mouseX, clientY: mouseY} = event
+        // document.querySelector('body').append(new CustomContextMenu({mouseX, mouseY, activeContentId: this.state.contentId}))
+        document.querySelector('body').append(new CustomContextMenu({target: this, activeContentId: this.state.contentId}))
       }
     })
   }
