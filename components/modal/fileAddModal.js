@@ -11,7 +11,7 @@ class FileAddModal extends HTMLElement {
 <div  class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
 
-    <div class="modal-content w-50">
+    <div class="modal-content w-75">
       <div class="modal-header">
         <h5 class="modal-title" id="fileModalLabel">File Add</h5>
         <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -27,30 +27,30 @@ class FileAddModal extends HTMLElement {
 
     
         <div class="row mb-2">
-          <label for="name" class="col-sm-2 col-form-label col-form-label-sm">Filename</label>
+          <label for="name" class="col-sm-2 col-form-label ">Filename</label>
           <div class="col-md-7 ">
-            <div id="name" ></div>
+            <div class="form-control form-control-sm" id="name" ></div>
           </div>
       
           <div id="extensionGroup" class="col-md-3" >
-            <div id="extension"></div>
+            <div class="form-control form-control-sm" id="extension"></div>
           </div>
         </div>
 
         <div id="ufIdGroup">
         <div  class="row mb-2">
-          <label for="ufId" class="col-sm-2 col-form-label col-form-label-sm">UF Id</label>
+          <label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
           <div class="col-md-10">
-            <div  id="ufId" ></div>
+            <div class="form-control form-control-sm" id="ufId" ></div>
           </div>
         </div>
 
         </div>
 
         <div class="row mb-2">
-          <label for="parentId" class="col-sm-2 col-form-label col-form-label-sm">Folder</label>
+          <label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
           <div class="col-md-10">
-            <div  id="parentId" ></div>
+            <div class="form-control form-control-sm" id="parentId" ></div>
           </div>
         </div>
 

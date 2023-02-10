@@ -102,7 +102,7 @@ function setDevexpressKeysStartWithDx(type) {
     insertText:
       type === 'json'
         ? '{\n\t"dxLabel": "${1:}",\n\t"uxPosition": "${2:}",\n\t"uxType": "${3:}"\n}'
-        : '{\n\tuxType: ' + key + ',\n\tdxLabel: "${1:}",\n\tuxPosition: "${2:}"\n}',
+        : '{\n\tuxType: "' + key + '",\n\tdxLabel: "${1:}",\n\tuxPosition: "${2:}"\n}',
   }))
 }
 function convertDependencyToJson(dependencies) {

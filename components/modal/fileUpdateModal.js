@@ -24,23 +24,37 @@ class FileUpdateModal extends HTMLElement {
 
           <div class="row  mb-2" ${this.state?.objectType !== '0' ? 'disabled' : ''} >
           <div class="col-md-12 d-flex" disabled>
-             <label  class="form-label" for="">Type</label>
-            <div id="type"></div>
+             <label  class="form-control-label" for="">Type</label>
+            <div  id="type"></div>
           </div>
           </div>
+
+      
+
+       <div id="fileIdGroup" class="col-md-12"  >
+       <div  class="row mb-2">
+         <label for="version" class="col-md-2 col-form-label ">Id</label>
+          
+         <div class="col-md-10">
+           <div class="input-group input-group-sm">
+           <div class="form-control" id="fileId" ></div>
+           <div  class="input-group-text" id="fileIdCopyButton"></div>
+           </div>
+        </div>
+     </div> 
 
 
       
     
         <div class="row mb-2">
 
-          <label for="name" class="col-sm-2 col-form-label col-form-label-sm">File Name</label>
+          <label for="name" class="col-sm-2 col-form-label">File Name</label>
           <div class=${this.state?.objectType !== '0' ? 'col-md-7' : 'col-md-10'}>
-            <div id="name" ></div>
+            <div class="form-control form-control-sm" id="name" ></div>
           </div>
 
           <div id="extensionGroup" class="col-md-3" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
-            <div id="extension"></div>
+            <div class="form-control form-control-sm" id="extension"></div>
           </div>
 
         </div>
@@ -49,9 +63,9 @@ class FileUpdateModal extends HTMLElement {
 
         <div id="ufIdGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}">
         <div  class="row mb-2">
-          <label for="ufId" class="col-sm-2 col-form-label col-form-label-sm">UF Id</label>
+          <label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
           <div class="col-md-10">
-            <div  id="ufId" ></div>
+            <div class="form-control form-control-sm"  id="ufId" ></div>
           </div>
           </div> 
 
@@ -61,25 +75,23 @@ class FileUpdateModal extends HTMLElement {
 
            <div id="versionGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
         <div  class="row mb-2">
-          <label for="version" class="col-sm-2 col-form-label col-form-label-sm">Version</label>
+          <label for="version" class="col-sm-2 col-form-label ">Version</label>
           <div class="col-md-10">
-            <div  id="version" ></div>
+            <div class="form-control form-control-sm"  id="version" ></div>
           </div>
       </div> 
      
 
         <div  class="row mb-2">
-          <label for="parentId" class="col-sm-2 col-form-label col-form-label-sm">Folder</label>
+          <label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
           <div class="col-md-10">
-            <div  id="parentId" ></div>
+            <div class="form-control form-control-sm"  id="parentId" ></div>
           </div>
           </div>
 
       </div>
 
-      <div  class="col-md-12 mb-2">
-      <div id="fileId" class=""></div>
-   </div>
+ 
 
       <div class="modal-footer">
       <button id="closeBtn" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" aria-label="Close">Close</button>
@@ -174,6 +186,18 @@ class FileUpdateModal extends HTMLElement {
       disabled: true,
     })
 
+    const fileIdCopyButton = document.querySelector('#fileIdCopyButton')
+    this.fileIdCopyButtonInstance = new DevExpress.ui.dxButton(fileIdCopyButton, {
+      // width: 50,
+      icon: 'copy',
+      hint: 'Copy Id',
+      // width: 120,
+      onClick() {
+        new ContentEditorHelper().copyTextToClipboard(self.state.id)
+        SweetAlert2Helper.toastFire({title: 'Id Copied', icon: 'success'})
+      },
+    })
+
     const ufId = document.querySelector('#ufId')
     this.ufIdInstance = new DevExpress.ui.dxTextBox(ufId, {
       value: this.state?.ufId?.replace(`${this.state.domainName}/`, ''),
@@ -253,8 +277,6 @@ class FileUpdateModal extends HTMLElement {
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
 
     const updatedFile = result.data
-
-    console.log(updatedFile)
 
     // ! Dosya güncellenince ismi contente yansısın diye.
 

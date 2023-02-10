@@ -41,7 +41,8 @@ class CustomContextMenu extends HTMLElement {
         break
       }
       case 'preview': {
-        window.open(window.config.previewUrl + this.state.selectedFile.id, '_blank')
+        const {id, domainId} = this.state.selectedFile
+        window.open(`${window.config.previewUrl}${domainId}/${id}`, '_blank')
         break
       }
       case 'copyUrl': {

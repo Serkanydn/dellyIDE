@@ -281,6 +281,7 @@ class SolutionExplorer extends HTMLElement {
                 </div>
             </div>
             `
+
             const element = document.createRange().createContextualFragment(template)
 
             if (objectType === '1') {
