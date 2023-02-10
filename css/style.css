@@ -51,7 +51,10 @@ small.text-muted.smallUfid {
 .resizer {
   position: absolute;
   z-index: 100;
-  background-color: #6c757d;
+  background-color: #ddd;
+}
+body.bg-dark .resizer {
+  background-color: #4d4d4d;
 }
 
 .verticalResizer {
@@ -234,4 +237,10 @@ body.bg-dark #file-menu #aside-body .aside-nav .nav-link.active {
   /* font-weight: 500; */
   /* border-color: red !important; */
   border-top: none !important;
+}
+.header{
+  border-bottom: 1px solid #ddd;
+}
+body.bg-dark .header{
+  border-bottom: 1px solid #4d4d4d;
 }

@@ -165,42 +165,6 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: "icon/trash.svg",
-            hint: 'Delete file',
-            onClick() {
-              self.deleteFile()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: "icon/add.svg",
-            hint: 'Add new file',
-            onClick() {
-              self.createModal()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
-            icon: "icon/edit.svg",
-            hint: 'Update file',
-            onClick() {
-              self.updateModal()
-            },
-          },
-        },
-        {
-          location: 'before',
-          widget: 'dxButton',
-          locateInMenu: 'auto',
-          options: {
             icon: "icon/fold.svg",
             hint: 'Fold the selected lines',
             onClick() {
@@ -220,7 +184,6 @@ class Header extends HTMLElement {
             },
           },
         },
-
         {
           location: 'before',
           widget: 'dxButton',
@@ -254,6 +217,42 @@ class Header extends HTMLElement {
             hint: 'Format Document',
             onClick() {
               self.formatDocument()
+            },
+          },
+        }, 
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/add.svg",
+            hint: 'Add new file',
+            onClick() {
+              self.createModal()
+            },
+          },
+        }, 
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/edit.svg",
+            hint: 'Update file',
+            onClick() {
+              self.updateModal()
+            },
+          },
+        },   
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: "icon/trash.svg",
+            hint: 'Delete file',
+            onClick() {
+              self.deleteFile()
             },
           },
         },
