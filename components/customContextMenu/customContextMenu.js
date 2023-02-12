@@ -4,6 +4,9 @@ import {setSelectedFolder} from '../../store/slices/content.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import FileAddModal from '../modal/fileAddModal.js'
 import FileUpdateModal from '../modal/fileUpdateModal.js'
+import domainUpdateModal from '../modal/domainUpdateModal.js'
+import {setActiveUser, setActiveDomain, setUserInitialState} from '../../store/slices/user.js'
+import DomainUpdateModal from '../modal/domainUpdateModal.js'
 
 class CustomContextMenu extends HTMLElement {
   constructor({items, target, selectedFile}) {
@@ -29,14 +32,26 @@ class CustomContextMenu extends HTMLElement {
       case 'newAdd': {
         if (this.state.selectedFile.objectType === '0') {
           useDispatch(setSelectedFolder(this.state.selectedFile))
+        } else if (this.state.selectedFile.objectType === '2') {
+          useDispatch(setSelectedFolder(this.state.selectedFile))
+          useDispatch(setActiveDomain({id: this.state.selectedFile.id, name: this.state.selectedFile.name}))
         } else {
           useDispatch(setSelectedFolder(null))
+          useDispatch(setActiveDomain(null))
         }
 
         this.createModal()
         break
       }
       case 'update': {
+        const {objectType, id, name} = this.state.selectedFile
+
+        if (objectType === '2') {
+          this.domainUpdateModal(this.state.selectedFile)
+          break
+        }
+
+        useDispatch(setActiveDomain({id, name}))
         this.updateModal(this.state.selectedFile)
         break
       }
@@ -52,7 +67,7 @@ class CustomContextMenu extends HTMLElement {
       }
       case 'copyId': {
         const {id, ufId, objectType} = this.state.selectedFile
-        await await new ContentEditorHelper().copyId({id, ufId, objectType})
+        await new ContentEditorHelper().copyId({id, ufId, objectType})
         break
       }
       case 'close': {
@@ -67,7 +82,11 @@ class CustomContextMenu extends HTMLElement {
       case 'delete': {
         const {id, objectType} = this.state.selectedFile
         await new ContentEditorHelper().deleteFile(id)
-        if (objectType === '0') useDispatch(setSelectedFolder(null))
+        if (objectType === '0' || objectType === '2') {
+          useDispatch(setSelectedFolder(null))
+          useDispatch(setActiveDomain(null))
+        }
+
         break
       }
     }
@@ -103,6 +122,14 @@ class CustomContextMenu extends HTMLElement {
 
     document.body.append(fileUpdateModal)
     fileUpdateModal.open()
+  }
+
+  async domainUpdateModal(item) {
+    const {id, name} = item
+    const domainUpdateModal = new DomainUpdateModal({id, name})
+    document.body.append(domainUpdateModal)
+    domainUpdateModal.open()
+    console.log('domain update modal')
   }
 
   connectedCallback() {

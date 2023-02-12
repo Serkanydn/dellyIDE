@@ -1,7 +1,9 @@
 import localStorageHelper from '../../utils/localStorageHelper.js'
 import FileGateService from '../../services/fileGateService.js'
 import UserService from '../../services/userService.js'
+import domainService from '../../services/domainService.js'
 import FileAddModal from '../modal/fileAddModal.js'
+import DomainAddModal from '../modal/domainAddModal.js'
 import FileUpdateModal from '../modal/fileUpdateModal.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector} from '../../store/index.js'
@@ -59,6 +61,12 @@ class Header extends HTMLElement {
     const fileAddModal = new FileAddModal()
     document.body.appendChild(fileAddModal)
     fileAddModal.open()
+  }
+
+  createDomainAddModal() {
+    const domainAddModal = new DomainAddModal()
+    document.body.appendChild(domainAddModal)
+    domainAddModal.open()
   }
 
   async updateModal() {
@@ -123,12 +131,12 @@ class Header extends HTMLElement {
     const userService = new UserService()
     const {data: user} = await userService.getActiveUser()
 
-    const {id: domainId, name} =
-      user.domainList.find((domain) => domain.id === localStorageHelper.getItem('activeDomainId')) || user.domainList[0]
+    // const {id: domainId, name} =
+    //   user.domainList.find((domain) => domain.id === localStorageHelper.getItem('activeDomainId')) || user.domainList[0]
 
     // useDispatch(setActiveUser())
-    useDispatch(setUserInitialState({user, activeDomain: {id: domainId, name}}))
-    localStorageHelper.setItem('activeDomainId', domainId)
+    useDispatch(setUserInitialState({user}))
+    // localStorageHelper.setItem('activeDomainId', domainId)
 
     const headerToolbar = document.querySelector('#headerToolbar')
     this.headerToolbar = new DevExpress.ui.dxToolbar(headerToolbar, {
@@ -301,6 +309,7 @@ class Header extends HTMLElement {
             },
           },
         },
+
         {
           location: 'after',
           locateInMenu: 'auto',
@@ -332,20 +341,33 @@ class Header extends HTMLElement {
             },
           },
         },
+
+        // {
+        //   location: 'after',
+        //   widget: 'dxSelectBox',
+        //   visible: user.domainList.length > 1,
+        //   locateInMenu: 'auto',
+        //   options: {
+        //     width: 140,
+        //     items: user.domainList,
+        //     valueExpr: 'id',
+        //     displayExpr: 'name',
+        //     value: domainId,
+        //     onValueChanged(_args) {
+        //       const {id, name} = _args.component.option('selectedItem')
+        //       useDispatch(setActiveDomain({id, name}))
+        //     },
+        //   },
+        // },
         {
           location: 'after',
-          widget: 'dxSelectBox',
-          visible: user.domainList.length > 1,
+          widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            width: 140,
-            items: user.domainList,
-            valueExpr: 'id',
-            displayExpr: 'name',
-            value: domainId,
-            onValueChanged(_args) {
-              const {id, name} = _args.component.option('selectedItem')
-              useDispatch(setActiveDomain({id, name}))
+            icon: 'icon/worldSharp.svg',
+            hint: 'Delete file',
+            onClick() {
+              self.createDomainAddModal()
             },
           },
         },

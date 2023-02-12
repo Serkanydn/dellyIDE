@@ -9,6 +9,7 @@ import localStorageHelper from '../../utils/localStorageHelper.js'
 
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import CustomContextMenu from '../customContextMenu/customContextMenu.js'
+import {setActiveDomain} from '../../store/slices/user.js'
 
 class SolutionExplorer extends HTMLElement {
   constructor() {
@@ -49,7 +50,8 @@ class SolutionExplorer extends HTMLElement {
     return this.treeListInstance.option('dataSource')
   }
 
-  getStore(id) {
+  // ! userId göndereceğiz.
+  getStore(userId) {
     return new DevExpress.data.CustomStore({
       totalCount: 100,
       key: 'id',
@@ -61,9 +63,9 @@ class SolutionExplorer extends HTMLElement {
           filter: loadOptions.filter,
           row1: loadOptions.skip,
           row2: loadOptions.skip + loadOptions.take,
-          sortBy: 'createdAt',
+          sortBy: 'name',
           sortDesc: 'asc',
-          domainId: id,
+          userId,
         }
         const {data: files} = await new FileGateService().readAllFilesWithDomainId(request)
 
@@ -84,8 +86,8 @@ class SolutionExplorer extends HTMLElement {
   setRecentlyFiles(data) {
     localStorageHelper.setRecentlyFiles(data)
   }
-  setTreelistItems(domainId) {
-    const customStore = this.getStore(domainId)
+  setTreelistItems(userId) {
+    const customStore = this.getStore(userId)
 
     this.treeListInstance.option('dataSource', customStore)
   }
@@ -119,28 +121,29 @@ class SolutionExplorer extends HTMLElement {
 
     const fileGateService = new FileGateService()
 
-    useSubscribe('user.activeDomain', async (activeDomain) => {
-      // const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
-      // console.log('domainSubs')
-      // this.setTreelistItems(files.data, activeDomain.id)
-      this.setTreelistItems(activeDomain.id)
+    // useSubscribe('user.activeDomain', async (activeDomain) => {
+    //   // const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
+    //   // console.log('domainSubs')
+    //   // this.setTreelistItems(files.data, activeDomain.id)
+    //   console.log('girdi')
+    //   this.setTreelistItems(activeDomain.id)
 
-      const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
-      if (storageActiveDomainId !== activeDomain.id) {
-        const contentEditorHelper = new ContentEditorHelper()
-        await contentEditorHelper.clearContent()
-        localStorageHelper.removeOpenedFiles()
-        localStorageHelper.clearRecentlyOpenedFiles()
-        contentEditorHelper.refreshRecentlyOpenedFiles()
+    //   const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
+    //   if (storageActiveDomainId !== activeDomain.id) {
+    //     const contentEditorHelper = new ContentEditorHelper()
+    //     await contentEditorHelper.clearContent()
+    //     localStorageHelper.removeOpenedFiles()
+    //     localStorageHelper.clearRecentlyOpenedFiles()
+    //     contentEditorHelper.refreshRecentlyOpenedFiles()
 
-        // * Headerda active domain değiştikten sonra storage ile redux'taki domain eşit olmuyor if'in içerisine giriyor.
-        // * Açılmış contentleri tekrar yükleyebilmek için headerda local storage'e set ettiğimiz activeDomainId'yi buraya taşımak zorunda kaldık.
-        // * Aksi halde headerda redux'a activeDomain'i attığımız için burası açılışta da çalışıyor ve  storage'deki openFiles'lar siliniyor.
-        localStorageHelper.setItem('activeDomainId', activeDomain.id)
-      }
+    //     // * Headerda active domain değiştikten sonra storage ile redux'taki domain eşit olmuyor if'in içerisine giriyor.
+    //     // * Açılmış contentleri tekrar yükleyebilmek için headerda local storage'e set ettiğimiz activeDomainId'yi buraya taşımak zorunda kaldık.
+    //     // * Aksi halde headerda redux'a activeDomain'i attığımız için burası açılışta da çalışıyor ve  storage'deki openFiles'lar siliniyor.
+    //     localStorageHelper.setItem('activeDomainId', activeDomain.id)
+    //   }
 
-      self.treeListInstance.searchByText('')
-    })
+    //   self.treeListInstance.searchByText('')
+    // })
 
     // ? Store Subscribe
     useSubscribe('content.selectedFile', async (selectedFile) => {
@@ -257,7 +260,8 @@ class SolutionExplorer extends HTMLElement {
           caption: 'File Name',
           cellTemplate(container, options) {
             const {data} = options
-            const {id, name, ufId, objectType} = data
+            const {id, name, ufId, extension, objectType} = data
+            // console.log(name)
 
             const title = name || ufId || id
 
@@ -265,7 +269,9 @@ class SolutionExplorer extends HTMLElement {
             if ((!name && !ufId) || name === ufId) smallTextContent = ''
             const template = `
             <div  class="d-flex tree-list-draggable-item">
-                <img src="icon/${data.extension ? data.extension : 'folder'}.svg" style="width:20px;objectFit:'cover'" class="img"/>
+                <img src="icon/${
+                  objectType === '1' ? extension : objectType === '0' ? 'folder' : 'worldSharp'
+                }.svg" style="width:20px;objectFit:'cover'" class="img"/>
                 <div>
                   <small class="me-2" style="user-select:none">${title}</small>
                   ${
@@ -309,7 +315,7 @@ class SolutionExplorer extends HTMLElement {
           self.setSelectedTreeItem(data)
         }
 
-        if (data.objectType === '0') {
+        if (data.objectType === '0' || data.objectType === '2') {
           self.createFolderContextMenu(data)
         }
 
@@ -323,9 +329,15 @@ class SolutionExplorer extends HTMLElement {
           useDispatch(setSelectedFolder(data))
           return
         }
+        if (data.objectType === '2') {
+          useDispatch(setSelectedFolder(data))
+          useDispatch(setActiveDomain({id: data.id, name: data.name}))
+          return
+        }
         const {selectedFolder} = useSelector((state) => state.content)
         if (Object.keys(selectedFolder).length !== 0) {
           useDispatch(setSelectedFolder(null))
+          useDispatch(setActiveDomain(null))
         }
       },
       rowExpanding(event) {
@@ -351,6 +363,9 @@ class SolutionExplorer extends HTMLElement {
         // useDispatch(setSelectedFile(row.data.id))
       },
     })
+
+    const {user} = useSelector((state) => state)
+    this.setTreelistItems(user.id)
   }
 
   createDraggable() {}

@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from '../../store/index.js'
 import {setSelectedFile} from '../../store/slices/content.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
+import {setActiveDomain} from '../../store/slices/user.js'
 class FileUpdateModal extends HTMLElement {
   constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}) {
     super()
@@ -32,16 +33,18 @@ class FileUpdateModal extends HTMLElement {
       
 
        <div id="fileIdGroup" class="col-md-12"  >
-       <div  class="row mb-2">
-         <label for="version" class="col-md-2 col-form-label ">Id</label>
+         <div  class="row mb-2">
+           <label for="version" class="col-md-2 col-form-label ">Id</label>
           
-         <div class="col-md-10">
-           <div class="input-group input-group-sm">
-           <div class="form-control" id="fileId" ></div>
-           <div  class="input-group-text" id="fileIdCopyButton"></div>
-           </div>
-        </div>
+           <div class="col-md-10">
+              <div class="input-group input-group-sm">
+                <div class="form-control" id="fileId" ></div>
+                <div  class="input-group-text" id="fileIdCopyButton"></div>
+              </div>
+          </div>
      </div> 
+
+     </div>
 
 
       
@@ -74,12 +77,13 @@ class FileUpdateModal extends HTMLElement {
 
 
            <div id="versionGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
-        <div  class="row mb-2">
-          <label for="version" class="col-sm-2 col-form-label ">Version</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm"  id="version" ></div>
+             <div  class="row mb-2">
+               <label for="version" class="col-sm-2 col-form-label ">Version</label>
+               <div class="col-md-10">
+                <div class="form-control form-control-sm"  id="version" ></div>
+            </div>
+          </div> 
           </div>
-      </div> 
      
 
         <div  class="row mb-2">
@@ -130,24 +134,150 @@ class FileUpdateModal extends HTMLElement {
     }, 100)
   }
 
+  syncTreeViewSelection(treeViewInstance, value) {
+    if (!value) {
+      // treeViewInstance.option('selectedRowKeys', [])
+      return
+    } else {
+      treeViewInstance.selectItem(value)
+    }
+  }
+
+  makeAsyncDataSource(jsonFile) {
+    return new DevExpress.data.CustomStore({
+      loadMode: 'raw',
+      key: 'ID',
+      load() {
+        return $.getJSON(`${jsonFile}`)
+      },
+    })
+  }
+
   prepareForm() {
     const self = this
 
     const parentId = document.querySelector('#parentId')
-    this.parentIdInstance = new DevExpress.ui.dxSelectBox(parentId, {
-      dataSource: new DevExpress.data.ArrayStore({
-        data: this.state?.files.data.filter(
-          (file) => file.objectType === '0' && file.id !== this.state.id && file.parentId !== this.state.id
-        ),
-        key: 'id',
-      }),
-      placeholder: 'Parent Id',
+    // this.parentIdInstance = new DevExpress.ui.dxSelectBox(parentId, {
+    //   dataSource: new DevExpress.data.ArrayStore({
+    //     data: this.state?.files.data.filter(
+    //       (file) => (file.objectType === '0' || file.objectType === '2') && file.id !== this.state.id && file.parentId !== this.state.id
+    //     ),
+    //     key: 'id',
+    //   }),
+    //   placeholder: 'Parent Id',
+    //   displayExpr(item) {
+    //     if (item) return item.name || item.id
+    //   },
+    //   valueExpr: 'id',
+    //   showClearButton: true,
+    //   value: this.state?.parentId,
+    // })
+
+    this.parentIdInstance = new DevExpress.ui.dxDropDownBox(parentId, {
+      value: this.state?.parentId,
       displayExpr(item) {
         if (item) return item.name || item.id
       },
       valueExpr: 'id',
-      showClearButton: true,
-      value: this.state?.parentId,
+      validationMessagePosition: 'left',
+      placeholder: 'Select a value...',
+      showClearButton: false,
+      dataSource: this.state?.files.data.filter(
+        (file) => (file.objectType === '0' || file.objectType === '2') && file.id !== this.state.id && file.parentId !== this.state.id
+      ),
+      contentTemplate(e) {
+        const value = e.component.option('value')
+
+        const div = document.createElement('div')
+        // document.body.appendChild(div)
+        const $treeView = new DevExpress.ui.dxTreeList(div, {
+          dataSource: e.component.getDataSource(),
+          dataStructure: 'plain',
+          rootValue: null,
+          keyExpr: 'id',
+          parentIdExpr: 'parentId',
+          selection: {
+            mode: 'single',
+            recursive: false,
+          },
+          columns: [
+            {
+              dataField: 'name',
+              caption: 'File Name',
+              cellTemplate(container, options) {
+                const {data} = options
+                const {id, name, ufId, extension, objectType} = data
+                // console.log(name)
+
+                const title = name || ufId || id
+
+                let smallTextContent = ufId || id
+                if ((!name && !ufId) || name === ufId) smallTextContent = ''
+                const template = `
+                <div  class="d-flex tree-list-draggable-item">
+                    <img src="icon/${
+                      objectType === '1' ? extension : objectType === '0' ? 'folder' : 'worldSharp'
+                    }.svg" style="width:20px;objectFit:'cover'" class="img"/>
+                    <div>
+                      <small class="me-2" >${title}</small>
+                      ${
+                        objectType === '1'
+                          ? `
+                        <small style="font-size:.7rem;" class="text-muted" disabled>
+                        ${smallTextContent}
+                        </small>
+                      
+                      `
+                          : ''
+                      }
+                    </div>
+                </div>
+                `
+
+                const element = document.createRange().createContextualFragment(template)
+
+                container.append(element)
+              },
+            },
+          ],
+          displayExpr(item) {
+            if (item) return item.name || item.id
+          },
+          onContentReady(args) {
+            // self.syncTreeViewSelection(args.component, value)
+          },
+          onRowClick(event) {
+            console.log(event)
+            const {data} = event
+            const selectedKeys = event.component.option('selectedRowKeys')
+            console.log(selectedKeys)
+            e.component.option('value', selectedKeys[0])
+            if (data.objectType === '2') {
+              useDispatch(setActiveDomain({id: data.id, name: data.name}))
+              return
+            }
+          },
+        })
+        console.log($treeView.element())
+        // treeView = $treeView.dxTreeView('instance')
+
+        // e.component.on('valueChanged', (args) => {
+        //   self.syncTreeViewSelection($treeView, args.value)
+        //   e.component.close()
+        // })
+
+        return $treeView.element()
+      },
+    })
+
+    const parentIdValidator = new DevExpress.ui.dxValidator(parentId, {
+      validationRules: [
+        {
+          type: 'required',
+          message: 'Folder is required',
+          validationMessagePosition: 'left',
+        },
+      ],
     })
 
     const extension = document.querySelector('#extension')
@@ -232,8 +362,20 @@ class FileUpdateModal extends HTMLElement {
       type: 'success',
       autoPostback: true,
       onClick: (event) => {
+        const {isValid} = event.validationGroup.validate()
+
+        if (!isValid) return
+
         this.update()
       },
+    })
+
+    this.registerValidators([parentIdValidator])
+  }
+
+  registerValidators(validators) {
+    validators.forEach((validator) => {
+      this.registerValidator(validator)
     })
   }
 
@@ -252,7 +394,7 @@ class FileUpdateModal extends HTMLElement {
     const object = {
       id: this.state?.id,
       ufId: ufId || '',
-      parentId,
+      parentId: parentId || null,
       objectType,
       extension,
       name,
