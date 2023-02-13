@@ -16,8 +16,10 @@ class SolutionExplorer extends HTMLElement {
     super()
 
     this.innerHTML = `
-            <div id="solutionExplorer" class=""  ></div>
+            <div id="solutionExplorer" style=" "  ></div>
         `
+
+    this.classList.add('flex-fill')
   }
 
   setSelectedTreeItem(file) {
@@ -69,6 +71,8 @@ class SolutionExplorer extends HTMLElement {
         }
         const {data: files} = await new FileGateService().readAllFilesWithDomainId(request)
         if (domainIds.length === 1) self.treeListInstance.expandRow(files[0].id)
+
+        self.treeListInstance.option('height', self.offsetHeight - 10)
         // files.forEach((element) => {
         //   console.log('"id": ', element.id, ' ----- ', '"parentId": ', element.parentId)
         // })
@@ -122,6 +126,7 @@ class SolutionExplorer extends HTMLElement {
     // ? Store Subscribe
     useSubscribe('user.activeUser', async (activeUser) => {
       this.setTreelistItems(activeUser.domainId)
+      console.log(this.offsetHeight)
     })
 
     useSubscribe('content.selectedFile', async (selectedFile) => {
@@ -146,7 +151,8 @@ class SolutionExplorer extends HTMLElement {
       hasItemsExpr: (data) => !data.extension,
       showColumnHeaders: false,
       width: '100%',
-      height: '100%',
+      // height: 800,
+      // maxHeight: '99%',
       noDataText: ' ',
       searchPanel: {
         visible: true,

@@ -18,7 +18,7 @@ class Aside extends HTMLElement {
     <div class="aside d-flex flex-fill">
 
     <div id="aside-body" class=" d-flex flex-column flex-fill">
-       <div class="aside-content flex-fill" > 
+       <div class="aside-content d-flex flex-fill" > 
       </div>
       <nav class="aside-nav" style="margin-bottom:2px" >
             <div class="nav nav-tabs nav-justified buttons" id="nav-tab" role="tablist">
