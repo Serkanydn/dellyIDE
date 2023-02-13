@@ -71,8 +71,13 @@ loadScript('./config.js').then((response) => {
       const theme = localStorage.getItem('theme') || 'light'
       root.style.opacity = 0
       new ContentEditorHelper().changeTheme(theme)
-      root.append(new Header())
-      root.append(new FileEditor())
+      const div = document.createElement('div')
+      div.classList.add('d-flex')
+      div.classList.add('flex-column')
+      div.classList.add('h-100')
+      div.append(new Header())
+      div.append(new FileEditor())
+      root.append(div)
       registerDependency()
 
       const spinner = document.querySelector('#spinner-container')

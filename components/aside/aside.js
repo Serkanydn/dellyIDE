@@ -15,15 +15,13 @@ class Aside extends HTMLElement {
     //       <button id="nav-hide-button" class="btn btn-light bi bi-chevron-double-right" data-id="0"> </button>
     //     </div>
     this.innerHTML = `
-    <div class="aside d-flex  flex-column h-100">
-    <div class="aside-header d-flex justify-content-between mt-1"> 
-      <div id="toolbarArea"></div>
-    </div>
-    <div id="aside-body" class=" d-flex flex-column h-100 justify-content-between">
-       <div class="aside-content flex-grow-1" > 
+    <div class="aside d-flex flex-fill">
+
+    <div id="aside-body" class=" d-flex flex-column flex-fill">
+       <div class="aside-content flex-fill" > 
       </div>
-      <nav class="aside-nav" >
-            <div class="nav nav-tabs border-bottom-0 nav-justified buttons" id="nav-tab" role="tablist">
+      <nav class="aside-nav" style="margin-bottom:2px" >
+            <div class="nav nav-tabs nav-justified buttons" id="nav-tab" role="tablist">
               <button
                 class="nav-link active"
                 id="solutionExplorer"
@@ -48,6 +46,9 @@ class Aside extends HTMLElement {
             </nav>
   </div> 
     `
+
+    this.classList.add('d-flex')
+    this.classList.add('flex-fill')
   }
 
   connectedCallback() {

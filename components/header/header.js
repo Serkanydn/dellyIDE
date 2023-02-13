@@ -101,10 +101,9 @@ class Header extends HTMLElement {
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
     if (!selectedFileId) return
 
-    const {id: domainId} = useSelector((state) => state.user.activeDomain) 
+    const {id: domainId} = useSelector((state) => state.user.activeDomain)
     window.open(`${window.config.previewUrl}${domainId}/${selectedFileId}`, '_blank')
   }
-
 
   foldSelection() {
     new ContentEditorHelper().foldSelection()

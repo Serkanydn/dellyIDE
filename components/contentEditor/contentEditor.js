@@ -11,7 +11,7 @@ class ContentEditor extends HTMLElement {
     this.fileEditor = document.querySelector('file-editor')
 
     this.innerHTML = `
-        <div class='monaco-container d-flex flex-column h-100' >
+        <div class='monaco-container h-100 ' >
         <div id='delly-${this.state.id}'  class='monaco editor h-100 w-100' > </div>
         </div>
         `
@@ -63,7 +63,7 @@ class ContentEditor extends HTMLElement {
     this.editor.getModel().onDidChangeContent((event) => {
       // console.log('editor change')
       const activeEditorNavButton = this.getChangedEditorNavButton(this.state.id)
-      activeEditorNavButton.lastChild.style.display = "inline-block"
+      activeEditorNavButton.lastChild.style.display = 'inline-block'
       this.state.editorContentChange = true
     })
 
@@ -132,8 +132,8 @@ class ContentEditor extends HTMLElement {
   getSelectionText() {
     return this.editor.getModel().getValueInRange(this.editor.getSelection())
   }
-  getChangedEditorNavButton(id){
-    return document.querySelector('#select-'+id);
+  getChangedEditorNavButton(id) {
+    return document.querySelector('#select-' + id)
   }
   connectedCallback() {
     this.createEditor()

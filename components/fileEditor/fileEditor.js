@@ -11,33 +11,37 @@ class FileEditor extends HTMLElement {
 
     this.innerHTML = `
  
-        <div  class='file-body d-flex' id="main">
-            <div class='file-content d-flex flex-column flex-grow-1 col-md-9' >
-                <div class="file-editor-nav-buttons d-flex align-items-center w-100 border-bottom-0 nav  "></div>
 
-                <div class="splashScreen  ">
-                      <div class="companyName">
-                          <a href="#" class="font-weight-light " >  <span> Delly</span>Editor </a>
-                      </div>
-                      <div class="welcomeText mt-15 font-weight-normal">
-                      <h4 class="font-weight-light" data-bs-theme="dark">Recently Files</h4>
-                    </div>
-                    <div class="welcomeDesc mt-15">
-                      <div class="recentlyOpenedFiles">
-                      </div>
-                    </div>
-                </div>
-                <div class="editors w-100 h-100"></div>
-            </div>
-            <div class="file-aside col-md-3">
-                <div id="file-menu" class=" w-100 h-100"></div>
-            </div>
-      </div>
+ <div  class='file-body d-flex h-100' id="main">
+ <div class='file-content d-flex  flex-column col-md-9' >
+     <div class="file-editor-nav-buttons d-flex align-items-center w-100 border-bottom-0 nav  "></div>
+
+     <div class="splashScreen ">
+           <div class="companyName">
+               <a href="#" class="font-weight-light " >  <span> Delly</span>Editor </a>
+           </div>
+           <div class="welcomeText mt-15 font-weight-normal">
+           <h4 class="font-weight-light" data-bs-theme="dark">Recently Files</h4>
+         </div>
+         <div class="welcomeDesc mt-15">
+           <div class="recentlyOpenedFiles">
+           </div>
+         </div>
+     </div>
+     <div class="editors w-100 h-100"></div>
+ </div>
+ <div class="file-aside col-md-3 d-flex ">
+  
+ </div>
+</div>
+
     `
+
+    this.classList.add('h-100')
   }
 
   async preparingLayouts() {
-    const fileMenu = document.querySelector('#file-menu')
+    const fileMenu = document.querySelector('.file-aside')
 
     const asideComponent = new Aside()
     fileMenu.appendChild(asideComponent)

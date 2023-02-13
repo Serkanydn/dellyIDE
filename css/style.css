@@ -1,6 +1,11 @@
 a {
   text-decoration: none;
 }
+
+html,
+body {
+  height: 100%;
+}
 /* body {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -22,6 +27,7 @@ small.text-muted.smallUfid {
 
 .splashScreen {
   margin: 7vh auto;
+  height: 100%;
 }
 
 .splashScreen .welcomeDesc li {
@@ -30,20 +36,19 @@ small.text-muted.smallUfid {
 }
 
 .file-body {
-  height: calc(100vh - 30px);
+  /* height: calc(100vh - 30px); */
 }
-.file-aside{
-  border-left:1px solid #ddd;
+.file-aside {
+  border-left: 1px solid #ddd;
 }
-.bg-dark .file-aside{
-  border-left:1px solid #4d4d4d;
+.bg-dark .file-aside {
+  border-left: 1px solid #4d4d4d;
 }
-
 
 .file-body .file-content .editor-nav .editor-nav-buttons {
   flex: 1;
   gap: 0.5rem;
-  width:70%;
+  width: 70%;
 }
 /* .resizable-right{
   width:30%;
@@ -244,12 +249,10 @@ body.bg-dark #file-menu #aside-body .aside-nav .nav-link.active {
 body.bg-dark .header {
   border-bottom: 1px solid #4d4d4d;
 }
- 
-.dx-treelist-header-panel{
-  margin-right:10px;
+
+.dx-treelist-header-panel {
+  margin-right: 10px;
 }
- 
- 
 
 body {
   font-size: 14px;
@@ -306,4 +309,3 @@ editor-nav-button + editor-nav-button .nav-item .nav-link {
 .dx-treelist-search-panel {
   margin-left: 0;
 }
- 
