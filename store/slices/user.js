@@ -17,7 +17,7 @@ const user = RTK.createSlice({
       state.activeDomain = {...payload}
     },
     setUserInitialState: (state, {payload}) => {
-      state.activeDomain = {...payload.activeDomain}
+      // state.activeDomain = {...payload.activeDomain}
       state.activeUser = {...payload.user}
     },
   },

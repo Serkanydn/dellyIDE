@@ -2,6 +2,9 @@ import FileGateService from '../../services/fileGateService.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector, useSubscribe} from '../../store/index.js'
 import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
+import {setActiveDomain} from '../../store/slices/user.js'
+import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
+import customTemplates from '../../utils/devExtreme/customTemplates.js'
 
 class FileAddModal extends HTMLElement {
   constructor() {
@@ -100,27 +103,87 @@ class FileAddModal extends HTMLElement {
 
     const fileGateService = new FileGateService()
     const {user, content} = useSelector((state) => state)
-    const {data: files} = await fileGateService.readAllFilesWithDomainId({domainId: user.activeDomain.id})
+    const {data: files} = await fileGateService.readAllFilesWithDomainId({
+      domainIds: user.activeUser.domainId,
+      sortBy: 'name',
+      sortDesc: 'asc',
+    })
     const {id: selectedFolderId, name, objectType: selectedFolderObjectType} = content.selectedFolder
 
-    // let name, ufId, id;
-    //  if(file.selectedItem) {
-    //   {name,ufId,id}=file.selectedItem
-    //  }
-
     const parentId = document.querySelector('#parentId')
-    this.parentIdInstance = new DevExpress.ui.dxSelectBox(parentId, {
-      dataSource: new DevExpress.data.ArrayStore({
-        data: files.length > 0 && files.filter((file) => file.objectType === '0'),
-        key: 'id',
-      }),
-      placeholder: 'Parent Id',
+
+    this.parentIdInstance = new DevExpress.ui.dxDropDownBox(parentId, {
+      value: (selectedFolderObjectType === '0' || selectedFolderObjectType === '2') && selectedFolderId ? selectedFolderId : null,
       displayExpr(item) {
         if (item) return item.name || item.id
       },
       valueExpr: 'id',
-      showClearButton: true,
-      value: selectedFolderObjectType && selectedFolderId && selectedFolderId,
+      validationMessagePosition: 'left',
+      placeholder: 'Select a value...',
+      showClearButton: false,
+      dataSource: files.length > 0 && files.filter((file) => file.objectType === '0' || file.objectType === '2'),
+      contentTemplate(contentTemplateEvent) {
+        const value = contentTemplateEvent.component.option('value')
+        const div = document.createElement('div')
+
+        const treeListInstance = new DevExpress.ui.dxTreeList(div, {
+          dataSource: contentTemplateEvent.component.getDataSource(),
+          rootValue: null,
+          keyExpr: 'id',
+          parentIdExpr: 'parentId',
+          readOnly: false,
+          highlightChanges: true,
+          showRowLines: true,
+          showBorders: false,
+          height: '100%',
+          selection: {
+            mode: 'single',
+            recursive: false,
+          },
+          filterRow: {
+            visible: true,
+          },
+          showColumnHeaders: false,
+          selectedRowKeys: [value],
+          columns: [
+            {
+              dataField: 'name',
+              caption: 'File Name',
+              cellTemplate(container, options) {
+                customTemplates.getTreeListCellTemplate(container, options, false)
+              },
+            },
+          ],
+          displayExpr(item) {
+            if (item) return item.name || item.id
+          },
+          onRowClick({data, component}) {
+            const selectedKeys = component.option('selectedRowKeys')
+            contentTemplateEvent.component.option('value', selectedKeys[0])
+            if (data.objectType === '2') {
+              useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
+              return
+            }
+          },
+        })
+
+        contentTemplateEvent.component.on('valueChanged', (args) => {
+          if (!args.value) return
+          contentTemplateEvent.component.close()
+        })
+
+        return treeListInstance.element()
+      },
+    })
+
+    const parentIdValidator = new DevExpress.ui.dxValidator(parentId, {
+      validationRules: [
+        {
+          type: 'required',
+          message: 'Folder is required',
+          validationMessagePosition: 'left',
+        },
+      ],
     })
 
     const extension = document.querySelector('#extension')
@@ -186,13 +249,15 @@ class FileAddModal extends HTMLElement {
       type: 'success',
       autoPostback: true,
       onClick: (event) => {
-        // const {isValid} = event.validationGroup.validate()
+        const {isValid} = event.validationGroup.validate()
 
-        // if (!isValid) return
+        if (!isValid) return
 
         this.create()
       },
     })
+
+    devExtremeHelper.registerValidators([parentIdValidator])
   }
 
   async create() {
@@ -234,23 +299,10 @@ class FileAddModal extends HTMLElement {
     SweetAlert2Helper.toastFire({title: result.message})
   }
 
-  removeRegisteredValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().removeRegisteredValidator(validator)
-  }
-
-  registerValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().registerValidator(validator)
-  }
-
-  resetValidatorGroup() {
-    DevExpress.validationEngine.resetGroup()
-  }
-
   connectedCallback() {
     const self = this
     const closeBtn = document.querySelector('#closeBtn')
     const closeIcon = document.querySelector('#closeIcon')
-    // const nameButton = document.querySelector('#closeIcon')
 
     closeBtn.addEventListener('click', () => this.close())
     closeIcon.addEventListener('click', () => this.close())
@@ -259,7 +311,7 @@ class FileAddModal extends HTMLElement {
   }
 
   disconnectedCallback() {
-    DevExpress.validationEngine.removeGroup()
+    devExtremeHelper.removeValidationGroup()
   }
 }
 

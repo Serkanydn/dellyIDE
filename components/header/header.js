@@ -1,7 +1,9 @@
 import localStorageHelper from '../../utils/localStorageHelper.js'
 import FileGateService from '../../services/fileGateService.js'
 import UserService from '../../services/userService.js'
+import domainService from '../../services/domainService.js'
 import FileAddModal from '../modal/fileAddModal.js'
+import DomainAddModal from '../modal/domainAddModal.js'
 import FileUpdateModal from '../modal/fileUpdateModal.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector} from '../../store/index.js'
@@ -61,16 +63,24 @@ class Header extends HTMLElement {
     fileAddModal.open()
   }
 
+  createDomainAddModal() {
+    const domainAddModal = new DomainAddModal()
+    document.body.appendChild(domainAddModal)
+    domainAddModal.open()
+  }
+
   async updateModal() {
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
 
     if (!selectedFileId) return
 
     const fileGateService = new FileGateService()
-    const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
-    const result = await fileGateService.readAllFilesWithDomainId({domainId})
+    const {user, content} = useSelector((state) => state)
+    console.log(user.activeUser.domainId)
+    // const {id: domainId, name: domainName} = useSelector((state) => state?.user?.activeDomain)
+    const result = await fileGateService.readAllFilesWithDomainId({domainIds: user.activeUser.domainId, sortBy: 'name', sortDesc: 'asc'})
 
-    const {id, parentId, name, objectType, ufId, extension, version, path} = useSelector((state) => state.content.selectedFile)
+    const {id, parentId, name, objectType, ufId, extension, version, path, domainId} = useSelector((state) => state.content.selectedFile)
 
     const fileUpdateModal = new FileUpdateModal({
       files: result,
@@ -81,7 +91,6 @@ class Header extends HTMLElement {
       extension,
       domainId,
       objectType,
-      domainName,
       version,
       path,
     })
@@ -122,7 +131,7 @@ class Header extends HTMLElement {
       localStorageHelper.setItem('theme', 'vs-light')
     }
     if (!localStorageHelper.getItem('fontSize')) {
-      localStorageHelper.setItem('fontSize', '10px')
+      localStorageHelper.setItem('fontSize', '14px')
     }
     if (!localStorageHelper.getItem('openNav')) {
       localStorageHelper.setItem('openNav', 'true')
@@ -131,12 +140,7 @@ class Header extends HTMLElement {
     const userService = new UserService()
     const {data: user} = await userService.getActiveUser()
 
-    const {id: domainId, name} =
-      user.domainList.find((domain) => domain.id === localStorageHelper.getItem('activeDomainId')) || user.domainList[0]
-
-    // useDispatch(setActiveUser())
-    useDispatch(setUserInitialState({user, activeDomain: {id: domainId, name}}))
-    localStorageHelper.setItem('activeDomainId', domainId)
+    useDispatch(setUserInitialState({user}))
 
     const headerToolbar = document.querySelector('#headerToolbar')
     this.headerToolbar = new DevExpress.ui.dxToolbar(headerToolbar, {
@@ -321,6 +325,7 @@ class Header extends HTMLElement {
             },
           },
         },
+
         {
           location: 'after',
           locateInMenu: 'auto',
@@ -351,20 +356,17 @@ class Header extends HTMLElement {
             },
           },
         },
+
         {
           location: 'after',
-          widget: 'dxSelectBox',
-          visible: user.domainList.length > 1,
+          widget: 'dxButton',
           locateInMenu: 'auto',
+          visible: user.role === 'superAdmin',
           options: {
-            width: 140,
-            items: user.domainList,
-            valueExpr: 'id',
-            displayExpr: 'name',
-            value: domainId,
-            onValueChanged(_args) {
-              const {id, name} = _args.component.option('selectedItem')
-              useDispatch(setActiveDomain({id, name}))
+            icon: 'icon/web.svg',
+            hint: 'Add domain',
+            onClick() {
+              self.createDomainAddModal()
             },
           },
         },

@@ -3,6 +3,10 @@ import {useDispatch, useSelector} from '../../store/index.js'
 import {setSelectedFile} from '../../store/slices/content.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
+import {setActiveDomain} from '../../store/slices/user.js'
+import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
+import customTemplates from '../../utils/devExtreme/customTemplates.js'
+
 class FileUpdateModal extends HTMLElement {
   constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}) {
     super()
@@ -32,16 +36,18 @@ class FileUpdateModal extends HTMLElement {
       
 
        <div id="fileIdGroup" class="col-md-12"  >
-       <div  class="row mb-2">
-         <label for="version" class="col-md-2 col-form-label ">Id</label>
+         <div  class="row mb-2">
+           <label for="version" class="col-md-2 col-form-label ">Id</label>
           
-         <div class="col-md-10">
-           <div class="input-group input-group-sm">
-           <div class="form-control" id="fileId" ></div>
-           <div  class="input-group-text" id="fileIdCopyButton"></div>
-           </div>
-        </div>
+           <div class="col-md-10">
+              <div class="input-group input-group-sm">
+                <div class="form-control" id="fileId" ></div>
+                <div  class="input-group-text" id="fileIdCopyButton"></div>
+              </div>
+          </div>
      </div> 
+
+     </div>
 
 
       
@@ -74,12 +80,13 @@ class FileUpdateModal extends HTMLElement {
 
 
            <div id="versionGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
-        <div  class="row mb-2">
-          <label for="version" class="col-sm-2 col-form-label ">Version</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm"  id="version" ></div>
+             <div  class="row mb-2">
+               <label for="version" class="col-sm-2 col-form-label ">Version</label>
+               <div class="col-md-10">
+                <div class="form-control form-control-sm"  id="version" ></div>
+            </div>
+          </div> 
           </div>
-      </div> 
      
 
         <div  class="row mb-2">
@@ -130,24 +137,106 @@ class FileUpdateModal extends HTMLElement {
     }, 100)
   }
 
+  syncTreeViewSelection(treeViewInstance, value) {
+    if (!value) {
+      // treeViewInstance.option('selectedRowKeys', [])
+      return
+    } else {
+      treeViewInstance.selectItem(value)
+    }
+  }
+
+  makeAsyncDataSource(jsonFile) {
+    return new DevExpress.data.CustomStore({
+      loadMode: 'raw',
+      key: 'ID',
+      load() {
+        return $.getJSON(`${jsonFile}`)
+      },
+    })
+  }
+
   prepareForm() {
     const self = this
 
     const parentId = document.querySelector('#parentId')
-    this.parentIdInstance = new DevExpress.ui.dxSelectBox(parentId, {
-      dataSource: new DevExpress.data.ArrayStore({
-        data: this.state?.files.data.filter(
-          (file) => file.objectType === '0' && file.id !== this.state.id && file.parentId !== this.state.id
-        ),
-        key: 'id',
-      }),
-      placeholder: 'Parent Id',
+
+    this.parentIdInstance = new DevExpress.ui.dxDropDownBox(parentId, {
+      value: this.state?.parentId,
       displayExpr(item) {
         if (item) return item.name || item.id
       },
       valueExpr: 'id',
-      showClearButton: true,
-      value: this.state?.parentId,
+      validationMessagePosition: 'left',
+      placeholder: 'Select a value...',
+      showClearButton: false,
+      dataSource: this.state?.files.data.filter(
+        (file) => (file.objectType === '0' || file.objectType === '2') && file.id !== this.state.id && file.parentId !== this.state.id
+      ),
+      contentTemplate(contentTemplateEvent) {
+        const value = contentTemplateEvent.component.option('value')
+        const div = document.createElement('div')
+
+        const treeListInstance = new DevExpress.ui.dxTreeList(div, {
+          dataSource: contentTemplateEvent.component.getDataSource(),
+          rootValue: null,
+          keyExpr: 'id',
+          parentIdExpr: 'parentId',
+          columnAutoWidth: true,
+          readOnly: false,
+          highlightChanges: true,
+          showRowLines: true,
+          showBorders: false,
+          width: '100%',
+          height: '100%',
+          selection: {
+            mode: 'single',
+            recursive: false,
+          },
+          filterRow: {
+            visible: true,
+          },
+          showColumnHeaders: false,
+          selectedRowKeys: [value],
+          columns: [
+            {
+              dataField: 'name',
+              caption: 'File Name',
+              cellTemplate(container, options) {
+                customTemplates.getTreeListCellTemplate(container, options, false)
+              },
+            },
+          ],
+          displayExpr(item) {
+            if (item) return item.name || item.id
+          },
+          onRowClick({data, component}) {
+            const selectedKeys = component.option('selectedRowKeys')
+            contentTemplateEvent.component.option('value', selectedKeys[0])
+            if (data.objectType === '2') {
+              useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
+              return
+            }
+          },
+        })
+
+        contentTemplateEvent.component.on('valueChanged', (args) => {
+          if (!args.value) return
+          contentTemplateEvent.component.close()
+        })
+
+        return treeListInstance.element()
+      },
+    })
+
+    const parentIdValidator = new DevExpress.ui.dxValidator(parentId, {
+      validationRules: [
+        {
+          type: 'required',
+          message: 'Folder is required',
+          validationMessagePosition: 'left',
+        },
+      ],
     })
 
     const extension = document.querySelector('#extension')
@@ -200,7 +289,7 @@ class FileUpdateModal extends HTMLElement {
 
     const ufId = document.querySelector('#ufId')
     this.ufIdInstance = new DevExpress.ui.dxTextBox(ufId, {
-      value: this.state?.ufId?.replace(`${this.state.domainName}/`, ''),
+      value: this.state?.ufId,
     })
 
     const name = document.querySelector('#name')
@@ -232,9 +321,15 @@ class FileUpdateModal extends HTMLElement {
       type: 'success',
       autoPostback: true,
       onClick: (event) => {
+        const {isValid} = event.validationGroup.validate()
+
+        if (!isValid) return
+
         this.update()
       },
     })
+
+    devExtremeHelper.registerValidators([parentIdValidator])
   }
 
   async update() {
@@ -247,12 +342,12 @@ class FileUpdateModal extends HTMLElement {
     const extension = this.extensionInstance.option('value')
     const version = this.versionInstance.option('value')
 
-    const {domainId} = this.state
+    const {id: domainId} = useSelector((state) => state.user.activeDomain)
 
     const object = {
       id: this.state?.id,
       ufId: ufId || '',
-      parentId,
+      parentId: parentId || null,
       objectType,
       extension,
       name,
@@ -316,18 +411,6 @@ class FileUpdateModal extends HTMLElement {
     solutionExplorer.refreshTreeList()
   }
 
-  removeRegisteredValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().removeRegisteredValidator(validator)
-  }
-
-  registerValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().registerValidator(validator)
-  }
-
-  resetValidatorGroup() {
-    DevExpress.validationEngine.resetGroup()
-  }
-
   async connectedCallback() {
     const self = this
 
@@ -341,7 +424,7 @@ class FileUpdateModal extends HTMLElement {
   }
 
   disconnectedCallback() {
-    DevExpress.validationEngine.removeGroup()
+    devExtremeHelper.removeValidationGroup()
   }
 }
 
