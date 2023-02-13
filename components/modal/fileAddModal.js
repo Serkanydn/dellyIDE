@@ -3,6 +3,8 @@ import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector, useSubscribe} from '../../store/index.js'
 import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
 import {setActiveDomain} from '../../store/slices/user.js'
+import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
+import customTemplates from '../../utils/devExtreme/customTemplates.js'
 
 class FileAddModal extends HTMLElement {
   constructor() {
@@ -96,57 +98,19 @@ class FileAddModal extends HTMLElement {
     }, 100)
   }
 
-  syncTreeViewSelection(treeViewInstance, value) {
-    if (!value) {
-      treeViewInstance.option('selectedRowKeys', [])
-    } else {
-      treeViewInstance.selectItem(value)
-    }
-  }
-
-  makeAsyncDataSource(jsonFile) {
-    return new DevExpress.data.CustomStore({
-      loadMode: 'raw',
-      key: 'ID',
-      load() {
-        return $.getJSON(`${jsonFile}`)
-      },
-    })
-  }
-
   async prepareForm() {
     const self = this
 
     const fileGateService = new FileGateService()
     const {user, content} = useSelector((state) => state)
     const {data: files} = await fileGateService.readAllFilesWithDomainId({
-      domainId: user?.activeDomain?.id,
+      domainIds: user.activeUser.domainId,
       sortBy: 'name',
       sortDesc: 'asc',
     })
     const {id: selectedFolderId, name, objectType: selectedFolderObjectType} = content.selectedFolder
-    // const {data: files} = await new FileGateService().readAllFilesWithDomainId({userId: user.id})
-    // console.log(files)
-
-    // let name, ufId, id;
-    //  if(file.selectedItem) {
-    //   {name,ufId,id}=file.selectedItem
-    //  }
 
     const parentId = document.querySelector('#parentId')
-    // this.parentIdInstance = new DevExpress.ui.dxSelectBox(parentId, {
-    //   dataSource: new DevExpress.data.ArrayStore({
-    //     data: files.length > 0 && files.filter((file) => file.objectType === '0' || file.objectType === '2'),
-    //     key: 'id',
-    //   }),
-    //   placeholder: 'Parent Id',
-    //   displayExpr(item) {
-    //     if (item) return item.name || item.id
-    //   },
-    //   valueExpr: 'id',
-    //   showClearButton: true,
-    //   value: (selectedFolderObjectType === '0' || selectedFolderObjectType === '2') && selectedFolderId && selectedFolderId,
-    // })
 
     this.parentIdInstance = new DevExpress.ui.dxDropDownBox(parentId, {
       value: (selectedFolderObjectType === '0' || selectedFolderObjectType === '2') && selectedFolderId ? selectedFolderId : null,
@@ -158,85 +122,59 @@ class FileAddModal extends HTMLElement {
       placeholder: 'Select a value...',
       showClearButton: false,
       dataSource: files.length > 0 && files.filter((file) => file.objectType === '0' || file.objectType === '2'),
-      contentTemplate(e) {
-        const value = e.component.option('value')
-
+      contentTemplate(contentTemplateEvent) {
+        const value = contentTemplateEvent.component.option('value')
         const div = document.createElement('div')
-        // document.body.appendChild(div)
-        const $treeView = new DevExpress.ui.dxTreeList(div, {
-          dataSource: e.component.getDataSource(),
-          dataStructure: 'plain',
+
+        const treeListInstance = new DevExpress.ui.dxTreeList(div, {
+          dataSource: contentTemplateEvent.component.getDataSource(),
           rootValue: null,
           keyExpr: 'id',
           parentIdExpr: 'parentId',
+          columnAutoWidth: true,
+          readOnly: false,
+          highlightChanges: true,
+          showRowLines: true,
+          showBorders: false,
+          width: '100%',
+          height: '100%',
           selection: {
             mode: 'single',
             recursive: false,
           },
+          filterRow: {
+            visible: true,
+          },
+          showColumnHeaders: false,
+          selectedRowKeys: [value],
           columns: [
             {
               dataField: 'name',
               caption: 'File Name',
               cellTemplate(container, options) {
-                const {data} = options
-                const {id, name, ufId, extension, objectType} = data
-                // console.log(name)
-
-                const title = name || ufId || id
-
-                let smallTextContent = ufId || id
-                if ((!name && !ufId) || name === ufId) smallTextContent = ''
-                const template = `
-                <div  class="d-flex tree-list-draggable-item">
-                    <img src="icon/${
-                      objectType === '1' ? extension : objectType === '0' ? 'folder' : 'worldSharp'
-                    }.svg" style="width:20px;objectFit:'cover'" class="img"/>
-                    <div>
-                      <small class="me-2" >${title}</small>
-                      ${
-                        objectType === '1'
-                          ? `
-                        <small style="font-size:.7rem;" class="text-muted" disabled>
-                        ${smallTextContent}
-                        </small>
-                      
-                      `
-                          : ''
-                      }
-                    </div>
-                </div>
-                `
-
-                const element = document.createRange().createContextualFragment(template)
-
-                container.append(element)
+                customTemplates.getTreeListCellTemplate(container, options, false)
               },
             },
           ],
           displayExpr(item) {
             if (item) return item.name || item.id
           },
-          onContentReady(args) {
-            // self.syncTreeViewSelection(args.component, value)
-          },
-          onRowClick(event) {
-            const {data} = event
-            const selectedKeys = event.component.option('selectedRowKeys')
-            e.component.option('value', selectedKeys[0])
+          onRowClick({data, component}) {
+            const selectedKeys = component.option('selectedRowKeys')
+            contentTemplateEvent.component.option('value', selectedKeys[0])
             if (data.objectType === '2') {
               useDispatch(setActiveDomain({id: data.id, name: data.name}))
               return
             }
           },
         })
-        // treeView = $treeView.dxTreeView('instance')
 
-        // e.component.on('valueChanged', (args) => {
-        //   self.syncTreeViewSelection($treeView, args.value)
-        //   e.component.close()
-        // })
+        contentTemplateEvent.component.on('valueChanged', (args) => {
+          if (!args.value) return
+          contentTemplateEvent.component.close()
+        })
 
-        return $treeView.element()
+        return treeListInstance.element()
       },
     })
 
@@ -320,13 +258,7 @@ class FileAddModal extends HTMLElement {
       },
     })
 
-    this.registerValidators([parentIdValidator])
-  }
-
-  registerValidators(validators) {
-    validators.forEach((validator) => {
-      this.registerValidator(validator)
-    })
+    devExtremeHelper.registerValidators([parentIdValidator])
   }
 
   async create() {
@@ -370,23 +302,10 @@ class FileAddModal extends HTMLElement {
     SweetAlert2Helper.toastFire({title: result.message})
   }
 
-  removeRegisteredValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().removeRegisteredValidator(validator)
-  }
-
-  registerValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().registerValidator(validator)
-  }
-
-  resetValidatorGroup() {
-    DevExpress.validationEngine.resetGroup()
-  }
-
   connectedCallback() {
     const self = this
     const closeBtn = document.querySelector('#closeBtn')
     const closeIcon = document.querySelector('#closeIcon')
-    // const nameButton = document.querySelector('#closeIcon')
 
     closeBtn.addEventListener('click', () => this.close())
     closeIcon.addEventListener('click', () => this.close())
@@ -395,7 +314,7 @@ class FileAddModal extends HTMLElement {
   }
 
   disconnectedCallback() {
-    DevExpress.validationEngine.removeGroup()
+    devExtremeHelper.removeValidationGroup()
   }
 }
 

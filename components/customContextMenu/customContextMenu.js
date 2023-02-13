@@ -4,14 +4,13 @@ import {setSelectedFolder} from '../../store/slices/content.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import FileAddModal from '../modal/fileAddModal.js'
 import FileUpdateModal from '../modal/fileUpdateModal.js'
-import domainUpdateModal from '../modal/domainUpdateModal.js'
-import {setActiveUser, setActiveDomain, setUserInitialState} from '../../store/slices/user.js'
+import {setActiveDomain} from '../../store/slices/user.js'
 import DomainUpdateModal from '../modal/domainUpdateModal.js'
 
 class CustomContextMenu extends HTMLElement {
-  constructor({items, target, selectedFile}) {
+  constructor({itemType, target, selectedFile}) {
     super()
-    this.state = {items, target, selectedFile}
+    this.state = {itemType, target, selectedFile}
     this.innerHTML = `
     
    <div id="custom-context-menu" >
@@ -57,7 +56,11 @@ class CustomContextMenu extends HTMLElement {
       }
       case 'preview': {
         const {id, domainId} = this.state.selectedFile
-        window.open(`${window.config.previewUrl}${domainId}/${id}`, '_blank')
+        const newWindow = window.open(`${window.config.previewUrl}${domainId}/${id}`, '_blank')
+        setTimeout(() => {
+          console.log(newWindow)
+          newWindow.location.reload()
+        }, 3000)
         break
       }
       case 'copyUrl': {
@@ -100,11 +103,12 @@ class CustomContextMenu extends HTMLElement {
 
   async updateModal(item) {
     const fileGateService = new FileGateService()
-    const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
-    const result = await fileGateService.readAllFilesWithDomainId({domainId})
+    const {user, content} = useSelector((state) => state)
+    // const {id: domainId, name: domainName} = useSelector((state) => state?.user?.activeDomain)
+    const result = await fileGateService.readAllFilesWithDomainId({domainIds: user.activeUser.domainId, sortBy: 'name', sortDesc: 'asc'})
     // const recently = this.setRecentlyFiles(this.state);
 
-    const {id, parentId, name, objectType, ufId, extension, version, path} = item
+    const {id, parentId, name, objectType, ufId, extension, domainId, version, path} = item
 
     const fileUpdateModal = new FileUpdateModal({
       files: result,
@@ -115,7 +119,6 @@ class CustomContextMenu extends HTMLElement {
       extension,
       domainId,
       objectType,
-      domainName,
       version,
       path,
     })
@@ -137,7 +140,7 @@ class CustomContextMenu extends HTMLElement {
     const self = this
 
     this.contextMenu = new DevExpress.ui.dxContextMenu(contextMenu, {
-      dataSource: self.state.items,
+      dataSource: self.getItems(self.state.itemType),
       target: self.state.target,
       width: '150px',
       itemTemplate(itemData) {
@@ -158,6 +161,33 @@ class CustomContextMenu extends HTMLElement {
         self.remove()
       },
     })
+  }
+
+  getItems(itemType) {
+    const items = {
+      file: [
+        {id: 'preview', text: 'Preview', icon: 'dx-icon-find'},
+        {id: 'duplicate', text: 'Duplicate', icon: 'dx-icon-copy'},
+        {id: 'copyUrl', text: 'Copy Url', icon: 'dx-icon-map'},
+        {id: 'copyId', text: 'Copy Identity', icon: 'dx-icon-copy'},
+        {id: 'newAdd', text: 'Add New', icon: 'dx-icon-add'},
+        {id: 'update', text: 'Update info', icon: 'dx-icon-edit'},
+        {id: 'delete', text: 'Delete', icon: 'dx-icon-trash'},
+      ],
+      folder: [
+        {id: 'newAdd', text: 'Add New', icon: 'dx-icon-add'},
+        {id: 'update', text: 'Update info', icon: 'dx-icon-edit'},
+        {id: 'delete', text: 'Delete', icon: 'dx-icon-trash'},
+      ],
+      editorNavButton: [
+        {id: 'preview', text: 'Preview', icon: 'dx-icon-find'},
+        {id: 'copyUrl', text: 'Copy Url', icon: 'dx-icon-map'},
+        {id: 'copyId', text: 'Copy Identity', icon: 'dx-icon-copy'},
+        {id: 'close', text: 'Close', icon: 'dx-icon-close'},
+        {id: 'closeAll', text: 'Close All', icon: 'dx-icon-close'},
+      ],
+    }
+    return items[itemType]
   }
 
   disconnectedCallback() {

@@ -1,7 +1,5 @@
-import FileGateService from '../../services/fileGateService.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
-import {useDispatch, useSelector, useSubscribe} from '../../store/index.js'
-import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
+import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
 import DomainService from '../../services/domainService.js'
 
 class DomainAddModal extends HTMLElement {
@@ -112,7 +110,7 @@ class DomainAddModal extends HTMLElement {
       ],
     })
 
-    this.registerValidators([domainIdValidator, domainNameValidator])
+    devExtremeHelper.registerValidators([domainIdValidator, domainNameValidator])
 
     const addBtn = document.querySelector('#addBtn')
     new DevExpress.ui.dxButton(addBtn, {
@@ -158,24 +156,6 @@ class DomainAddModal extends HTMLElement {
     SweetAlert2Helper.toastFire({title: message})
   }
 
-  removeRegisteredValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().removeRegisteredValidator(validator)
-  }
-
-  registerValidator(validator) {
-    DevExpress.validationEngine.getGroupConfig().registerValidator(validator)
-  }
-
-  registerValidators(validators) {
-    validators.forEach((validator) => {
-      this.registerValidator(validator)
-    })
-  }
-
-  resetValidatorGroup() {
-    DevExpress.validationEngine.resetGroup()
-  }
-
   connectedCallback() {
     const self = this
     const closeBtn = document.querySelector('#closeBtn')
@@ -189,7 +169,7 @@ class DomainAddModal extends HTMLElement {
   }
 
   disconnectedCallback() {
-    DevExpress.validationEngine.removeGroup()
+    devExtremeHelper.removeValidationGroup()
   }
 }
 

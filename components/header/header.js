@@ -75,10 +75,12 @@ class Header extends HTMLElement {
     if (!selectedFileId) return
 
     const fileGateService = new FileGateService()
-    const {id: domainId, name: domainName} = useSelector((state) => state.user.activeDomain)
-    const result = await fileGateService.readAllFilesWithDomainId({domainId})
+    const {user, content} = useSelector((state) => state)
+    console.log(user.activeUser.domainId)
+    // const {id: domainId, name: domainName} = useSelector((state) => state?.user?.activeDomain)
+    const result = await fileGateService.readAllFilesWithDomainId({domainIds: user.activeUser.domainId, sortBy: 'name', sortDesc: 'asc'})
 
-    const {id, parentId, name, objectType, ufId, extension, version, path} = useSelector((state) => state.content.selectedFile)
+    const {id, parentId, name, objectType, ufId, extension, version, path, domainId} = useSelector((state) => state.content.selectedFile)
 
     const fileUpdateModal = new FileUpdateModal({
       files: result,
@@ -89,7 +91,6 @@ class Header extends HTMLElement {
       extension,
       domainId,
       objectType,
-      domainName,
       version,
       path,
     })
@@ -364,8 +365,8 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: 'icon/worldSharp.svg',
-            hint: 'Delete file',
+            icon: 'icon/web.svg',
+            hint: 'Add domain',
             onClick() {
               self.createDomainAddModal()
             },
