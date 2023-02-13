@@ -50,8 +50,8 @@ class SolutionExplorer extends HTMLElement {
     return this.treeListInstance.option('dataSource')
   }
 
-  // ! userId göndereceğiz.
   getStore(domainIds) {
+    const self = this
     return new DevExpress.data.CustomStore({
       totalCount: 100,
       key: 'id',
@@ -68,7 +68,7 @@ class SolutionExplorer extends HTMLElement {
           domainIds,
         }
         const {data: files} = await new FileGateService().readAllFilesWithDomainId(request)
-
+        if (domainIds.length === 1) self.treeListInstance.expandRow(files[0].id)
         // files.forEach((element) => {
         //   console.log('"id": ', element.id, ' ----- ', '"parentId": ', element.parentId)
         // })
@@ -119,43 +119,16 @@ class SolutionExplorer extends HTMLElement {
   connectedCallback() {
     const self = this
 
-    const fileGateService = new FileGateService()
-
-    // useSubscribe('user.activeDomain', async (activeDomain) => {
-    //   // const files = await fileGateService.readAllFilesWithDomainId({domainId: activeDomain.id})
-    //   // console.log('domainSubs')
-    //   // this.setTreelistItems(files.data, activeDomain.id)
-    //   console.log('girdi')
-    //   this.setTreelistItems(activeDomain.id)
-
-    //   const storageActiveDomainId = localStorageHelper.getItem('activeDomainId')
-    //   if (storageActiveDomainId !== activeDomain.id) {
-    //     const contentEditorHelper = new ContentEditorHelper()
-    //     await contentEditorHelper.clearContent()
-    //     localStorageHelper.removeOpenedFiles()
-    //     localStorageHelper.clearRecentlyOpenedFiles()
-    //     contentEditorHelper.refreshRecentlyOpenedFiles()
-
-    //     // * Headerda active domain değiştikten sonra storage ile redux'taki domain eşit olmuyor if'in içerisine giriyor.
-    //     // * Açılmış contentleri tekrar yükleyebilmek için headerda local storage'e set ettiğimiz activeDomainId'yi buraya taşımak zorunda kaldık.
-    //     // * Aksi halde headerda redux'a activeDomain'i attığımız için burası açılışta da çalışıyor ve  storage'deki openFiles'lar siliniyor.
-    //     localStorageHelper.setItem('activeDomainId', activeDomain.id)
-    //   }
-
-    //   self.treeListInstance.searchByText('')
-    // })
-
+    // ? Store Subscribe
     useSubscribe('user.activeUser', async (activeUser) => {
       this.setTreelistItems(activeUser.domainId)
     })
 
-    // ? Store Subscribe
     useSubscribe('content.selectedFile', async (selectedFile) => {
       self.setSelectedTreeItem(selectedFile)
     })
 
     const folders = document.querySelector('#solutionExplorer')
-    var draggingGroupName = 'appointmentsGroup'
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
       // dataSource: [],
@@ -243,16 +216,23 @@ class SolutionExplorer extends HTMLElement {
         if (!event.row?.data) return
 
         const {data} = event.row
-        if (data) {
-          self.setSelectedTreeItem(data)
-        }
 
-        if (data.objectType === '0' || data.objectType === '2') {
+        self.setSelectedTreeItem(data)
+
+        if (data.objectType === '0') {
           self.createFolderContextMenu(data)
         }
 
         if (data.objectType === '1') {
           self.createFileContextMenu(data)
+        }
+
+        const {role} = useSelector((state) => state.user.activeUser)
+        if (role === 'superAdmin') {
+          if (data.objectType === '2') {
+            self.createFolderContextMenu(data)
+            useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
+          }
         }
       },
       rowClick(event) {
@@ -263,7 +243,7 @@ class SolutionExplorer extends HTMLElement {
         }
         if (data.objectType === '2') {
           useDispatch(setSelectedFolder(data))
-          useDispatch(setActiveDomain({id: data.id, name: data.name}))
+          useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
           return
         }
         const {selectedFolder} = useSelector((state) => state.content)
@@ -285,8 +265,6 @@ class SolutionExplorer extends HTMLElement {
       },
     })
   }
-
-  createDraggable() {}
 
   async createModal() {
     const fileAddModal = new FileAddModal()

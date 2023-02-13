@@ -4,14 +4,14 @@ import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import CustomContextMenu from '../customContextMenu/customContextMenu.js'
 
 class EditorNavButton extends HTMLElement {
-  constructor({title, path, data, contentId, extension}) {
+  constructor({title, data, contentId, extension}) {
     super()
-    this.state = {title, path, data, contentId, extension}
+    this.state = {title, data, contentId, extension}
     this.solutionExplorer = document.querySelector('solution-explorer-component')
     this.innerHTML = `
     <div id="editorNavItem-${this.state.contentId}" class="nav-item">
       <div class=" position-relative">
-        <button id="select-${this.state.contentId}" class="nav-link active" data-bs-toggle="tooltip" data-bs-placement="right" title="${this.state.path}">${this.state.title}.${this.state.extension}</button>
+        <button id="select-${this.state.contentId}" class="nav-link active" data-bs-toggle="tooltip" data-bs-placement="right">${this.state.title}.${this.state.extension}</button>
         <button id="remove-${this.state.contentId}" class="remove-button p-0 m-0 position-absolute translate-middle badge bg-white text-dark border-0 rounded-pill "><i class="bi bi-x"></i> </button>
       </div>
     </div>

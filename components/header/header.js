@@ -123,7 +123,7 @@ class Header extends HTMLElement {
       localStorageHelper.setItem('theme', 'vs-light')
     }
     if (!localStorageHelper.getItem('fontSize')) {
-      localStorageHelper.setItem('fontSize', '10px')
+      localStorageHelper.setItem('fontSize', '14px')
     }
     if (!localStorageHelper.getItem('openNav')) {
       localStorageHelper.setItem('openNav', 'true')
@@ -132,12 +132,7 @@ class Header extends HTMLElement {
     const userService = new UserService()
     const {data: user} = await userService.getActiveUser()
 
-    // const {id: domainId, name} =
-    //   user.domainList.find((domain) => domain.id === localStorageHelper.getItem('activeDomainId')) || user.domainList[0]
-
-    // useDispatch(setActiveUser())
     useDispatch(setUserInitialState({user}))
-    // localStorageHelper.setItem('activeDomainId', domainId)
 
     const headerToolbar = document.querySelector('#headerToolbar')
     this.headerToolbar = new DevExpress.ui.dxToolbar(headerToolbar, {
@@ -343,27 +338,11 @@ class Header extends HTMLElement {
           },
         },
 
-        // {
-        //   location: 'after',
-        //   widget: 'dxSelectBox',
-        //   visible: user.domainList.length > 1,
-        //   locateInMenu: 'auto',
-        //   options: {
-        //     width: 140,
-        //     items: user.domainList,
-        //     valueExpr: 'id',
-        //     displayExpr: 'name',
-        //     value: domainId,
-        //     onValueChanged(_args) {
-        //       const {id, name} = _args.component.option('selectedItem')
-        //       useDispatch(setActiveDomain({id, name}))
-        //     },
-        //   },
-        // },
         {
           location: 'after',
           widget: 'dxButton',
           locateInMenu: 'auto',
+          visible: user.role === 'superAdmin',
           options: {
             icon: 'icon/web.svg',
             hint: 'Add domain',

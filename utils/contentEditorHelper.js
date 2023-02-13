@@ -103,14 +103,14 @@ class ContentEditorHelper {
     const {data: result} = await fileGateService.readFileById(_contentId)
     const {data} = result
 
-    const {id, name, ufId, path, extension, content, parentId} = data
+    const {id, name, ufId, extension, content, parentId} = data
     localStorageHelper.addOpenedFile(_contentId)
 
     // ! Nav
     const editorNavButtons = document.querySelector('.file-editor-nav-buttons')
     editorNavButtons.classList.add('nav-tabs')
 
-    const editorNavButton = new EditorNavButton({title: name || ufId || id, contentId: id, extension, data, path})
+    const editorNavButton = new EditorNavButton({title: name || ufId || id, contentId: id, extension, data})
     editorNavButton.setAttribute('data-id', id)
     editorNavButton.setAttribute('data-parentId', parentId)
     editorNavButtons.append(editorNavButton)

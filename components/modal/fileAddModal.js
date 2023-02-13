@@ -131,12 +131,10 @@ class FileAddModal extends HTMLElement {
           rootValue: null,
           keyExpr: 'id',
           parentIdExpr: 'parentId',
-          columnAutoWidth: true,
           readOnly: false,
           highlightChanges: true,
           showRowLines: true,
           showBorders: false,
-          width: '100%',
           height: '100%',
           selection: {
             mode: 'single',
@@ -163,7 +161,7 @@ class FileAddModal extends HTMLElement {
             const selectedKeys = component.option('selectedRowKeys')
             contentTemplateEvent.component.option('value', selectedKeys[0])
             if (data.objectType === '2') {
-              useDispatch(setActiveDomain({id: data.id, name: data.name}))
+              useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
               return
             }
           },
@@ -269,8 +267,6 @@ class FileAddModal extends HTMLElement {
     const name = this.nameInstance.option('value')
     let ufId = this.ufIdInstance.option('value')
     let extension = this.extensionInstance.option('value')
-
-    console.log(parentId)
 
     const {id: domainId} = useSelector((state) => state.user.activeDomain)
     if (objectType === '0') {

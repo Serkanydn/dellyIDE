@@ -214,7 +214,7 @@ class FileUpdateModal extends HTMLElement {
             const selectedKeys = component.option('selectedRowKeys')
             contentTemplateEvent.component.option('value', selectedKeys[0])
             if (data.objectType === '2') {
-              useDispatch(setActiveDomain({id: data.id, name: data.name}))
+              useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
               return
             }
           },
@@ -342,7 +342,7 @@ class FileUpdateModal extends HTMLElement {
     const extension = this.extensionInstance.option('value')
     const version = this.versionInstance.option('value')
 
-    const {domainId} = this.state
+    const {id: domainId} = useSelector((state) => state.user.activeDomain)
 
     const object = {
       id: this.state?.id,

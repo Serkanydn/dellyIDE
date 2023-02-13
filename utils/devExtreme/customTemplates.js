@@ -1,5 +1,7 @@
+import {useSelector} from '../../store/index.js'
+
 class CustomTemplates {
-  getTreeListCellTemplate(container, options, draggable) {
+  getTreeListCellTemplate(container, options, fileDraggable) {
     const {data} = options
     const {id, name, ufId, extension, objectType} = data
     // console.log(name)
@@ -31,12 +33,19 @@ class CustomTemplates {
 
     const element = document.createRange().createContextualFragment(template)
 
-    if (draggable && objectType === '1') {
+    if (fileDraggable && objectType === '1') {
       const draggable = element.querySelector('.tree-list-draggable-item')
       draggable.setAttribute('draggable', true)
       draggable.setAttribute('role', 'button')
       draggable.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', `"@@include myspace/${data.ufId || data.id}@@"`)
+        // event.dataTransfer.setData('text/plain', `"@@include myspace/${data.ufId || data.id}@@"`)
+        const {domainId} = useSelector((state) => state.user.activeUser)
+        console.log(domainId.length > 1)
+        const isMultipleDomain = domainId.length > 1
+        event.dataTransfer.setData(
+          'text/plain',
+          `const ${data.name || 'module1'} = require("${isMultipleDomain ? data.domainId : 'myspace'}/${data.ufId || data.id}");`
+        )
       })
     }
 

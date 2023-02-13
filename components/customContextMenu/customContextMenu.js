@@ -33,7 +33,7 @@ class CustomContextMenu extends HTMLElement {
           useDispatch(setSelectedFolder(this.state.selectedFile))
         } else if (this.state.selectedFile.objectType === '2') {
           useDispatch(setSelectedFolder(this.state.selectedFile))
-          useDispatch(setActiveDomain({id: this.state.selectedFile.id, name: this.state.selectedFile.name}))
+          useDispatch(setActiveDomain({id: this.state.selectedFile.domainId, name: this.state.selectedFile.name}))
         } else {
           useDispatch(setSelectedFolder(null))
           useDispatch(setActiveDomain(null))
@@ -47,10 +47,10 @@ class CustomContextMenu extends HTMLElement {
 
         if (objectType === '2') {
           this.domainUpdateModal(this.state.selectedFile)
+          useDispatch(setActiveDomain({id: this.state.selectedFile.domainId, name}))
           break
         }
 
-        useDispatch(setActiveDomain({id, name}))
         this.updateModal(this.state.selectedFile)
         break
       }
