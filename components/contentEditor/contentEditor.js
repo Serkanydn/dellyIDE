@@ -62,6 +62,8 @@ class ContentEditor extends HTMLElement {
 
     this.editor.getModel().onDidChangeContent((event) => {
       // console.log('editor change')
+      const activeEditorNavButton = this.getChangedEditorNavButton(this.state.id)
+      activeEditorNavButton.lastChild.style.display = "inline-block"
       this.state.editorContentChange = true
     })
 
@@ -130,7 +132,9 @@ class ContentEditor extends HTMLElement {
   getSelectionText() {
     return this.editor.getModel().getValueInRange(this.editor.getSelection())
   }
-
+  getChangedEditorNavButton(id){
+    return document.querySelector('#select-'+id);
+  }
   connectedCallback() {
     this.createEditor()
   }

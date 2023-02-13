@@ -12,7 +12,7 @@ class FileEditor extends HTMLElement {
     this.innerHTML = `
  
         <div  class='file-body d-flex' id="main">
-            <div class='resizable-left file-content d-flex flex-column flex-grow-1' id='win1' >
+            <div class='resizable-left file-content d-flex flex-column flex-grow-1 col-md-9' >
                 <div class="file-editor-nav-buttons d-flex align-items-center w-100 border-bottom-0 nav  "></div>
 
                 <div class="splashScreen  ">
@@ -29,7 +29,7 @@ class FileEditor extends HTMLElement {
                 </div>
                 <div class="editors w-100 h-100"></div>
             </div>
-            <div class="resizable-right" id="win2">
+            <div class="resizable-right col-md-3">
                 <div id="file-menu" class=" w-100 h-100"></div>
             </div>
       </div>
@@ -68,27 +68,27 @@ class FileEditor extends HTMLElement {
     }
   }
 
-  preparingResizable() {
-    const header = document.querySelector('header-component')
-    const height = window.innerHeight - 57
-    document.getElementById('main').style.width = `${window.innerWidth}px`
-    document.getElementById('main').style.height = `${height}px`
-    const sizes = {
-      win1: localStorageHelper.getItem('resWrap1') || '0.7',
-      win2: localStorageHelper.getItem('resWrap2') || '0.3',
-    }
-    Resizable.initialise('main', sizes)
+  // preparingResizable() {
+  //   const header = document.querySelector('header-component')
+  //   const height = window.innerHeight - 57
+  //   document.getElementById('main').style.width = `${window.innerWidth}px`
+  //   document.getElementById('main').style.height = `${height}px`
+  //   const sizes = {
+  //     win1: localStorageHelper.getItem('resWrap1') || '0.7',
+  //     win2: localStorageHelper.getItem('resWrap2') || '0.3',
+  //   }
+  //   Resizable.initialise('main', sizes)
 
-    Resizable.resizingEnded = () => {
-      const resWrap1 = `${Resizable.activeContentWindows[0].children[0].width / window.innerWidth}`
-      const resWrap2 = `${Resizable.activeContentWindows[0].children[1].width / window.innerWidth}`
-      localStorageHelper.setItem('resWrap1', resWrap1)
-      localStorageHelper.setItem('resWrap2', resWrap2)
-    }
-  }
+  //   Resizable.resizingEnded = () => {
+  //     const resWrap1 = `${Resizable.activeContentWindows[0].children[0].width / window.innerWidth}`
+  //     const resWrap2 = `${Resizable.activeContentWindows[0].children[1].width / window.innerWidth}`
+  //     localStorageHelper.setItem('resWrap1', resWrap1)
+  //     localStorageHelper.setItem('resWrap2', resWrap2)
+  //   }
+  // }
 
   async connectedCallback() {
-    this.preparingResizable()
+    // this.preparingResizable()
     this.preparingLayouts()
     this.getRecentlyOpenedFiles()
     this.openRecentlyFiles()
@@ -125,29 +125,29 @@ class FileEditor extends HTMLElement {
     })
   }
 
-  resizeControl() {
-    const header = document.querySelector('header-component')
-    const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
+  // resizeControl() {
+  //   const header = document.querySelector('header-component')
+  //   const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
 
-    if (selectedFileId) {
-      const contentEditor = document.querySelector(`content-editor[data-id='${selectedFileId}']`)
-      contentEditor.setLayout()
-    }
+  //   if (selectedFileId) {
+  //     const contentEditor = document.querySelector(`content-editor[data-id='${selectedFileId}']`)
+  //     contentEditor.setLayout()
+  //   }
 
-    Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight - 1)
-    Resizable.activeContentWindows[0].childrenResize()
+  //   Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - header.offsetHeight - 1)
+  //   Resizable.activeContentWindows[0].childrenResize()
 
-    if (localStorageHelper.getItem('openNav') === 'true') {
-      document.querySelector('.resizable-right').style.removeProperty('right')
-      document.querySelector('.resizer').classList.add('d-block')
+  //   if (localStorageHelper.getItem('openNav') === 'true') {
+  //     document.querySelector('.resizable-right').style.removeProperty('right')
+  //     document.querySelector('.resizer').classList.add('d-block')
 
-      return
-    }
+  //     return
+  //   }
 
-    document.querySelector('.resizable-left').style.width = '100%'
-    document.querySelector('.resizable-right').style.removeProperty('left')
-    document.querySelector('.resizer').classList.add('d-none')
-  }
+  //   document.querySelector('.resizable-left').style.width = '100%'
+  //   document.querySelector('.resizable-right').style.removeProperty('left')
+  //   document.querySelector('.resizer').classList.add('d-none')
+  // }
 
   disconnectedCallback() {
     document.removeEventListener('keydown', this.ctrlSaveEvent)

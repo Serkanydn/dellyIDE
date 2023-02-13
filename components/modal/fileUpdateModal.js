@@ -183,7 +183,7 @@ class FileUpdateModal extends HTMLElement {
     const fileId = document.querySelector('#fileId')
     this.fileIdInstance = new DevExpress.ui.dxTextBox(fileId, {
       value: this.state?.id,
-      disabled: true,
+      readOnly: true,
     })
 
     const fileIdCopyButton = document.querySelector('#fileIdCopyButton')
@@ -205,10 +205,10 @@ class FileUpdateModal extends HTMLElement {
 
     const name = document.querySelector('#name')
     this.nameInstance = new DevExpress.ui.dxTextBox(name, {
-      value: this.state?.name,
-      onFocusOut(e) {
-        self.ufIdInstance.option('value', e.component.option('value'))
-      },
+      value: this.state?.name
+      // onFocusOut(e) {
+      //   self.ufIdInstance.option('value', e.component.option('value'))
+      // },
     })
 
     // new DevExpress.ui.dxValidator(name, {

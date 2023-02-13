@@ -88,6 +88,14 @@ class Header extends HTMLElement {
     document.body.append(fileUpdateModal)
     fileUpdateModal.open()
   }
+  async previewFile() {
+    const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
+    if (!selectedFileId) return
+
+    const {id: domainId} = useSelector((state) => state.user.activeDomain) 
+    window.open(`${window.config.previewUrl}${domainId}/${selectedFileId}`, '_blank')
+  }
+
 
   foldSelection() {
     new ContentEditorHelper().foldSelection()
@@ -162,8 +170,8 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: 'icon/fold.svg',
-            hint: 'Fold the selected lines',
+            icon: 'icon/collapse-all.svg',
+            hint: 'Collapse Al',
             onClick() {
               self.foldSelection()
             },
@@ -174,8 +182,8 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: 'icon/unfold.svg',
-            hint: 'Unfold the selected lines',
+            icon: 'icon/expand-all.svg',
+            hint: 'Expand All',
             onClick() {
               self.unFoldSelection()
             },
@@ -198,7 +206,7 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: 'icon/comment-discussion.svg',
+            icon: 'icon/un-comment.svg',
             hint: 'Uncomment out the selected lines',
             onClick() {
               self.removeCommentLine()
@@ -214,6 +222,18 @@ class Header extends HTMLElement {
             hint: 'Format Document',
             onClick() {
               self.formatDocument()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: 'icon/preview.svg',
+            hint: 'Preview',
+            onClick() {
+              self.previewFile()
             },
           },
         },
@@ -314,7 +334,6 @@ class Header extends HTMLElement {
                 localStorageHelper.setItem('openNav', 'false')
                 document.querySelector('#win1').style.width = '100%'
                 document.querySelector('#file-menu').classList.add('d-none')
-                document.querySelector('#resizer0').classList.add('d-none')
                 document.querySelector('#aside-body').classList.add('d-none')
                 this.option('icon', 'icon/chevron-left.svg')
                 this.option('hint', 'Show Panel ')
@@ -323,10 +342,10 @@ class Header extends HTMLElement {
 
               localStorageHelper.setItem('openNav', 'true')
               document.querySelector('#file-menu').classList.remove('d-none')
-              document.querySelector('#resizer0').classList.remove('d-none')
               document.querySelector('#aside-body').classList.remove('d-none')
-              Resizable.activeContentWindows[0].changeSize(window.innerWidth, window.innerHeight - self.offsetHeight)
-              Resizable.activeContentWindows[0].childrenResize()
+              document.querySelector('#win1').style.width = '70%'
+              document.querySelector('#win2').style.width = '30%'
+
               this.option('icon', 'icon/chevron-right.svg')
               this.option('hint', 'Hide Panel ')
             },

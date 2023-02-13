@@ -1,3 +1,1 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M13.3532 1.146L14.8532 2.646L15.0002 3V14.5L14.5002 15H1.50024L1.00024 14.5V1.5L1.50024 1H13.0002L13.3532 1.146ZM2.00024 2V14H14.0002V3.208L12.7932 2H11.0002V6H4.00024V2H2.00024ZM8.00024 2V5H10.0002V2H8.00024Z" fill="#424242"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><defs><style>.icon-canvas-transparent,.icon-vs-out{fill:#f6f6f6;}.icon-canvas-transparent{opacity:0;}.icon-vs-action-blue{fill:#424242;}</style></defs><title>Save_16x</title><g id="canvas"><path class="icon-canvas-transparent" d="M16,0V16H0V0Z"/></g><g id="outline"><path class="icon-vs-out" d="M16,2V16H2.586L0,13.414V2A2,2,0,0,1,2,0H14A2,2,0,0,1,16,2Z"/></g><g id="iconBg"><path class="icon-vs-action-blue" d="M6,12H8v3H6ZM15,2V15H12V10H4v5H3L1,13V2A1,1,0,0,1,2,1H14A1,1,0,0,1,15,2ZM13,3H3V7H13Z"/></g></svg>

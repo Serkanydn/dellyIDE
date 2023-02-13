@@ -175,7 +175,8 @@ class FileAddModal extends HTMLElement {
     this.nameInstance = new DevExpress.ui.dxTextBox(nameDiv, {
       value: '',
       onFocusOut(e) {
-        self.ufIdInstance.option('value', e.component.option('value'))
+        if(self.ufIdInstance.option('value')=='')
+          self.ufIdInstance.option('value', e.component.option('value'))
       },
     })
 

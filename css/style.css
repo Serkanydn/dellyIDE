@@ -36,7 +36,11 @@ small.text-muted.smallUfid {
 .file-body .file-content .editor-nav .editor-nav-buttons {
   flex: 1;
   gap: 0.5rem;
+  width:70%;
 }
+/* .resizable-right{
+  width:30%;
+} */
 
 .companyName a {
   color: #7d7d7d;
@@ -244,3 +248,7 @@ body.bg-dark #file-menu #aside-body .aside-nav .nav-link.active {
 body.bg-dark .header{
   border-bottom: 1px solid #4d4d4d;
 }
+.dx-treelist-header-panel{
+  margin-right:10px;
+}
+ 

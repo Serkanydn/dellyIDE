@@ -1,4 +1,1 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.00024 9H4.00024V10H9.00024V9Z" fill="#424242"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M5.00024 3L6.00024 2H13.0002L14.0002 3V10L13.0002 11H11.0002V13L10.0002 14H3.00024L2.00024 13V6L3.00024 5H5.00024V3ZM6.00024 5H10.0002L11.0002 6V10H13.0002V3H6.00024V5ZM10.0002 6H3.00024V13H10.0002V6Z" fill="#424242"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><defs><style>.icon-canvas-transparent,.icon-vs-out{fill:#f6f6f6;}.icon-canvas-transparent{opacity:0;}.icon-vs-bg{fill:#424242;}.icon-vs-action-blue{fill:#00539c;}</style></defs><title>CollapseAll_16x</title><g id="canvas"><path class="icon-canvas-transparent" d="M16,16H0V0H16Z"/></g><g id="outline"><path class="icon-vs-out" d="M1,15V2H2V0H16V14H14v1Z"/></g><g id="iconBg"><path class="icon-vs-bg" d="M2,14H13V3H2ZM3,4h9v9H3ZM15,1V13H14V2H3V1Z"/></g><g id="colorAction"><path class="icon-vs-action-blue" d="M11,9H4V8h7Z"/></g></svg>
