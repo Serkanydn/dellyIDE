@@ -12,7 +12,7 @@ class FileEditor extends HTMLElement {
     this.innerHTML = `
  
         <div  class='file-body d-flex' id="main">
-            <div class='resizable-left file-content d-flex flex-column flex-grow-1 col-md-9' >
+            <div class='file-content d-flex flex-column flex-grow-1 col-md-9' >
                 <div class="file-editor-nav-buttons d-flex align-items-center w-100 border-bottom-0 nav  "></div>
 
                 <div class="splashScreen  ">
@@ -29,7 +29,7 @@ class FileEditor extends HTMLElement {
                 </div>
                 <div class="editors w-100 h-100"></div>
             </div>
-            <div class="resizable-right col-md-3">
+            <div class="file-aside col-md-3">
                 <div id="file-menu" class=" w-100 h-100"></div>
             </div>
       </div>
