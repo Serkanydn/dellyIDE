@@ -32,6 +32,13 @@ small.text-muted.smallUfid {
 .file-body {
   height: calc(100vh - 30px);
 }
+.file-aside{
+  border-left:1px solid #ddd;
+}
+.bg-dark .file-aside{
+  border-left:1px solid #4d4d4d;
+}
+
 
 .file-body .file-content .editor-nav .editor-nav-buttons {
   flex: 1;
@@ -50,23 +57,6 @@ small.text-muted.smallUfid {
 
 .companyName a span {
   color: #334a82;
-}
-
-.resizer {
-  position: absolute;
-  z-index: 100;
-  background-color: #ddd;
-}
-body.bg-dark .resizer {
-  background-color: #4d4d4d;
-}
-
-.verticalResizer {
-  cursor: ns-resize;
-}
-
-.horizontalResizer {
-  cursor: ew-resize;
 }
 
 #icon {
