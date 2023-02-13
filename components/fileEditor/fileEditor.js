@@ -93,10 +93,10 @@ class FileEditor extends HTMLElement {
     this.getRecentlyOpenedFiles()
     this.openRecentlyFiles()
 
-    window.addEventListener('resize', (event) => {
-      event.stopPropagation()
-      this.resizeControl()
-    })
+    // window.addEventListener('resize', (event) => {
+    //   event.stopPropagation()
+    //    this.resizeControl()
+    // })
   }
 
   getRecentlyOpenedFiles() {
