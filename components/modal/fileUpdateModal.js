@@ -1,9 +1,8 @@
 import FileGateService from '../../services/fileGateService.js'
 import {useDispatch, useSelector} from '../../store/index.js'
-import {setSelectedFile} from '../../store/slices/content.js'
+import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
-import {setActiveDomain} from '../../store/slices/user.js'
 import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
 import customTemplates from '../../utils/devExtreme/customTemplates.js'
 
@@ -119,6 +118,7 @@ class FileUpdateModal extends HTMLElement {
     this.typeInstance = null
     this.nameInstance = null
     this.ufIdInstance = null
+    this.selectedDomainId = null
   }
 
   open() {
@@ -137,27 +137,10 @@ class FileUpdateModal extends HTMLElement {
     }, 100)
   }
 
-  syncTreeViewSelection(treeViewInstance, value) {
-    if (!value) {
-      // treeViewInstance.option('selectedRowKeys', [])
-      return
-    } else {
-      treeViewInstance.selectItem(value)
-    }
-  }
-
-  makeAsyncDataSource(jsonFile) {
-    return new DevExpress.data.CustomStore({
-      loadMode: 'raw',
-      key: 'ID',
-      load() {
-        return $.getJSON(`${jsonFile}`)
-      },
-    })
-  }
-
   prepareForm() {
     const self = this
+    console.log(self.state.domainId)
+    self.selectedDomainId = self.state.domainId
 
     const parentId = document.querySelector('#parentId')
 
@@ -214,7 +197,7 @@ class FileUpdateModal extends HTMLElement {
             const selectedKeys = component.option('selectedRowKeys')
             contentTemplateEvent.component.option('value', selectedKeys[0])
             if (data.objectType === '2') {
-              useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
+              self.selectedDomainId = data.domainId
               return
             }
           },
@@ -294,7 +277,7 @@ class FileUpdateModal extends HTMLElement {
 
     const name = document.querySelector('#name')
     this.nameInstance = new DevExpress.ui.dxTextBox(name, {
-      value: this.state?.name
+      value: this.state?.name,
       // onFocusOut(e) {
       //   self.ufIdInstance.option('value', e.component.option('value'))
       // },
@@ -342,7 +325,7 @@ class FileUpdateModal extends HTMLElement {
     const extension = this.extensionInstance.option('value')
     const version = this.versionInstance.option('value')
 
-    const {id: domainId} = useSelector((state) => state.user.activeDomain)
+    const domainId = this.selectedDomainId
 
     const object = {
       id: this.state?.id,
@@ -405,6 +388,7 @@ class FileUpdateModal extends HTMLElement {
           if (selectedFileId === updatedFile.id) useDispatch(setSelectedFile(updatedFile))
         }
       }
+      useDispatch(setSelectedFolder({}))
     }
 
     SweetAlert2Helper.toastFire({title: result.message})

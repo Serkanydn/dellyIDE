@@ -7,7 +7,7 @@ import DomainAddModal from '../modal/domainAddModal.js'
 import FileUpdateModal from '../modal/fileUpdateModal.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector} from '../../store/index.js'
-import {setActiveUser, setActiveDomain, setUserInitialState} from '../../store/slices/user.js'
+import {setUserInitialState} from '../../store/slices/user.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 
 class Header extends HTMLElement {
@@ -22,16 +22,11 @@ class Header extends HTMLElement {
     </div>
     `
     this.user = null
-    this.activeDomainId = null
     this.selectedDomain = null
   }
 
   repaintToolbox() {
     this.toolbar?.repaint()
-  }
-
-  getActiveDomain() {
-    return this.activeDomainId
   }
 
   changeTheme(theme) {
@@ -76,8 +71,7 @@ class Header extends HTMLElement {
 
     const fileGateService = new FileGateService()
     const {user, content} = useSelector((state) => state)
-    console.log(user.activeUser.domainId)
-    // const {id: domainId, name: domainName} = useSelector((state) => state?.user?.activeDomain)
+
     const result = await fileGateService.readAllFilesWithDomainId({domainIds: user.activeUser.domainId, sortBy: 'name', sortDesc: 'asc'})
 
     const {id, parentId, name, objectType, ufId, extension, version, path, domainId} = useSelector((state) => state.content.selectedFile)
@@ -98,10 +92,9 @@ class Header extends HTMLElement {
     fileUpdateModal.open()
   }
   async previewFile() {
-    const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
+    const {id: selectedFileId, domainId} = useSelector((state) => state.content.selectedFile)
     if (!selectedFileId) return
 
-    const {id: domainId} = useSelector((state) => state.user.activeDomain)
     window.open(`${window.config.previewUrl}${domainId}/${selectedFileId}`, '_blank')
   }
 

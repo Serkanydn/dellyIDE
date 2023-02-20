@@ -49,7 +49,7 @@ class EditorNavButton extends HTMLElement {
 
         document
           .querySelector('body')
-          .append(new CustomContextMenu({target: this, itemType: 'editorNavButton', selectedFile: this.state.data}))
+          .append(new CustomContextMenu({target: this, itemType: 'editorNavButton', selectedItem: this.state.data}))
       }
     })
   }

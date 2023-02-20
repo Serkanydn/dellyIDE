@@ -2,7 +2,6 @@ import FileGateService from '../../services/fileGateService.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector, useSubscribe} from '../../store/index.js'
 import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
-import {setActiveDomain} from '../../store/slices/user.js'
 import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
 import customTemplates from '../../utils/devExtreme/customTemplates.js'
 
@@ -80,6 +79,7 @@ class FileAddModal extends HTMLElement {
     this.typeInstance = null
     this.nameInstance = null
     this.ufIdInstance = null
+    this.selectedDomainId = null
   }
 
   open() {
@@ -108,7 +108,9 @@ class FileAddModal extends HTMLElement {
       sortBy: 'name',
       sortDesc: 'asc',
     })
-    const {id: selectedFolderId, name, objectType: selectedFolderObjectType} = content.selectedFolder
+    const {id: selectedFolderId, name, objectType: selectedFolderObjectType, domainId} = content.selectedFolder
+    console.log(domainId)
+    self.selectedDomainId = domainId
 
     const parentId = document.querySelector('#parentId')
 
@@ -126,7 +128,7 @@ class FileAddModal extends HTMLElement {
         const value = contentTemplateEvent.component.option('value')
         const div = document.createElement('div')
 
-        const treeListInstance = new DevExpress.ui.dxTreeList(div, {
+        self.treeListInstance = new DevExpress.ui.dxTreeList(div, {
           dataSource: contentTemplateEvent.component.getDataSource(),
           rootValue: null,
           keyExpr: 'id',
@@ -161,7 +163,7 @@ class FileAddModal extends HTMLElement {
             const selectedKeys = component.option('selectedRowKeys')
             contentTemplateEvent.component.option('value', selectedKeys[0])
             if (data.objectType === '2') {
-              useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
+              self.selectedDomainId = data.domainId
               return
             }
           },
@@ -172,7 +174,7 @@ class FileAddModal extends HTMLElement {
           contentTemplateEvent.component.close()
         })
 
-        return treeListInstance.element()
+        return self.treeListInstance.element()
       },
     })
 
@@ -268,7 +270,8 @@ class FileAddModal extends HTMLElement {
     let ufId = this.ufIdInstance.option('value')
     let extension = this.extensionInstance.option('value')
 
-    const {id: domainId} = useSelector((state) => state.user.activeDomain)
+    const domainId = this.selectedDomainId
+
     if (objectType === '0') {
       extension = null
       ufId = null
@@ -291,7 +294,10 @@ class FileAddModal extends HTMLElement {
 
     this.close()
 
-    if (result.data.objectType !== '0') useDispatch(setSelectedFile(result.data))
+    if (result.data.objectType !== '0') {
+      useDispatch(setSelectedFile(result.data))
+      useDispatch(setSelectedFolder({}))
+    }
 
     solutionExplorer.refreshTreeList()
 

@@ -130,6 +130,8 @@ class DomainUpdateModal extends HTMLElement {
     const {data: domainResult} = await new DomainService().update({id, name})
     const {success, message, data: domainData} = domainResult
 
+    console.log(domainResult)
+
     if (!success) {
       console.log(message)
       SweetAlert2Helper.toastFire({title: message, icon: 'error'})
