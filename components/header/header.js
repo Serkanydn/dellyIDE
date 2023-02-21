@@ -329,7 +329,7 @@ class Header extends HTMLElement {
             onClick() {
               if (localStorageHelper.getItem('openNav') === 'true') {
                 localStorageHelper.setItem('openNav', 'false')
-                document.querySelector('#win1').style.width = '100%'
+                // document.querySelector('#win1').style.width = '100%'
                 document.querySelector('#file-menu').classList.add('d-none')
                 document.querySelector('#aside-body').classList.add('d-none')
                 this.option('icon', 'icon/chevron-left.svg')

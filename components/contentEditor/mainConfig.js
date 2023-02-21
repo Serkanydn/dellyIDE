@@ -16,7 +16,13 @@ const mainConfig = {
   // ??
   wrappingIndent: 'indent',
 
-  minimap: {enabled: true, showSlider: 'always'},
+  minimap: {enabled: true, showSlider: 'always', autohide: false, renderCharacters: true},
+
+  // ? Parantezlerin otomatik kapatılması
+  autoClosingBrackets: true,
+
+  // ? Eşleşen parantezlere highlight
+  matchBrackets: true,
 
   scrollbar: {
     horizontal: 'auto',

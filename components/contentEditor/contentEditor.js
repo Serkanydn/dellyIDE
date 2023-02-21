@@ -67,6 +67,26 @@ class ContentEditor extends HTMLElement {
       this.state.editorContentChange = true
     })
 
+    // const myAction = (monaco.editor.IActionDescriptor = {
+    //   id: 'something-neat',
+    //   label: 'Something Neat',
+    //   contextMenuOrder: 10, // choose the order
+    //   contextMenuGroupId: 'operation', // create a new grouping
+    //   keybindings: [],
+    //   run: () => {
+    //     console.log('object')
+    //   },
+    // })
+
+    // this.editor.addAction(myAction)
+
+    // const config = JSON.stringify({
+    //   surroundingPairs: [{open: '{', close: '}'}],
+    //   autoClosingPairs: [{open: '{', close: '}'}],
+    //   brackets: [['{', '}']],
+    // })
+
+    // window.monaco.languages.setLanguageConfiguration('javascript', config)
     //this.editor.layout({width: '100%', height: '100%'})
 
     // this.editor.updateOptions({
@@ -74,6 +94,15 @@ class ContentEditor extends HTMLElement {
     //     enabled: true,
     //   },
     // })
+
+    // setTimeout(() => {
+    //   alert('Disabling')
+    //   this.editor.updateOptions({
+    //     minimap: {
+    //       enabled: false,
+    //     },
+    //   })
+    // }, 3000)
   }
 
   getExtensionLongName(extension) {
