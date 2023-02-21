@@ -94,15 +94,6 @@ class ContentEditor extends HTMLElement {
     //     enabled: true,
     //   },
     // })
-
-    // setTimeout(() => {
-    //   alert('Disabling')
-    //   this.editor.updateOptions({
-    //     minimap: {
-    //       enabled: false,
-    //     },
-    //   })
-    // }, 3000)
   }
 
   getExtensionLongName(extension) {
@@ -164,6 +155,25 @@ class ContentEditor extends HTMLElement {
   getChangedEditorNavButton(id) {
     return document.querySelector('#select-' + id)
   }
+
+  toggleMinimap() {
+    const isEnabled = this.editor.getRawOptions().minimap.enabled
+    if (isEnabled) {
+      this.editor.updateOptions({
+        minimap: {
+          enabled: false,
+        },
+      })
+      return
+    }
+
+    this.editor.updateOptions({
+      minimap: {
+        enabled: true,
+      },
+    })
+  }
+
   connectedCallback() {
     this.createEditor()
   }

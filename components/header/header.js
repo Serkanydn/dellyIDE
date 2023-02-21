@@ -23,6 +23,7 @@ class Header extends HTMLElement {
     `
     this.user = null
     this.selectedDomain = null
+    this.miniMapIsShow = true
   }
 
   repaintToolbox() {
@@ -115,6 +116,12 @@ class Header extends HTMLElement {
   }
   formatDocument() {
     new ContentEditorHelper().formatDocument()
+  }
+
+  toggleMinimap() {
+    new ContentEditorHelper().toggleMinimap()
+
+    this.miniMapIsShow = !this.miniMapIsShow
   }
 
   async connectedCallback() {
@@ -230,6 +237,24 @@ class Header extends HTMLElement {
             hint: 'Preview',
             onClick() {
               self.previewFile()
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
+            icon: 'icon/minimapShow.svg',
+            hint: 'Minimap',
+            onClick() {
+              self.toggleMinimap()
+
+              if (!self.miniMapIsShow) {
+                this.option('icon', 'icon/minimapHide.svg')
+              } else {
+                this.option('icon', 'icon/minimapShow.svg')
+              }
             },
           },
         },

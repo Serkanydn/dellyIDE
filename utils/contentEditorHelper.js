@@ -61,9 +61,9 @@ class ContentEditorHelper {
 
     SweetAlert2Helper.toastFire({title: updateResult.message})
     // await this.solutionExplorer.treeListUpdateRow(updateResult.data)
-    const activeEditorNavButton = activeContentEditor.getChangedEditorNavButton(id);
+    const activeEditorNavButton = activeContentEditor.getChangedEditorNavButton(id)
     activeContentEditor.state.editorContentChange = false
-    activeEditorNavButton.lastChild.style.display = "none"
+    activeEditorNavButton.lastChild.style.display = 'none'
     this.solutionExplorer.refreshTreeList()
   }
 
@@ -75,9 +75,9 @@ class ContentEditorHelper {
     openedContentEditors.forEach((contentEditor) => {
       const value = {id: contentEditor.state.id, content: contentEditor.getContent()}
       contents.push(value)
-      const activeEditorNavButton = contentEditor.getChangedEditorNavButton(contentEditor.state.id);
+      const activeEditorNavButton = contentEditor.getChangedEditorNavButton(contentEditor.state.id)
       contentEditor.state.editorContentChange = false
-      activeEditorNavButton.lastChild.style.display = "none"
+      activeEditorNavButton.lastChild.style.display = 'none'
     })
 
     const fileGateService = new FileGateService()
@@ -355,6 +355,12 @@ class ContentEditorHelper {
 
   formatDocument() {
     this.getActiveContentEditor()?.formatDocument()
+  }
+
+  toggleMinimap() {
+    this.getOpenedContentEditors().forEach((editor) => {
+      editor.toggleMinimap()
+    })
   }
 
   fallbackCopyTextToClipboard(text) {
