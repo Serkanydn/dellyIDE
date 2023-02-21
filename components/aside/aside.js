@@ -56,7 +56,7 @@ class Aside extends HTMLElement {
 
     const asideContent = document.querySelector('.aside-content')
     asideContent.appendChild(this.solutionExplorer)
-
+    console.log(asideContent)
     this.toolBox = new Toolbox()
     this.toolBox.style.display = 'none'
     asideContent.appendChild(this.toolBox)
@@ -87,14 +87,8 @@ class Aside extends HTMLElement {
     })
 
     if (localStorageHelper.getItem('openNav') === 'false') {
-      document.querySelector('#aside-body').classList.add('d-none')
-      document.querySelector('.aside-header').style.display = 'none'
-      // document.querySelector('.openNav').style.display = 'block'
-      document.querySelector('.resizable-left').style.width = '100%'
-      // document.querySelector('.resizable-right').style.right = '0px'
-      // document.querySelector('.resizable-right').style.width = '50px'
-      document.querySelector('.resizable-right').style.removeProperty('left')
-      document.querySelector('.resizer').classList.add('d-none')
+      document.querySelector('.file-content').classList.add('col-md-12') 
+      document.querySelector('.file-aside').classList.add('w-0')
     }
   }
 }

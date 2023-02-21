@@ -336,20 +336,15 @@ class Header extends HTMLElement {
             onClick() {
               if (localStorageHelper.getItem('openNav') === 'true') {
                 localStorageHelper.setItem('openNav', 'false')
-                document.querySelector('#win1').style.width = '100%'
-                document.querySelector('#file-menu').classList.add('d-none')
-                document.querySelector('#aside-body').classList.add('d-none')
+                document.querySelector('.file-content').classList.add('col-md-12') 
+                document.querySelector('.file-aside').classList.add('d-none')
                 this.option('icon', 'icon/chevron-left.svg')
                 this.option('hint', 'Show Panel ')
                 return
               }
-
               localStorageHelper.setItem('openNav', 'true')
-              document.querySelector('#file-menu').classList.remove('d-none')
-              document.querySelector('#aside-body').classList.remove('d-none')
-              document.querySelector('#win1').style.width = '70%'
-              document.querySelector('#win2').style.width = '30%'
-
+              document.querySelector('.file-content').classList.remove('col-md-12')
+              document.querySelector('.file-aside').classList.remove('d-none') 
               this.option('icon', 'icon/chevron-right.svg')
               this.option('hint', 'Hide Panel ')
             },

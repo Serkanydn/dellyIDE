@@ -308,4 +308,7 @@ editor-nav-button + editor-nav-button .nav-item .nav-link {
 
 .dx-treelist-search-panel {
   margin-left: 0;
+} 
+.dx-treelist-header-panel { 
+  margin-top: 10px;
 }

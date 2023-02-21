@@ -65,7 +65,7 @@ class FileEditor extends HTMLElement {
   async ctrlSaveEvent(event) {
     const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
     if (!selectedFileId) return
-    if (event.ctrlKey && event.key === 's') {
+    if (event.key === 's' && event.ctrlKey || event.metaKey )  {
       event.preventDefault()
       const contentEditorHelper = new ContentEditorHelper()
       await contentEditorHelper.saveFile()

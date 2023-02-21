@@ -93,7 +93,7 @@ class SolutionExplorer extends HTMLElement {
   setTreelistItems(domainIds) {
     const customStore = this.getStore(domainIds)
 
-    this.treeListInstance.option('dataSource', customStore)
+    this.treeListInstance.option('dataSource', customStore) 
   }
 
   async treeListAddRow(file) {
