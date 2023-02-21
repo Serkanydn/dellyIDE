@@ -4,13 +4,12 @@ import {setSelectedFolder} from '../../store/slices/content.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import FileAddModal from '../modal/fileAddModal.js'
 import FileUpdateModal from '../modal/fileUpdateModal.js'
-import {setActiveDomain} from '../../store/slices/user.js'
 import DomainUpdateModal from '../modal/domainUpdateModal.js'
 
 class CustomContextMenu extends HTMLElement {
-  constructor({itemType, target, selectedFile}) {
+  constructor({itemType, target, selectedItem}) {
     super()
-    this.state = {itemType, target, selectedFile}
+    this.state = {itemType, target, selectedItem}
     this.innerHTML = `
     
    <div id="custom-context-menu" >
@@ -22,40 +21,35 @@ class CustomContextMenu extends HTMLElement {
     switch (actionName) {
       case 'duplicate': {
         const fileGateService = new FileGateService()
-        const {data: result} = await fileGateService.copyFile(this.state.selectedFile)
+        const {data: result} = await fileGateService.copyFile(this.state.selectedItem)
         const solutionExplorer = document.querySelector('solution-explorer-component')
         solutionExplorer.refreshTreeList()
 
         break
       }
       case 'newAdd': {
-        if (this.state.selectedFile.objectType === '0') {
-          useDispatch(setSelectedFolder(this.state.selectedFile))
-        } else if (this.state.selectedFile.objectType === '2') {
-          useDispatch(setSelectedFolder(this.state.selectedFile))
-          useDispatch(setActiveDomain({id: this.state.selectedFile.domainId, name: this.state.selectedFile.name}))
+        if (this.state.selectedItem.objectType === '0' || this.state.selectedItem.objectType === '2') {
+          useDispatch(setSelectedFolder(this.state.selectedItem))
         } else {
           useDispatch(setSelectedFolder(null))
-          useDispatch(setActiveDomain(null))
         }
 
         this.createModal()
         break
       }
       case 'update': {
-        const {objectType, id, name} = this.state.selectedFile
+        const {objectType, id, name} = this.state.selectedItem
 
         if (objectType === '2') {
-          this.domainUpdateModal(this.state.selectedFile)
-          useDispatch(setActiveDomain({id: this.state.selectedFile.domainId, name}))
+          this.domainUpdateModal(this.state.selectedItem)
           break
         }
 
-        this.updateModal(this.state.selectedFile)
+        this.updateModal(this.state.selectedItem)
         break
       }
       case 'preview': {
-        const {id, domainId} = this.state.selectedFile
+        const {id, domainId} = this.state.selectedItem
         const newWindow = window.open(`${window.config.previewUrl}${domainId}/${id}`, '_blank')
         setTimeout(() => {
           console.log(newWindow)
@@ -64,12 +58,12 @@ class CustomContextMenu extends HTMLElement {
         break
       }
       case 'copyUrl': {
-        const {id, ufId, domainId, objectType} = this.state.selectedFile
+        const {id, ufId, domainId, objectType} = this.state.selectedItem
         await new ContentEditorHelper().copyUrl({id, ufId, domainId, objectType})
         break
       }
       case 'copyId': {
-        const {id, ufId, objectType} = this.state.selectedFile
+        const {id, ufId, objectType} = this.state.selectedItem
         await new ContentEditorHelper().copyId({id, ufId, objectType})
         break
       }
@@ -83,11 +77,10 @@ class CustomContextMenu extends HTMLElement {
         break
       }
       case 'delete': {
-        const {id, objectType} = this.state.selectedFile
+        const {id, objectType} = this.state.selectedItem
         await new ContentEditorHelper().deleteFile(id)
         if (objectType === '0' || objectType === '2') {
           useDispatch(setSelectedFolder(null))
-          useDispatch(setActiveDomain(null))
         }
 
         break
@@ -97,16 +90,14 @@ class CustomContextMenu extends HTMLElement {
 
   async createModal() {
     const fileAddModal = new FileAddModal()
-    document.body.appendChild(fileAddModal)
     fileAddModal.open()
   }
 
   async updateModal(item) {
     const fileGateService = new FileGateService()
     const {user, content} = useSelector((state) => state)
-    // const {id: domainId, name: domainName} = useSelector((state) => state?.user?.activeDomain)
+
     const result = await fileGateService.readAllFilesWithDomainId({domainIds: user.activeUser.domainId, sortBy: 'name', sortDesc: 'asc'})
-    // const recently = this.setRecentlyFiles(this.state);
 
     const {id, parentId, name, objectType, ufId, extension, domainId, version, path} = item
 
@@ -123,16 +114,13 @@ class CustomContextMenu extends HTMLElement {
       path,
     })
 
-    document.body.append(fileUpdateModal)
     fileUpdateModal.open()
   }
 
   async domainUpdateModal(item) {
-    const {id, name} = item
-    const domainUpdateModal = new DomainUpdateModal({id, name})
-    document.body.append(domainUpdateModal)
+    const {domainId, name} = item
+    const domainUpdateModal = new DomainUpdateModal({id: domainId, name})
     domainUpdateModal.open()
-    console.log('domain update modal')
   }
 
   connectedCallback() {
@@ -154,7 +142,7 @@ class CustomContextMenu extends HTMLElement {
         return document.createRange().createContextualFragment(template)
       },
       onItemClick(event) {
-        self.onItemClick(event.itemData.id, self.state.selectedFile.id)
+        self.onItemClick(event.itemData.id, self.state.selectedItem.id)
         self.remove()
       },
       closeOnOutsideClick() {

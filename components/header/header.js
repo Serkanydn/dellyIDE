@@ -7,7 +7,7 @@ import DomainAddModal from '../modal/domainAddModal.js'
 import FileUpdateModal from '../modal/fileUpdateModal.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import {useDispatch, useSelector} from '../../store/index.js'
-import {setActiveUser, setActiveDomain, setUserInitialState} from '../../store/slices/user.js'
+import {setUserInitialState} from '../../store/slices/user.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 
 class Header extends HTMLElement {
@@ -22,16 +22,12 @@ class Header extends HTMLElement {
     </div>
     `
     this.user = null
-    this.activeDomainId = null
     this.selectedDomain = null
+    this.miniMapIsShow = true
   }
 
   repaintToolbox() {
     this.toolbar?.repaint()
-  }
-
-  getActiveDomain() {
-    return this.activeDomainId
   }
 
   changeTheme(theme) {
@@ -59,13 +55,11 @@ class Header extends HTMLElement {
 
   async createModal() {
     const fileAddModal = new FileAddModal()
-    document.body.appendChild(fileAddModal)
     fileAddModal.open()
   }
 
   createDomainAddModal() {
     const domainAddModal = new DomainAddModal()
-    document.body.appendChild(domainAddModal)
     domainAddModal.open()
   }
 
@@ -76,8 +70,7 @@ class Header extends HTMLElement {
 
     const fileGateService = new FileGateService()
     const {user, content} = useSelector((state) => state)
-    console.log(user.activeUser.domainId)
-    // const {id: domainId, name: domainName} = useSelector((state) => state?.user?.activeDomain)
+
     const result = await fileGateService.readAllFilesWithDomainId({domainIds: user.activeUser.domainId, sortBy: 'name', sortDesc: 'asc'})
 
     const {id, parentId, name, objectType, ufId, extension, version, path, domainId} = useSelector((state) => state.content.selectedFile)
@@ -94,14 +87,13 @@ class Header extends HTMLElement {
       version,
       path,
     })
-    document.body.append(fileUpdateModal)
+    // document.body.append(fileUpdateModal)
     fileUpdateModal.open()
   }
   async previewFile() {
-    const {id: selectedFileId} = useSelector((state) => state.content.selectedFile)
+    const {id: selectedFileId, domainId} = useSelector((state) => state.content.selectedFile)
     if (!selectedFileId) return
 
-    const {id: domainId} = useSelector((state) => state.user.activeDomain)
     window.open(`${window.config.previewUrl}${domainId}/${selectedFileId}`, '_blank')
   }
 
@@ -122,6 +114,12 @@ class Header extends HTMLElement {
   }
   formatDocument() {
     new ContentEditorHelper().formatDocument()
+  }
+
+  toggleMinimap() {
+    new ContentEditorHelper().toggleMinimap()
+
+    this.miniMapIsShow = !this.miniMapIsShow
   }
 
   async connectedCallback() {
@@ -245,6 +243,24 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
+            icon: 'icon/minimapShow.svg',
+            hint: 'Minimap',
+            onClick() {
+              self.toggleMinimap()
+
+              if (!self.miniMapIsShow) {
+                this.option('icon', 'icon/minimapHide.svg')
+              } else {
+                this.option('icon', 'icon/minimapShow.svg')
+              }
+            },
+          },
+        },
+        {
+          location: 'before',
+          widget: 'dxButton',
+          locateInMenu: 'auto',
+          options: {
             icon: 'icon/add.svg',
             hint: 'Add new file',
             onClick() {
@@ -336,7 +352,8 @@ class Header extends HTMLElement {
             onClick() {
               if (localStorageHelper.getItem('openNav') === 'true') {
                 localStorageHelper.setItem('openNav', 'false')
-                document.querySelector('.file-content').classList.add('col-md-12') 
+
+                document.querySelector('.file-content').classList.add('col-md-12')
                 document.querySelector('.file-aside').classList.add('d-none')
                 this.option('icon', 'icon/chevron-left.svg')
                 this.option('hint', 'Show Panel ')
@@ -344,7 +361,7 @@ class Header extends HTMLElement {
               }
               localStorageHelper.setItem('openNav', 'true')
               document.querySelector('.file-content').classList.remove('col-md-12')
-              document.querySelector('.file-aside').classList.remove('d-none') 
+              document.querySelector('.file-aside').classList.remove('d-none')
               this.option('icon', 'icon/chevron-right.svg')
               this.option('hint', 'Hide Panel ')
             },

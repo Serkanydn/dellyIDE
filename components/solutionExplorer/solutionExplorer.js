@@ -7,7 +7,6 @@ import localStorageHelper from '../../utils/localStorageHelper.js'
 
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import CustomContextMenu from '../customContextMenu/customContextMenu.js'
-import {setActiveDomain} from '../../store/slices/user.js'
 
 import customTemplates from '../../utils/devExtreme/customTemplates.js'
 
@@ -130,7 +129,6 @@ class SolutionExplorer extends HTMLElement {
     // ? Store Subscribe
     useSubscribe('user.activeUser', async (activeUser) => {
       this.setTreelistItems(activeUser.domainId)
-      console.log(this.offsetHeight)
     })
 
     useSubscribe('content.selectedFile', async (selectedFile) => {
@@ -155,8 +153,6 @@ class SolutionExplorer extends HTMLElement {
       hasItemsExpr: (data) => !data.extension,
       showColumnHeaders: false,
       width: '100%',
-      // height: 800,
-      // maxHeight: '99%',
       noDataText: ' ',
       searchPanel: {
         visible: true,
@@ -247,25 +243,19 @@ class SolutionExplorer extends HTMLElement {
         if (role === 'superAdmin') {
           if (data.objectType === '2') {
             self.createFolderContextMenu(data)
-            useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
           }
         }
       },
       rowClick(event) {
         const {data} = event
-        if (data.objectType === '0') {
+        if (data.objectType === '0' || data.objectType === '2') {
           useDispatch(setSelectedFolder(data))
           return
         }
-        if (data.objectType === '2') {
-          useDispatch(setSelectedFolder(data))
-          useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
-          return
-        }
+
         const {selectedFolder} = useSelector((state) => state.content)
         if (Object.keys(selectedFolder).length !== 0) {
           useDispatch(setSelectedFolder(null))
-          useDispatch(setActiveDomain(null))
         }
       },
       rowDblClick(row) {
@@ -285,7 +275,6 @@ class SolutionExplorer extends HTMLElement {
 
   async createModal() {
     const fileAddModal = new FileAddModal()
-    document.body.appendChild(fileAddModal)
     fileAddModal.open()
   }
 
@@ -294,7 +283,7 @@ class SolutionExplorer extends HTMLElement {
       new CustomContextMenu({
         target: '#solutionExplorer .dx-treelist-rowsview .dx-treelist-table tbody .dx-row.dx-data-row td',
         itemType: 'folder',
-        selectedFile: data,
+        selectedItem: data,
       })
     )
   }
@@ -304,7 +293,7 @@ class SolutionExplorer extends HTMLElement {
       new CustomContextMenu({
         target: '#solutionExplorer .dx-treelist-rowsview .dx-treelist-table tbody .dx-row.dx-data-row td',
         itemType: 'file',
-        selectedFile: data,
+        selectedItem: data,
       })
     )
   }

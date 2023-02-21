@@ -14,8 +14,8 @@ class DomainService {
   async create({id, name}) {
     return await this.domainClient.post(`${window.config.webServiceUrl}/domain`, {id, name})
   }
-  async update({id, name}) {
-    return await this.domainClient.patch(`${window.config.webServiceUrl}/domain/${id}`, {name})
+  async update({id, name, domainId}) {
+    return await this.domainClient.patch(`${window.config.webServiceUrl}/domain/${id}`, {name, domainId})
   }
 }
 

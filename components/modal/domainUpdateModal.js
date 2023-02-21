@@ -1,81 +1,41 @@
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
 import DomainService from '../../services/domainService.js'
+import BaseModal from './baseModal.js'
 
-class DomainUpdateModal extends HTMLElement {
-  constructor({id, name}) {
-    super()
-
-    this.state = {id, name}
-    this.innerHTML = `
-   
-<div  class="modal fade" id="domainModal" tabindex="-1" aria-labelledby="domainModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-
-    <div class="modal-content w-75">
-      <div class="modal-header">
-        <h5 class="modal-title" id="domainModalLabel">Domain Update</h5>
-        <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <div class="modal-body">
-
-        <div id="domainIdGroup">
-          <div  class="row mb-2">
-            <label for="domainId" class="col-sm-2 col-form-label ">Id</label>
-            <div class="col-md-10">
-                <div class="form-control form-control-sm" id="domainId" readonly ></div>
-            </div>
-          </div>
-        </div>
-  
-        <div id="domainNameGroup">
-        <div  class="row mb-2">
-          <label for="domainName" class="col-sm-2 col-form-label ">Name</label>
-          <div class="col-md-10">
-              <div class="form-control form-control-sm" id="domainName" ></div>
-          </div>
-        </div>
-      </div>
-    
-
-      <div class="modal-footer">
-         <button id="closeBtn" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" aria-label="Close">Close</button>
-
-         <div id="addBtn" ></div>
-      
-      </div>
-    </div>
-    </div>
+const modalBody = `
+<div id="domainIdGroup">
+<div  class="row mb-2">
+  <label for="domainId" class="col-sm-2 col-form-label ">Id</label>
+  <div class="col-md-10">
+      <div class="form-control form-control-sm" id="domainId" readonly ></div>
   </div>
 </div>
+</div>
 
-        `
+<div id="domainNameGroup">
+<div  class="row mb-2">
+<label for="domainName" class="col-sm-2 col-form-label ">Name</label>
+<div class="col-md-10">
+    <div class="form-control form-control-sm" id="domainName" ></div>
+</div>
+</div>
+</div>
 
-    this.modal = null
+`
+
+const modalFooter = `<div id="addBtn" ></div>`
+class DomainUpdateModal extends BaseModal {
+  constructor({id, name}) {
+    super({body: modalBody, footer: modalFooter, title: 'Domain Update'})
+
+    this.state = {id, name}
+
     this.domainNameInstance = null
     this.domainIdInstance = null
   }
 
-  open() {
-    this.modal = new window.bootstrap.Modal(document.getElementById('domainModal'), {
-      backdrop: 'static',
-      keyboard: false,
-    })
-    this.modal.show()
-  }
-
-  close() {
-    this.modal.hide()
-
-    setTimeout(() => {
-      document.body.removeChild(this)
-    }, 100)
-  }
-
   async prepareForm() {
-    const self = this
-
     const domainId = document.querySelector('#domainId')
     this.domainIdInstance = new DevExpress.ui.dxTextBox(domainId, {
       value: this.state.id,
@@ -144,14 +104,6 @@ class DomainUpdateModal extends HTMLElement {
   }
 
   connectedCallback() {
-    const self = this
-    const closeBtn = document.querySelector('#closeBtn')
-    const closeIcon = document.querySelector('#closeIcon')
-    // const nameButton = document.querySelector('#closeIcon')
-
-    closeBtn.addEventListener('click', () => this.close())
-    closeIcon.addEventListener('click', () => this.close())
-
     this.prepareForm()
   }
 

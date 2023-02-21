@@ -13,9 +13,7 @@ const user = RTK.createSlice({
     clearActiveUser: (state, {payload}) => {
       state.activeUser = payload
     },
-    setActiveDomain: (state, {payload}) => {
-      state.activeDomain = {...payload}
-    },
+
     setUserInitialState: (state, {payload}) => {
       // state.activeDomain = {...payload.activeDomain}
       state.activeUser = {...payload.user}
@@ -23,5 +21,5 @@ const user = RTK.createSlice({
   },
 })
 
-export const {setActiveUser, clearActiveUser, setActiveDomain, setUserInitialState} = user.actions
+export const {setActiveUser, clearActiveUser, setUserInitialState} = user.actions
 export default user.reducer

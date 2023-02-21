@@ -56,7 +56,7 @@ class Aside extends HTMLElement {
 
     const asideContent = document.querySelector('.aside-content')
     asideContent.appendChild(this.solutionExplorer)
-    console.log(asideContent)
+
     this.toolBox = new Toolbox()
     this.toolBox.style.display = 'none'
     asideContent.appendChild(this.toolBox)
@@ -86,7 +86,7 @@ class Aside extends HTMLElement {
       })
     })
 
-  
+ 
   }
 }
 

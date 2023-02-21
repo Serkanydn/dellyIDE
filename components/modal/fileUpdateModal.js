@@ -1,163 +1,112 @@
 import FileGateService from '../../services/fileGateService.js'
 import {useDispatch, useSelector} from '../../store/index.js'
-import {setSelectedFile} from '../../store/slices/content.js'
+import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
 import SweetAlert2Helper from '../../utils/sweetAlert2Helper.js'
 import ContentEditorHelper from '../../utils/contentEditorHelper.js'
-import {setActiveDomain} from '../../store/slices/user.js'
 import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
 import customTemplates from '../../utils/devExtreme/customTemplates.js'
 
-class FileUpdateModal extends HTMLElement {
-  constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}) {
-    super()
-    this.state = {id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}
+import BaseModal from './baseModal.js'
 
-    this.innerHTML = `
-
-<div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content w-75">
-      <div class="modal-header">
-        <h5 class="modal-title" id="fileModalLabel">File Update</h5>
-        <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-          <div class="modal-body">
-
-         
-
-          <div class="row  mb-2" ${this.state?.objectType !== '0' ? 'disabled' : ''} >
-          <div class="col-md-12 d-flex" disabled>
-             <label  class="form-control-label" for="">Type</label>
-            <div  id="type"></div>
-          </div>
-          </div>
-
-      
-
-       <div id="fileIdGroup" class="col-md-12"  >
-         <div  class="row mb-2">
-           <label for="version" class="col-md-2 col-form-label ">Id</label>
-          
-           <div class="col-md-10">
-              <div class="input-group input-group-sm">
-                <div class="form-control" id="fileId" ></div>
-                <div  class="input-group-text" id="fileIdCopyButton"></div>
-              </div>
-          </div>
-     </div> 
-
-     </div>
-
-
-      
-    
-        <div class="row mb-2">
-
-          <label for="name" class="col-sm-2 col-form-label">File Name</label>
-          <div class=${this.state?.objectType !== '0' ? 'col-md-7' : 'col-md-10'}>
-            <div class="form-control form-control-sm" id="name" ></div>
-          </div>
-
-          <div id="extensionGroup" class="col-md-3" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
-            <div class="form-control form-control-sm" id="extension"></div>
-          </div>
-
-        </div>
-
-
-
-        <div id="ufIdGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}">
-        <div  class="row mb-2">
-          <label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm"  id="ufId" ></div>
-          </div>
-          </div> 
-
-          </div>
-      
-
-
-           <div id="versionGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
-             <div  class="row mb-2">
-               <label for="version" class="col-sm-2 col-form-label ">Version</label>
-               <div class="col-md-10">
-                <div class="form-control form-control-sm"  id="version" ></div>
-            </div>
-          </div> 
-          </div>
-     
-
-        <div  class="row mb-2">
-          <label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm"  id="parentId" ></div>
-          </div>
-          </div>
-
-      </div>
-
- 
-
-      <div class="modal-footer">
-      <button id="closeBtn" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" aria-label="Close">Close</button>
-  
-        <div id="updateBtn"></div>
-      
-      </div>
-    </div>
-  </div>
+function modalBody(state) {
+  return `
+<div class="row  mb-2" ${state?.objectType !== '0' ? 'disabled' : ''} >
+<div class="col-md-12 d-flex" disabled>
+   <label  class="form-control-label" for="">Type</label>
+  <div  id="type"></div>
+</div>
 </div>
 
 
 
-        `
-    this.modal = null
+<div id="fileIdGroup" class="col-md-12"  >
+<div  class="row mb-2">
+ <label for="version" class="col-md-2 col-form-label ">Id</label>
+
+ <div class="col-md-10">
+    <div class="input-group input-group-sm">
+      <div class="form-control" id="fileId" ></div>
+      <div  class="input-group-text" id="fileIdCopyButton"></div>
+    </div>
+</div>
+</div> 
+
+</div>
+
+
+
+
+<div class="row mb-2">
+
+<label for="name" class="col-sm-2 col-form-label">File Name</label>
+<div class=${state?.objectType !== '0' ? 'col-md-7' : 'col-md-10'}>
+  <div class="form-control form-control-sm" id="name" ></div>
+</div>
+
+<div id="extensionGroup" class="col-md-3" style="display:${state?.objectType !== '0' ? 'block' : 'none'}" >
+  <div class="form-control form-control-sm" id="extension"></div>
+</div>
+
+</div>
+
+
+
+<div id="ufIdGroup" class="col-md-12" style="display:${state?.objectType !== '0' ? 'block' : 'none'}">
+<div  class="row mb-2">
+<label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
+<div class="col-md-10">
+  <div class="form-control form-control-sm"  id="ufId" ></div>
+</div>
+</div> 
+
+</div>
+
+
+
+ <div id="versionGroup" class="col-md-12" style="display:${state?.objectType !== '0' ? 'block' : 'none'}" >
+   <div  class="row mb-2">
+     <label for="version" class="col-sm-2 col-form-label ">Version</label>
+     <div class="col-md-10">
+      <div class="form-control form-control-sm"  id="version" ></div>
+  </div>
+</div> 
+</div>
+
+
+<div  class="row mb-2">
+<label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
+<div class="col-md-10">
+  <div class="form-control form-control-sm"  id="parentId" ></div>
+</div>
+</div>
+
+
+
+`
+}
+
+const modalFooter = `<div id="updateBtn"></div>`
+
+class FileUpdateModal extends BaseModal {
+  constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}) {
+    super({
+      body: modalBody({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}),
+      footer: modalFooter,
+      title: 'File Update',
+    })
+    this.state = {id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}
+
     this.parentIdInstance = null
     this.extensionInstance = null
     this.typeInstance = null
     this.nameInstance = null
     this.ufIdInstance = null
-  }
-
-  open() {
-    this.modal = new window.bootstrap.Modal(document.getElementById('fileModal'), {
-      backdrop: 'static',
-      keyboard: false,
-    })
-    this.modal.show()
-  }
-
-  close() {
-    this.modal.hide()
-
-    setTimeout(() => {
-      document.body.removeChild(this)
-    }, 100)
-  }
-
-  syncTreeViewSelection(treeViewInstance, value) {
-    if (!value) {
-      // treeViewInstance.option('selectedRowKeys', [])
-      return
-    } else {
-      treeViewInstance.selectItem(value)
-    }
-  }
-
-  makeAsyncDataSource(jsonFile) {
-    return new DevExpress.data.CustomStore({
-      loadMode: 'raw',
-      key: 'ID',
-      load() {
-        return $.getJSON(`${jsonFile}`)
-      },
-    })
+    this.selectedDomainId = null
   }
 
   prepareForm() {
     const self = this
+    self.selectedDomainId = self.state.domainId
 
     const parentId = document.querySelector('#parentId')
 
@@ -214,7 +163,7 @@ class FileUpdateModal extends HTMLElement {
             const selectedKeys = component.option('selectedRowKeys')
             contentTemplateEvent.component.option('value', selectedKeys[0])
             if (data.objectType === '2') {
-              useDispatch(setActiveDomain({id: data.domainId, name: data.name}))
+              self.selectedDomainId = data.domainId
               return
             }
           },
@@ -294,7 +243,7 @@ class FileUpdateModal extends HTMLElement {
 
     const name = document.querySelector('#name')
     this.nameInstance = new DevExpress.ui.dxTextBox(name, {
-      value: this.state?.name
+      value: this.state?.name,
       // onFocusOut(e) {
       //   self.ufIdInstance.option('value', e.component.option('value'))
       // },
@@ -342,7 +291,7 @@ class FileUpdateModal extends HTMLElement {
     const extension = this.extensionInstance.option('value')
     const version = this.versionInstance.option('value')
 
-    const {id: domainId} = useSelector((state) => state.user.activeDomain)
+    const domainId = this.selectedDomainId
 
     const object = {
       id: this.state?.id,
@@ -405,6 +354,7 @@ class FileUpdateModal extends HTMLElement {
           if (selectedFileId === updatedFile.id) useDispatch(setSelectedFile(updatedFile))
         }
       }
+      useDispatch(setSelectedFolder({}))
     }
 
     SweetAlert2Helper.toastFire({title: result.message})
@@ -412,14 +362,6 @@ class FileUpdateModal extends HTMLElement {
   }
 
   async connectedCallback() {
-    const self = this
-
-    this.closeBtn = document.querySelector('#closeBtn')
-    this.closeIcon = document.querySelector('#closeIcon')
-
-    this.closeBtn.addEventListener('click', () => this.close())
-    this.closeIcon.addEventListener('click', () => this.close())
-
     this.prepareForm()
   }
 
