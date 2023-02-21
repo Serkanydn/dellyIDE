@@ -90,7 +90,6 @@ class CustomContextMenu extends HTMLElement {
 
   async createModal() {
     const fileAddModal = new FileAddModal()
-    document.body.appendChild(fileAddModal)
     fileAddModal.open()
   }
 
@@ -115,16 +114,13 @@ class CustomContextMenu extends HTMLElement {
       path,
     })
 
-    document.body.append(fileUpdateModal)
     fileUpdateModal.open()
   }
 
   async domainUpdateModal(item) {
     const {domainId, name} = item
     const domainUpdateModal = new DomainUpdateModal({id: domainId, name})
-    document.body.append(domainUpdateModal)
     domainUpdateModal.open()
-    console.log('domain update modal')
   }
 
   connectedCallback() {

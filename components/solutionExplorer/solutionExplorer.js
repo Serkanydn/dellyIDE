@@ -264,7 +264,6 @@ class SolutionExplorer extends HTMLElement {
 
   async createModal() {
     const fileAddModal = new FileAddModal()
-    document.body.appendChild(fileAddModal)
     fileAddModal.open()
   }
 

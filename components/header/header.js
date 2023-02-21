@@ -55,13 +55,11 @@ class Header extends HTMLElement {
 
   async createModal() {
     const fileAddModal = new FileAddModal()
-    document.body.appendChild(fileAddModal)
     fileAddModal.open()
   }
 
   createDomainAddModal() {
     const domainAddModal = new DomainAddModal()
-    document.body.appendChild(domainAddModal)
     domainAddModal.open()
   }
 
@@ -89,7 +87,7 @@ class Header extends HTMLElement {
       version,
       path,
     })
-    document.body.append(fileUpdateModal)
+    // document.body.append(fileUpdateModal)
     fileUpdateModal.open()
   }
   async previewFile() {

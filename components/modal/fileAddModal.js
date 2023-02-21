@@ -4,98 +4,55 @@ import {useDispatch, useSelector, useSubscribe} from '../../store/index.js'
 import {setSelectedFile, setSelectedFolder} from '../../store/slices/content.js'
 import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
 import customTemplates from '../../utils/devExtreme/customTemplates.js'
+import BaseModal from './baseModal.js'
 
-class FileAddModal extends HTMLElement {
-  constructor() {
-    super()
-    this.innerHTML = `
-   
-<div  class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-
-    <div class="modal-content w-75">
-      <div class="modal-header">
-        <h5 class="modal-title" id="fileModalLabel">File Add</h5>
-        <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <div class="modal-body">
-         <div class="row  mb-2">
-            <div class="col-md-12 d-flex" disabled>
-               <label  class="form-label" for="">Type</label>
-              <div id="type" class="ml-1"></div>
-            </div>
-         </div>
-
-    
-        <div class="row mb-2">
-          <label for="name" class="col-sm-2 col-form-label ">Filename</label>
-          <div class="col-md-7 ">
-            <div class="form-control form-control-sm" id="name" ></div>
-          </div>
-      
-          <div id="extensionGroup" class="col-md-3" >
-            <div class="form-control form-control-sm" id="extension"></div>
-          </div>
-        </div>
-
-        <div id="ufIdGroup">
-        <div  class="row mb-2">
-          <label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm" id="ufId" ></div>
-          </div>
-        </div>
-
-        </div>
-
-        <div class="row mb-2">
-          <label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm" id="parentId" ></div>
-          </div>
-        </div>
-
-  
-    
-      
-
-      <div class="modal-footer">
-         <button id="closeBtn" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" aria-label="Close">Close</button>
-     
-         <div id="addBtn" ></div>
-      
-      </div>
-    </div>
-    </div>
-  </div>
+const modalBody = `<div class="row  mb-2">
+<div class="col-md-12 d-flex" disabled>
+   <label  class="form-label" for="">Type</label>
+  <div id="type" class="ml-1"></div>
+</div>
 </div>
 
-        `
 
-    this.modal = null
+<div class="row mb-2">
+<label for="name" class="col-sm-2 col-form-label ">Filename</label>
+<div class="col-md-7 ">
+<div class="form-control form-control-sm" id="name" ></div>
+</div>
+
+<div id="extensionGroup" class="col-md-3" >
+<div class="form-control form-control-sm" id="extension"></div>
+</div>
+</div>
+
+<div id="ufIdGroup">
+<div  class="row mb-2">
+<label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
+<div class="col-md-10">
+<div class="form-control form-control-sm" id="ufId" ></div>
+</div>
+</div>
+
+</div>
+
+<div class="row mb-2">
+<label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
+<div class="col-md-10">
+<div class="form-control form-control-sm" id="parentId" ></div>
+</div>
+</div>`
+
+const modalFooter = `<div id="addBtn" ></div>`
+class FileAddModal extends BaseModal {
+  constructor() {
+    super({body: modalBody, footer: modalFooter, title: 'File Add'})
+
     this.parentIdInstance = null
     this.extensionInstance = null
     this.typeInstance = null
     this.nameInstance = null
     this.ufIdInstance = null
     this.selectedDomainId = null
-  }
-
-  open() {
-    this.modal = new window.bootstrap.Modal(document.getElementById('fileModal'), {
-      backdrop: 'static',
-      keyboard: false,
-    })
-    this.modal.show()
-  }
-
-  close() {
-    this.modal.hide()
-
-    setTimeout(() => {
-      document.body.removeChild(this)
-    }, 100)
   }
 
   async prepareForm() {
@@ -109,7 +66,7 @@ class FileAddModal extends HTMLElement {
       sortDesc: 'asc',
     })
     const {id: selectedFolderId, name, objectType: selectedFolderObjectType, domainId} = content.selectedFolder
-    console.log(domainId)
+
     self.selectedDomainId = domainId
 
     const parentId = document.querySelector('#parentId')
@@ -305,13 +262,6 @@ class FileAddModal extends HTMLElement {
   }
 
   connectedCallback() {
-    const self = this
-    const closeBtn = document.querySelector('#closeBtn')
-    const closeIcon = document.querySelector('#closeIcon')
-
-    closeBtn.addEventListener('click', () => this.close())
-    closeIcon.addEventListener('click', () => this.close())
-
     this.prepareForm()
   }
 

@@ -6,113 +6,96 @@ import ContentEditorHelper from '../../utils/contentEditorHelper.js'
 import devExtremeHelper from '../../utils/devExtreme/devExtremeHelper.js'
 import customTemplates from '../../utils/devExtreme/customTemplates.js'
 
-class FileUpdateModal extends HTMLElement {
-  constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}) {
-    super()
-    this.state = {id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}
+import BaseModal from './baseModal.js'
 
-    this.innerHTML = `
-
-<div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content w-75">
-      <div class="modal-header">
-        <h5 class="modal-title" id="fileModalLabel">File Update</h5>
-        <button id="closeIcon" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-          <div class="modal-body">
-
-         
-
-          <div class="row  mb-2" ${this.state?.objectType !== '0' ? 'disabled' : ''} >
-          <div class="col-md-12 d-flex" disabled>
-             <label  class="form-control-label" for="">Type</label>
-            <div  id="type"></div>
-          </div>
-          </div>
-
-      
-
-       <div id="fileIdGroup" class="col-md-12"  >
-         <div  class="row mb-2">
-           <label for="version" class="col-md-2 col-form-label ">Id</label>
-          
-           <div class="col-md-10">
-              <div class="input-group input-group-sm">
-                <div class="form-control" id="fileId" ></div>
-                <div  class="input-group-text" id="fileIdCopyButton"></div>
-              </div>
-          </div>
-     </div> 
-
-     </div>
-
-
-      
-    
-        <div class="row mb-2">
-
-          <label for="name" class="col-sm-2 col-form-label">File Name</label>
-          <div class=${this.state?.objectType !== '0' ? 'col-md-7' : 'col-md-10'}>
-            <div class="form-control form-control-sm" id="name" ></div>
-          </div>
-
-          <div id="extensionGroup" class="col-md-3" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
-            <div class="form-control form-control-sm" id="extension"></div>
-          </div>
-
-        </div>
-
-
-
-        <div id="ufIdGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}">
-        <div  class="row mb-2">
-          <label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm"  id="ufId" ></div>
-          </div>
-          </div> 
-
-          </div>
-      
-
-
-           <div id="versionGroup" class="col-md-12" style="display:${this.state?.objectType !== '0' ? 'block' : 'none'}" >
-             <div  class="row mb-2">
-               <label for="version" class="col-sm-2 col-form-label ">Version</label>
-               <div class="col-md-10">
-                <div class="form-control form-control-sm"  id="version" ></div>
-            </div>
-          </div> 
-          </div>
-     
-
-        <div  class="row mb-2">
-          <label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
-          <div class="col-md-10">
-            <div class="form-control form-control-sm"  id="parentId" ></div>
-          </div>
-          </div>
-
-      </div>
-
- 
-
-      <div class="modal-footer">
-      <button id="closeBtn" class="btn btn-secondary shadow-none" data-bs-dismiss="modal" aria-label="Close">Close</button>
-  
-        <div id="updateBtn"></div>
-      
-      </div>
-    </div>
-  </div>
+function modalBody(state) {
+  return `
+<div class="row  mb-2" ${state?.objectType !== '0' ? 'disabled' : ''} >
+<div class="col-md-12 d-flex" disabled>
+   <label  class="form-control-label" for="">Type</label>
+  <div  id="type"></div>
+</div>
 </div>
 
 
 
-        `
-    this.modal = null
+<div id="fileIdGroup" class="col-md-12"  >
+<div  class="row mb-2">
+ <label for="version" class="col-md-2 col-form-label ">Id</label>
+
+ <div class="col-md-10">
+    <div class="input-group input-group-sm">
+      <div class="form-control" id="fileId" ></div>
+      <div  class="input-group-text" id="fileIdCopyButton"></div>
+    </div>
+</div>
+</div> 
+
+</div>
+
+
+
+
+<div class="row mb-2">
+
+<label for="name" class="col-sm-2 col-form-label">File Name</label>
+<div class=${state?.objectType !== '0' ? 'col-md-7' : 'col-md-10'}>
+  <div class="form-control form-control-sm" id="name" ></div>
+</div>
+
+<div id="extensionGroup" class="col-md-3" style="display:${state?.objectType !== '0' ? 'block' : 'none'}" >
+  <div class="form-control form-control-sm" id="extension"></div>
+</div>
+
+</div>
+
+
+
+<div id="ufIdGroup" class="col-md-12" style="display:${state?.objectType !== '0' ? 'block' : 'none'}">
+<div  class="row mb-2">
+<label for="ufId" class="col-sm-2 col-form-label ">UF Id</label>
+<div class="col-md-10">
+  <div class="form-control form-control-sm"  id="ufId" ></div>
+</div>
+</div> 
+
+</div>
+
+
+
+ <div id="versionGroup" class="col-md-12" style="display:${state?.objectType !== '0' ? 'block' : 'none'}" >
+   <div  class="row mb-2">
+     <label for="version" class="col-sm-2 col-form-label ">Version</label>
+     <div class="col-md-10">
+      <div class="form-control form-control-sm"  id="version" ></div>
+  </div>
+</div> 
+</div>
+
+
+<div  class="row mb-2">
+<label for="parentId" class="col-sm-2 col-form-label ">Folder</label>
+<div class="col-md-10">
+  <div class="form-control form-control-sm"  id="parentId" ></div>
+</div>
+</div>
+
+
+
+`
+}
+
+const modalFooter = `<div id="updateBtn"></div>`
+
+class FileUpdateModal extends BaseModal {
+  constructor({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}) {
+    super({
+      body: modalBody({id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}),
+      footer: modalFooter,
+      title: 'File Update',
+    })
+    this.state = {id, parentId, name, objectType, ufId, refs, extension, domainName, domainId, version, path, files}
+
     this.parentIdInstance = null
     this.extensionInstance = null
     this.typeInstance = null
@@ -121,25 +104,8 @@ class FileUpdateModal extends HTMLElement {
     this.selectedDomainId = null
   }
 
-  open() {
-    this.modal = new window.bootstrap.Modal(document.getElementById('fileModal'), {
-      backdrop: 'static',
-      keyboard: false,
-    })
-    this.modal.show()
-  }
-
-  close() {
-    this.modal.hide()
-
-    setTimeout(() => {
-      document.body.removeChild(this)
-    }, 100)
-  }
-
   prepareForm() {
     const self = this
-    console.log(self.state.domainId)
     self.selectedDomainId = self.state.domainId
 
     const parentId = document.querySelector('#parentId')
@@ -396,14 +362,6 @@ class FileUpdateModal extends HTMLElement {
   }
 
   async connectedCallback() {
-    const self = this
-
-    this.closeBtn = document.querySelector('#closeBtn')
-    this.closeIcon = document.querySelector('#closeIcon')
-
-    this.closeBtn.addEventListener('click', () => this.close())
-    this.closeIcon.addEventListener('click', () => this.close())
-
     this.prepareForm()
   }
 
