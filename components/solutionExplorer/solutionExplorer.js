@@ -94,6 +94,10 @@ class SolutionExplorer extends HTMLElement {
     const customStore = this.getStore(domainIds)
 
     this.treeListInstance.option('dataSource', customStore) 
+
+    // setTimeout(() => {
+  
+    // },5000)
   }
 
   async treeListAddRow(file) {
@@ -217,6 +221,12 @@ class SolutionExplorer extends HTMLElement {
     })
 
     this.treeListInstance.on({
+      contentReady(){
+        if (localStorageHelper.getItem('openNav') === 'false') {
+          document.querySelector('.file-content').classList.add('col-md-12') 
+          document.querySelector('.file-aside').classList.add('d-none')
+        }
+      },
       contextMenuPreparing(event) {
         // ? Treelistteki itemların dışına tıklanırsa data olmadığı için patlayabiliyor.
         if (!event.row?.data) return
@@ -270,6 +280,7 @@ class SolutionExplorer extends HTMLElement {
         new ContentEditorHelper().changeContent(row.data.id)
       },
     })
+ 
   }
 
   async createModal() {
