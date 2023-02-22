@@ -374,6 +374,7 @@ class Header extends HTMLElement {
           locateInMenu: 'auto',
           visible: user.role === 'superAdmin',
           options: {
+            stylingMode: 'text',
             icon: 'icon/web.svg',
             hint: 'Add domain',
             onClick() {

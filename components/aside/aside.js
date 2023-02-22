@@ -86,10 +86,7 @@ class Aside extends HTMLElement {
       })
     })
 
-    if (localStorageHelper.getItem('openNav') === 'false') {
-      document.querySelector('.file-content').classList.add('col-md-12')
-      document.querySelector('.file-aside').classList.add('w-0')
-    }
+ 
   }
 }
 
