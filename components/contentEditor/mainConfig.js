@@ -24,6 +24,12 @@ const mainConfig = {
   // ? Eşleşen parantezlere highlight
   matchBrackets: true,
 
+  unicodeHighlight: {
+    ambiguousCharacters: false,
+    nonBasicASCII: false,
+    allowedLocals: false,
+  },
+
   scrollbar: {
     horizontal: 'auto',
     handleMouseWheel: true,
