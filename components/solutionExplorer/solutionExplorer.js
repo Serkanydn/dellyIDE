@@ -214,10 +214,12 @@ class SolutionExplorer extends HTMLElement {
 
     this.treeListInstance.on({
       contentReady() {
-        if (localStorageHelper.getItem('openNav') === 'false') {
-          document.querySelector('.file-content').classList.add('col-md-12')
-          document.querySelector('.file-aside').classList.add('d-none')
-        }
+        setTimeout(() => {
+          if (localStorageHelper.getItem('openNav') === 'false') {
+            document.querySelector('.file-content').classList.add('col-md-12')
+            document.querySelector('.file-aside').classList.add('d-none')
+          }
+        }, 10)
       },
       contextMenuPreparing(event) {
         // ? Treelistteki itemların dışına tıklanırsa data olmadığı için patlayabiliyor.
