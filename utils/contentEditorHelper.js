@@ -66,17 +66,7 @@ class ContentEditorHelper {
     activeEditorNavButton.lastChild.style.display = 'none'
     this.solutionExplorer.refreshTreeList()
 
-    const previewWindows = useSelector((state) => state.content.previewWindows)
-
-    const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === id)
-    if (fileIsPreview) {
-      try {
-        // ! Açılan pencere kapatılırsa location bulamıyor ver patlıyor bu durumda siliyoruz.
-        fileIsPreview.previewWindow.location.reload()
-      } catch (error) {
-        useDispatch(removePreviewWindow({fileId: id}))
-      }
-    }
+    this.refreshPreviewWindow(id)
   }
 
   async saveAllFiles() {
@@ -96,6 +86,8 @@ class ContentEditorHelper {
     const {data: result} = await fileGateService.updateAllContents(contents)
 
     SweetAlert2Helper.toastFire({title: result.message})
+
+    this.refreshPreviewWindows()
   }
 
   async deleteFile(_contentId) {
@@ -180,12 +172,7 @@ class ContentEditorHelper {
     navButton.remove()
     localStorageHelper.removeOpenedFile(_contentId)
 
-    const previewWindows = useSelector((state) => state.content.previewWindows)
-
-    const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === _contentId)
-    if (fileIsPreview) {
-      useDispatch(removePreviewWindow({fileId: fileIsPreview.fileId}))
-    }
+    this.removePreviewWindow(_contentId)
 
     const openedContentEditors = this.getOpenedContentEditors()
     if (openedContentEditors.length > 0) {
@@ -306,12 +293,7 @@ class ContentEditorHelper {
           this.getActiveNavButton().remove()
           localStorageHelper.removeOpenedFile(editor.state.id)
 
-          const previewWindows = useSelector((state) => state.content.previewWindows)
-
-          const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === data.id)
-          if (fileIsPreview) {
-            useDispatch(removePreviewWindow({fileId: fileIsPreview.fileId}))
-          }
+          this.removePreviewWindows(data.id)
         }
       }
     }
@@ -320,12 +302,7 @@ class ContentEditorHelper {
       editor.remove()
       localStorageHelper.removeOpenedFile(editor.state.id)
 
-      const previewWindows = useSelector((state) => state.content.previewWindows)
-
-      const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === editor.state.id)
-      if (fileIsPreview) {
-        useDispatch(removePreviewWindow({fileId: fileIsPreview.fileId}))
-      }
+      this.removePreviewWindow(editor.state.id)
     })
 
     editorNavButtons.forEach((editorNavButton) => {
@@ -440,6 +417,44 @@ class ContentEditorHelper {
         console.error('Async: Could not copy text: ', err)
       }
     )
+  }
+
+  removePreviewWindow(id) {
+    const previewWindows = useSelector((state) => state.content.previewWindows)
+
+    const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === id)
+    if (fileIsPreview) {
+      useDispatch(removePreviewWindow({fileId: fileIsPreview.fileId}))
+    }
+  }
+
+  refreshPreviewWindow(id) {
+    const previewWindows = useSelector((state) => state.content.previewWindows)
+
+    const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === id)
+    if (fileIsPreview) {
+      try {
+        // ! Açılan pencere kapatılırsa location bulamıyor ver patlıyor bu durumda siliyoruz.
+        fileIsPreview.previewWindow.location.reload()
+      } catch (error) {
+        useDispatch(removePreviewWindow({fileId: id}))
+      }
+    }
+  }
+
+  refreshPreviewWindows() {
+    const previewWindows = useSelector((state) => state.content.previewWindows)
+
+    if (previewWindows.length > 0) {
+      previewWindows.forEach((previewWindow) => {
+        try {
+          // ! Açılan pencere kapatılırsa location bulamıyor ver patlıyor bu durumda siliyoruz.
+          previewWindow.previewWindow.location.reload()
+        } catch (error) {
+          useDispatch(removePreviewWindow({fileId: previewWindow.fileId}))
+        }
+      })
+    }
   }
 }
 
