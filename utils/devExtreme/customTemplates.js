@@ -1,9 +1,10 @@
 import {useSelector} from '../../store/index.js'
+import ContentEditorHelper from '../contentEditorHelper.js'
 
 class CustomTemplates {
-  getTreeListCellTemplate(container, options, fileDraggable) {
+  getTreeListCellTemplate(container, options, fileDraggable, isFilePreviewWithCtrlClick = false) {
     const {data} = options
-    const {id, name, ufId, extension, objectType} = data
+    const {id, name, ufId, extension, objectType, domainId} = data
     // console.log(name)
 
     const title = name || ufId || id
@@ -46,6 +47,15 @@ class CustomTemplates {
           'text/plain',
           `const ${data.name || 'module1'} = require("${isMultipleDomain ? data.domainId : 'myspace'}/${data.ufId || data.id}");`
         )
+      })
+    }
+
+    if (isFilePreviewWithCtrlClick && objectType === '1') {
+      const fileItem = element.querySelector('.tree-list-draggable-item')
+      fileItem.addEventListener('click', () => {
+        if (!window.event.ctrlKey) return
+
+        new ContentEditorHelper().setPreviewWindow(id, domainId)
       })
     }
 

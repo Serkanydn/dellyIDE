@@ -206,7 +206,7 @@ class SolutionExplorer extends HTMLElement {
           dataField: 'name',
           caption: 'File Name',
           cellTemplate(container, options) {
-            customTemplates.getTreeListCellTemplate(container, options, true)
+            customTemplates.getTreeListCellTemplate(container, options, true, true)
           },
         },
       ],
