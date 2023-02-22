@@ -310,7 +310,11 @@ body.bg-dark .dx-button-back .dx-button-content {
 
 .dx-treelist-search-panel {
   margin-left: 0;
-} 
-.dx-treelist-header-panel { 
+}
+.dx-treelist-header-panel {
   margin-top: 10px;
+}
+
+solution-explorer-component .dx-treelist-icon-container {
+  pointer-events: none;
 }

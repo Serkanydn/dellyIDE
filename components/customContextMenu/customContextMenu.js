@@ -50,11 +50,7 @@ class CustomContextMenu extends HTMLElement {
       }
       case 'preview': {
         const {id, domainId} = this.state.selectedItem
-        const newWindow = window.open(`${window.config.previewUrl}${domainId}/${id}`, '_blank')
-        setTimeout(() => {
-          console.log(newWindow)
-          newWindow.location.reload()
-        }, 3000)
+        new ContentEditorHelper().setPreviewWindow(id, domainId)
         break
       }
       case 'copyUrl': {

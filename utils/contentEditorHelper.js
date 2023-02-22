@@ -1,7 +1,7 @@
 import {useDispatch, useSelector} from '../store/index.js'
 import FileGateService from '../services/fileGateService.js'
 import SweetAlert2Helper from './sweetAlert2Helper.js'
-import {setSelectedFile} from '../store/slices/content.js'
+import {setSelectedFile, addPreviewWindow, removePreviewWindow} from '../store/slices/content.js'
 import EditorNavButton from '../components/editorNavButton/editorNavButton.js'
 import ContentEditor from '../components/contentEditor/contentEditor.js'
 import localStorageHelper from './localStorageHelper.js'
@@ -65,6 +65,18 @@ class ContentEditorHelper {
     activeContentEditor.state.editorContentChange = false
     activeEditorNavButton.lastChild.style.display = 'none'
     this.solutionExplorer.refreshTreeList()
+
+    const previewWindows = useSelector((state) => state.content.previewWindows)
+
+    const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === id)
+    if (fileIsPreview) {
+      try {
+        // ! Açılan pencere kapatılırsa location bulamıyor ver patlıyor bu durumda siliyoruz.
+        fileIsPreview.previewWindow.location.reload()
+      } catch (error) {
+        useDispatch(removePreviewWindow({fileId: id}))
+      }
+    }
   }
 
   async saveAllFiles() {
@@ -168,6 +180,13 @@ class ContentEditorHelper {
     navButton.remove()
     localStorageHelper.removeOpenedFile(_contentId)
 
+    const previewWindows = useSelector((state) => state.content.previewWindows)
+
+    const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === _contentId)
+    if (fileIsPreview) {
+      useDispatch(removePreviewWindow({fileId: fileIsPreview.fileId}))
+    }
+
     const openedContentEditors = this.getOpenedContentEditors()
     if (openedContentEditors.length > 0) {
       const activeContentEditor = this.getActiveContentEditor()
@@ -261,8 +280,6 @@ class ContentEditorHelper {
     let contentEditors = this.getOpenedContentEditors()
     let editorNavButtons = this.getOpenedNavButtons()
 
-    let isCancel = false
-
     for await (const editor of contentEditors) {
       if (editor.state.editorContentChange) {
         await this.changeContent(editor.state.id)
@@ -282,14 +299,19 @@ class ContentEditorHelper {
         contentEditors = contentEditors.filter((editor) => editor.state.id !== data.id)
         editorNavButtons = editorNavButtons.filter((navButton) => navButton.state.contentId !== data.id)
 
-        if (!isDenied && !isConfirmed) isCancel = true
-
         if (isConfirmed) await this.saveFile()
 
         if (isDenied || isConfirmed) {
           editor.remove()
           this.getActiveNavButton().remove()
           localStorageHelper.removeOpenedFile(editor.state.id)
+
+          const previewWindows = useSelector((state) => state.content.previewWindows)
+
+          const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === data.id)
+          if (fileIsPreview) {
+            useDispatch(removePreviewWindow({fileId: fileIsPreview.fileId}))
+          }
         }
       }
     }
@@ -297,19 +319,32 @@ class ContentEditorHelper {
     contentEditors.forEach((editor) => {
       editor.remove()
       localStorageHelper.removeOpenedFile(editor.state.id)
+
+      const previewWindows = useSelector((state) => state.content.previewWindows)
+
+      const fileIsPreview = previewWindows.find((previewWindow) => previewWindow.fileId === editor.state.id)
+      if (fileIsPreview) {
+        useDispatch(removePreviewWindow({fileId: fileIsPreview.fileId}))
+      }
     })
 
     editorNavButtons.forEach((editorNavButton) => {
       editorNavButton.remove()
     })
 
-    if (!isCancel) {
-      const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
-      fileEditorNavButtons.classList.remove('nav-tabs')
-      this.refreshRecentlyOpenedFiles()
-      document.querySelector('.splashScreen').style.display = 'block'
-      useDispatch(setSelectedFile(null))
+    const isThereAnyOpenFileLeft = this.getOpenedContentEditors()
+
+    if (isThereAnyOpenFileLeft.length > 0) {
+      const lastOpenedFile = isThereAnyOpenFileLeft.pop()
+      await this.changeContent(lastOpenedFile.state.id)
+      return
     }
+
+    const fileEditorNavButtons = document.querySelector('.file-editor-nav-buttons')
+    fileEditorNavButtons.classList.remove('nav-tabs')
+    this.refreshRecentlyOpenedFiles()
+    document.querySelector('.splashScreen').style.display = 'block'
+    useDispatch(setSelectedFile(null))
   }
 
   async copyUrl({id, ufId, domainId, objectType}) {
@@ -335,6 +370,12 @@ class ContentEditorHelper {
     SweetAlert2.toastFire({
       title: 'Id copied',
     })
+  }
+
+  setPreviewWindow(id, domainId) {
+    const previewWindow = window.open(`${window.config.previewUrl}${domainId}/${id}`, '_blank')
+
+    useDispatch(addPreviewWindow({fileId: id, previewWindow}))
   }
 
   foldSelection() {

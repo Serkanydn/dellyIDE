@@ -92,7 +92,7 @@ class SolutionExplorer extends HTMLElement {
   setTreelistItems(domainIds) {
     const customStore = this.getStore(domainIds)
 
-    this.treeListInstance.option('dataSource', customStore) 
+    this.treeListInstance.option('dataSource', customStore)
   }
 
   async treeListAddRow(file) {
@@ -240,6 +240,9 @@ class SolutionExplorer extends HTMLElement {
         const {data} = event
         if (data.objectType === '0' || data.objectType === '2') {
           useDispatch(setSelectedFolder(data))
+          const {id: key} = data
+          if (this.isRowExpanded(key)) this.collapseRow(key)
+          else this.expandRow(key)
           return
         }
 
@@ -250,10 +253,6 @@ class SolutionExplorer extends HTMLElement {
       },
       rowDblClick(row) {
         if (row.data.objectType === '0' || row.data.objectType === '2') {
-          const {id: key} = row.data
-          if (this.isRowExpanded(key)) this.collapseRow(key)
-          else this.expandRow(key)
-
           return
         }
         self.setRecentlyFiles(row.data)
