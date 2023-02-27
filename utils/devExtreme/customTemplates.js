@@ -39,13 +39,12 @@ class CustomTemplates {
       draggable.setAttribute('draggable', true)
       draggable.setAttribute('role', 'button')
       draggable.addEventListener('dragstart', (event) => {
-        // event.dataTransfer.setData('text/plain', `"@@include myspace/${data.ufId || data.id}@@"`)
-        const {domainId} = useSelector((state) => state.user.activeUser)
-        console.log(domainId.length > 1)
-        const isMultipleDomain = domainId.length > 1
+        const {selectedFile} = useSelector((state) => state.content)
+
+        const draggedFileDomain = selectedFile.domainId === data.domainId ? 'myspace' : data.domainId
         event.dataTransfer.setData(
           'text/plain',
-          `const ${data.name || 'module1'} = require("${isMultipleDomain ? data.domainId : 'myspace'}/${data.ufId || data.id}");`
+          `const ${data.name || 'module1'} = require("${draggedFileDomain}/${data.ufId || data.id}");`
         )
       })
     }
