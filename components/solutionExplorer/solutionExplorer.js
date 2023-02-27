@@ -89,11 +89,6 @@ class SolutionExplorer extends HTMLElement {
   setRecentlyFiles(data) {
     localStorageHelper.setRecentlyFiles(data)
   }
-  setTreelistItems(domainIds) {
-    const customStore = this.getStore(domainIds)
-
-    this.treeListInstance.option('dataSource', customStore)
-  }
 
   async treeListAddRow(file) {
     const dataSource = this.treeListInstance.getDataSource()
@@ -122,11 +117,9 @@ class SolutionExplorer extends HTMLElement {
   connectedCallback() {
     const self = this
 
-    // ? Store Subscribe
-    useSubscribe('user.activeUser', async (activeUser) => {
-      this.setTreelistItems(activeUser.domainId)
-    })
+    const {user} = useSelector((state) => state)
 
+    // ? Store Subscribe
     useSubscribe('content.selectedFile', async (selectedFile) => {
       self.setSelectedTreeItem(selectedFile)
     })
@@ -134,7 +127,7 @@ class SolutionExplorer extends HTMLElement {
     const folders = document.querySelector('#solutionExplorer')
 
     this.treeListInstance = new DevExpress.ui.dxTreeList(folders, {
-      // dataSource: [],
+      dataSource: self.getStore(user.activeUser.domainId),
       remoteOperations: {
         filtering: true,
         paging: true,

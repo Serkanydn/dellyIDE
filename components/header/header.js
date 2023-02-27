@@ -134,10 +134,8 @@ class Header extends HTMLElement {
       localStorageHelper.setItem('openNav', 'true')
     }
 
-    const userService = new UserService()
-    const {data: user} = await userService.getActiveUser()
-
-    useDispatch(setUserInitialState({user}))
+    const {user, content} = useSelector((state) => state)
+    this.user = user
 
     const headerToolbar = document.querySelector('#headerToolbar')
     this.headerToolbar = new DevExpress.ui.dxToolbar(headerToolbar, {
@@ -372,7 +370,7 @@ class Header extends HTMLElement {
           location: 'after',
           widget: 'dxButton',
           locateInMenu: 'auto',
-          visible: user.role === 'superAdmin',
+          // visible: self.user.role === 'superAdmin',
           options: {
             icon: 'icon/web.svg',
             hint: 'Add domain',

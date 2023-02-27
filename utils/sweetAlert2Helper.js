@@ -23,11 +23,12 @@ class SweetAlert2 {
     })
   }
 
-  static fire(title, timer = 1000, icon = 'success') {
-    Swal.fire({
+  static fire({title, text, timer, showConfirmButton = true, icon = 'success'}) {
+    return Swal.fire({
       title,
+      text,
       icon,
-      showConfirmButton: false,
+      showConfirmButton,
       timer,
     })
   }
