@@ -23,7 +23,6 @@ class Header extends HTMLElement {
     `
     this.user = null
     this.selectedDomain = null
-    this.miniMapIsShow = true
   }
 
   repaintToolbox() {
@@ -116,10 +115,16 @@ class Header extends HTMLElement {
     new ContentEditorHelper().formatDocument()
   }
 
-  toggleMinimap() {
+  toggleMinimap(miniMapButton) {
     new ContentEditorHelper().toggleMinimap()
 
-    this.miniMapIsShow = !this.miniMapIsShow
+    if (localStorageHelper.getItem('miniMapShow') === 'false') {
+      miniMapButton.option('icon', 'icon/minimapShow.svg')
+      localStorageHelper.setItem('miniMapShow', true)
+    } else {
+      miniMapButton.option('icon', 'icon/minimapHide.svg')
+      localStorageHelper.setItem('miniMapShow', false)
+    }
   }
 
   async connectedCallback() {
@@ -241,16 +246,10 @@ class Header extends HTMLElement {
           widget: 'dxButton',
           locateInMenu: 'auto',
           options: {
-            icon: 'icon/minimapShow.svg',
+            icon: localStorageHelper.getItem('miniMapShow') === 'false' ? 'icon/minimapHide.svg' : 'icon/minimapShow.svg',
             hint: 'Minimap',
             onClick() {
-              self.toggleMinimap()
-
-              if (!self.miniMapIsShow) {
-                this.option('icon', 'icon/minimapHide.svg')
-              } else {
-                this.option('icon', 'icon/minimapShow.svg')
-              }
+              self.toggleMinimap(this)
             },
           },
         },
@@ -355,6 +354,7 @@ class Header extends HTMLElement {
                 document.querySelector('.file-aside').classList.add('d-none')
                 this.option('icon', 'icon/chevron-left.svg')
                 this.option('hint', 'Show Panel ')
+
                 return
               }
               localStorageHelper.setItem('openNav', 'true')
@@ -362,6 +362,9 @@ class Header extends HTMLElement {
               document.querySelector('.file-aside').classList.remove('d-none')
               this.option('icon', 'icon/chevron-right.svg')
               this.option('hint', 'Hide Panel ')
+
+              const solutionExplorerComponent = document.querySelector('solution-explorer-component')
+              solutionExplorerComponent.refreshTreeList()
             },
           },
         },

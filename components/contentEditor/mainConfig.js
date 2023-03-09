@@ -16,8 +16,6 @@ const mainConfig = {
   // ??
   wrappingIndent: 'indent',
 
-  minimap: {enabled: true, showSlider: 'always', autohide: false, renderCharacters: true},
-
   // ? Parantezlerin otomatik kapatılması
   autoClosingBrackets: true,
 

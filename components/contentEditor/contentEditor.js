@@ -49,6 +49,8 @@ class ContentEditor extends HTMLElement {
   createEditor() {
     const theme = localStorage.getItem('theme') || 'light'
     const fontSize = localStorage.getItem('fontSize') || '7px'
+    const miniMapShow = JSON.parse(localStorage.getItem('miniMapShow')) ?? true
+
     const container = document.querySelector(`#delly-${this.state.id}`)
     const {extension, value} = this.state
     const language = this.getExtensionLongName(extension)
@@ -57,6 +59,7 @@ class ContentEditor extends HTMLElement {
       language,
       theme: `vs-${theme}`,
       fontSize,
+      minimap: {enabled: miniMapShow, showSlider: 'always', autohide: false, renderCharacters: true},
       ...mainConfig,
     })
 
